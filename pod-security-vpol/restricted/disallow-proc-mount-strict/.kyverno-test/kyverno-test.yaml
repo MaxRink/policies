@@ -6,7 +6,21 @@ policies:
 - ../disallow-proc-mount-strict.yaml
 resources:
 - resource.yaml
+- replicationcontroller-unmasked.yaml
+- ephemeralcontainer-unmasked.yaml
 results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-proc-mount-strict
+  resources:
+  - badpod-ephemeralcontainer
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: disallow-proc-mount-strict
+  resources:
+  - badreplicationcontroller
+  result: fail
 - isValidatingPolicy: true
   kind: CronJob
   policy: disallow-proc-mount-strict

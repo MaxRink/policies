@@ -11,6 +11,19 @@ spec:
   - name: step-01
     try:
     - apply:
+        file: ephemeral-rbac.yaml
+    - script:
+        content: |
+          set -eu
+          for attempt in $(seq 1 120); do
+            if kubectl auth can-i update pods --subresource=ephemeralcontainers --as=system:serviceaccount:kyverno:kyverno-admission-controller | grep -qx yes; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "admission controller lacks pods/ephemeralcontainers update permission" >&2
+          exit 1
+    - apply:
         file: ../disallow-proc-mount-strict.yaml
     - patch:
         resource:
@@ -32,12 +45,52 @@ spec:
     - create:
         expect:
         - check:
-            ($error != null): true
+            (contains($error, 'The Restricted profile does not allow a non-default proc mount')): true
         file: pod-bad.yaml
     - apply:
         file: podcontroller-good.yaml
     - apply:
         expect:
         - check:
-            ($error != null): true
+            (contains($error, 'The Restricted profile does not allow a non-default proc mount')): true
         file: podcontroller-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'The Restricted profile does not allow a non-default proc mount')): true
+        file: replicationcontroller-bad.yaml
+  - name: step-03-ephemeralcontainers
+    try:
+    - script:
+        content: |
+          set -eu
+          POD=disallow-proc-mount-strict-ephemeral-live
+          trap 'kubectl -n "$NAMESPACE" delete pod "$POD" --ignore-not-found --wait=true --timeout=60s >/dev/null 2>&1 || true' EXIT
+          kubectl -n "$NAMESPACE" delete pod "$POD" --ignore-not-found --wait=true --timeout=60s
+          kubectl -n "$NAMESPACE" apply -f - <<'YAML'
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: disallow-proc-mount-strict-ephemeral-live
+          spec:
+            hostUsers: false
+            containers:
+            - name: app
+              image: ghcr.io/kyverno/test-busybox:1.35
+              command: ["sleep", "3600"]
+          YAML
+          kubectl -n "$NAMESPACE" wait --for=jsonpath='{.status.phase}'=Running "pod/$POD" --timeout=120s
+          set +e
+          output=$(kubectl -n "$NAMESPACE" patch pod "$POD" --subresource=ephemeralcontainers --type=merge --patch='{"spec":{"ephemeralContainers":[{"name":"debug","image":"ghcr.io/kyverno/test-busybox:1.35","targetContainerName":"app","securityContext":{"procMount":"Unmasked"}}]}}' 2>&1)
+          code=$?
+          set -e
+          test "$code" -ne 0
+          printf '%s' "$output" | grep -F "The Restricted profile does not allow a non-default proc mount"
+  - name: step-99-cleanup
+    try:
+    - script:
+        env:
+        - name: NAMESPACE
+          value: $namespace
+        content: |
+          kubectl -n "$NAMESPACE" delete pod disallow-proc-mount-strict-ephemeral-live --ignore-not-found --wait=true --timeout=60s
