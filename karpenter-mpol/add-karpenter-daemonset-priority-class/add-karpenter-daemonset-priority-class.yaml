@@ -14,6 +14,7 @@ metadata:
       DaemonSet because the new pods are not scheduled the way regular pods are. It would require
       parallel scheduling logic that is not proper to Kubernetes. Therefore, eviction of regular 
       pods should happen instead. This can be achieved with the priority class system-node-critical.
+      The policy ensures this priority class is set on every DaemonSet.
 spec:
   evaluation:
     admission:
@@ -24,6 +25,9 @@ spec:
       apiVersions: ["v1"]
       operations: ["CREATE", "UPDATE"]
       resources: ["daemonsets"]
+  matchConditions:
+  - name: priority-class-is-not-system-critical
+    expression: 'object.spec.template.spec.?priorityClassName.orValue("") != "system-node-critical"'
   mutations:
   - patchType: ApplyConfiguration
     applyConfiguration:
