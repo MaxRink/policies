@@ -42,6 +42,8 @@ spec:
       expression: >-
         object.spec.?jobTemplate.?spec.?template.?spec.orValue(
         object.spec.?template.?spec.orValue(object.spec))
+    - name: priorityClassName
+      expression: "variables.podSpec.?priorityClassName.orValue('')"
   validations:
-    - expression: "variables.podSpec.?priorityClassName.orValue('') != '' || variables.podSpec.?priorityClassName.orValue('') in exceptions.allowedValues.orValue([])"
+    - expression: "variables.priorityClassName != null && variables.priorityClassName != '' || variables.priorityClassName in exceptions.allowedValues.orValue([])"
       message: "Pods must define the priorityClassName field."
