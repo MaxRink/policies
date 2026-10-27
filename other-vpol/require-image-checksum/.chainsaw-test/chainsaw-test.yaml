@@ -52,6 +52,11 @@ spec:
             ($error != null): true
         file: ../.kyverno-test/invalid-digest-pod.yaml
     - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: ../.kyverno-test/null-image-pod.yaml
+    - apply:
         file: ephemeral-pod.yaml
     - script:
         content: |
