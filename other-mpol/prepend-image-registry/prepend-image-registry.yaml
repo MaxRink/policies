@@ -10,15 +10,6 @@ metadata:
     policies.kyverno.io/description: >-
       Prepends 'registry.io/' to all container and initContainer images in Pods and supported pod-controller templates.
 spec:
-  autogen:
-    podControllers:
-      controllers:
-      - deployments
-      - statefulsets
-      - daemonsets
-      - replicasets
-      - jobs
-      - cronjobs
   evaluation:
     admission:
       enabled: true

@@ -31,4 +31,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.21"
   kyverno/subject: "Pod"
-digest: a2b08e2a192fa6c3ce92fe94dc824d4e8999020b0c7cafdcdbf92c9f68991299
+digest: 7aa130f431c29e40a659e0d9ce3843113a8dc507e551924a9fc02ad1709915ef
