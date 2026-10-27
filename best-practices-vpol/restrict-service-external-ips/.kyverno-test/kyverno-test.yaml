@@ -32,3 +32,9 @@ results:
   - exception-external-ips
   result: pass
   isValidatingPolicy: true
+- kind: Service
+  policy: restrict-external-ips
+  resources:
+  - null-external-ips
+  result: pass
+  isValidatingPolicy: true
