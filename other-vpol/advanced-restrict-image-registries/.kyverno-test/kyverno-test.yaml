@@ -7,6 +7,7 @@ policies:
 - ../advanced-restrict-image-registries.yaml
 resources:
 - resource.yaml
+- prefix-bypass.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -16,6 +17,7 @@ results:
   - imageregistries-ns01/badpod02
   - imageregistries-ns01/badpod03
   - badpod04
+  - prefix-bypass
   result: fail
 - isValidatingPolicy: true
   kind: Pod
