@@ -56,3 +56,22 @@ spec:
           limits:
             cpu: "25m"
             memory: "25Mi"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-in-empty-namespace
+  namespace: hpa-empty
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment-in-empty-namespace
+  template:
+    metadata:
+      labels:
+        app: deployment-in-empty-namespace
+    spec:
+      containers:
+      - name: nginx
+        image: nginx

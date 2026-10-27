@@ -30,5 +30,5 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Deployment,ReplicaSet,StatefulSet,DaemonSet"
-digest: b9515f89e75fede3dfbda1511531ee787073fbcd27205dee25dfe22d08cc7bba
+digest: f12b64f133c286dd3040ed626bee5716fe716c402df92ab976d21b151cefc996
 createdAt: "2025-12-12T14:35:08Z"

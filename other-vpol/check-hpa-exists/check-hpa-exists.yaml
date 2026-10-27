@@ -37,4 +37,4 @@ spec:
       - v1
   validations:
   - message: "Resource is not allowed without a corresponding HPA."
-    expression: "has(exceptions.allowedValues) && object.metadata.name in exceptions.allowedValues || variables.hpaList.exists(hpa, hpa.spec.scaleTargetRef.name == object.metadata.name)"
+    expression: "has(exceptions.allowedValues) && object.metadata.name in exceptions.allowedValues || variables.hpaList.exists(hpa, hpa.spec.scaleTargetRef.apiVersion == object.apiVersion && hpa.spec.scaleTargetRef.kind == object.kind && hpa.spec.scaleTargetRef.name == object.metadata.name)"

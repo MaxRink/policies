@@ -20,3 +20,9 @@ results:
   - deployment-without-hpa
   kind: Deployment
   result: fail
+- isValidatingPolicy: true
+  policy: check-hpa-exists
+  resources:
+  - hpa-empty/deployment-in-empty-namespace
+  kind: Deployment
+  result: fail
