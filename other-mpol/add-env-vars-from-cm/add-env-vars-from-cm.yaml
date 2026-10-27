@@ -30,171 +30,50 @@ spec:
       operations: ["CREATE", "UPDATE"]
       resources: ["jobs", "cronjobs"]
 
+  variables:
+  - name: podSpec
+    expression: >-
+      object.kind == "Pod" ? object.spec :
+      object.kind == "CronJob" ? object.spec.?jobTemplate.?spec.?template.?spec.orValue({}) :
+      object.spec.?template.?spec.orValue({})
+  - name: podSpecPath
+    expression: >-
+      object.kind == "Pod" ? "/spec" :
+      object.kind == "CronJob" ? "/spec/jobTemplate/spec/template/spec" :
+      "/spec/template/spec"
+  - name: initContainers
+    expression: '!has(variables.podSpec.initContainers) || variables.podSpec.initContainers == null ? [] : variables.podSpec.initContainers'
+  - name: containers
+    expression: variables.podSpec.containers
   mutations:
-  # Mutation for Pods
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        object.kind == "Pod" ?
-        (
-          (has(object.spec.initContainers) && object.spec.initContainers != null ?
-            object.spec.initContainers.filter(container,
-              !exceptions.allowedImages.exists(image, image == container.image) &&
-              (!has(container.envFrom) || container.envFrom == null ||
-               !container.envFrom.exists(source, source.?configMapRef.?name.orValue("") == "nsenvvars"))
-            ).map(container,
-              object.spec.initContainers.indexOf(container)
-            ).map(idx,
-              JSONPatch{
-                op: "add",
-                path: "/spec/initContainers/" + string(idx) +
-                  ((has(object.spec.initContainers[idx].envFrom) && object.spec.initContainers[idx].envFrom != null) ? "/envFrom/-" : "/envFrom"),
-                value: (has(object.spec.initContainers[idx].envFrom) && object.spec.initContainers[idx].envFrom != null)
-                  ? dyn({"configMapRef": {"name": "nsenvvars"}})
-                  : dyn([{"configMapRef": {"name": "nsenvvars"}}])
-              }
-            ) : []
-          ) +
-          object.spec.containers.filter(container,
-            !exceptions.allowedImages.exists(image, image == container.image) &&
-            (!has(container.envFrom) || container.envFrom == null ||
-             !container.envFrom.exists(source, source.?configMapRef.?name.orValue("") == "nsenvvars"))
-          ).map(container,
-            object.spec.containers.indexOf(container)
-          ).map(idx,
-            JSONPatch{
-              op: "add",
-              path: "/spec/containers/" + string(idx) +
-                ((has(object.spec.containers[idx].envFrom) && object.spec.containers[idx].envFrom != null) ? "/envFrom/-" : "/envFrom"),
-              value: (has(object.spec.containers[idx].envFrom) && object.spec.containers[idx].envFrom != null)
-                ? dyn({"configMapRef": {"name": "nsenvvars"}})
-                : dyn([{"configMapRef": {"name": "nsenvvars"}}])
-            }
-          )
-        ) : []
-
-  # Mutation for Deployments, DaemonSets, StatefulSets
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        object.kind in ["Deployment", "DaemonSet", "StatefulSet"] ?
-        (
-          (has(object.spec.template.spec.initContainers) && object.spec.template.spec.initContainers != null ?
-            object.spec.template.spec.initContainers.filter(container,
-              !exceptions.allowedImages.exists(image, image == container.image) &&
-              (!has(container.envFrom) || container.envFrom == null ||
-               !container.envFrom.exists(source, source.?configMapRef.?name.orValue("") == "nsenvvars"))
-            ).map(container,
-              object.spec.template.spec.initContainers.indexOf(container)
-            ).map(idx,
-              JSONPatch{
-                op: "add",
-                path: "/spec/template/spec/initContainers/" + string(idx) +
-                  ((has(object.spec.template.spec.initContainers[idx].envFrom) && object.spec.template.spec.initContainers[idx].envFrom != null) ? "/envFrom/-" : "/envFrom"),
-                value: (has(object.spec.template.spec.initContainers[idx].envFrom) && object.spec.template.spec.initContainers[idx].envFrom != null)
-                  ? dyn({"configMapRef": {"name": "nsenvvars"}})
-                  : dyn([{"configMapRef": {"name": "nsenvvars"}}])
-              }
-            ) : []
-          ) +
-          object.spec.template.spec.containers.filter(container,
-            !exceptions.allowedImages.exists(image, image == container.image) &&
-            (!has(container.envFrom) || container.envFrom == null ||
-             !container.envFrom.exists(source, source.?configMapRef.?name.orValue("") == "nsenvvars"))
-          ).map(container,
-            object.spec.template.spec.containers.indexOf(container)
-          ).map(idx,
-            JSONPatch{
-              op: "add",
-              path: "/spec/template/spec/containers/" + string(idx) +
-                ((has(object.spec.template.spec.containers[idx].envFrom) && object.spec.template.spec.containers[idx].envFrom != null) ? "/envFrom/-" : "/envFrom"),
-              value: (has(object.spec.template.spec.containers[idx].envFrom) && object.spec.template.spec.containers[idx].envFrom != null)
-                ? dyn({"configMapRef": {"name": "nsenvvars"}})
-                : dyn([{"configMapRef": {"name": "nsenvvars"}}])
-            }
-          )
-        ) : []
-
-  # Mutation for Jobs
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        object.kind == "Job" ?
-        (
-          (has(object.spec.template.spec.initContainers) && object.spec.template.spec.initContainers != null ?
-            object.spec.template.spec.initContainers.filter(container,
-              !exceptions.allowedImages.exists(image, image == container.image) &&
-              (!has(container.envFrom) || container.envFrom == null ||
-               !container.envFrom.exists(source, source.?configMapRef.?name.orValue("") == "nsenvvars"))
-            ).map(container,
-              object.spec.template.spec.initContainers.indexOf(container)
-            ).map(idx,
-              JSONPatch{
-                op: "add",
-                path: "/spec/template/spec/initContainers/" + string(idx) +
-                  ((has(object.spec.template.spec.initContainers[idx].envFrom) && object.spec.template.spec.initContainers[idx].envFrom != null) ? "/envFrom/-" : "/envFrom"),
-                value: (has(object.spec.template.spec.initContainers[idx].envFrom) && object.spec.template.spec.initContainers[idx].envFrom != null)
-                  ? dyn({"configMapRef": {"name": "nsenvvars"}})
-                  : dyn([{"configMapRef": {"name": "nsenvvars"}}])
-              }
-            ) : []
-          ) +
-          object.spec.template.spec.containers.filter(container,
-            !exceptions.allowedImages.exists(image, image == container.image) &&
-            (!has(container.envFrom) || container.envFrom == null ||
-             !container.envFrom.exists(source, source.?configMapRef.?name.orValue("") == "nsenvvars"))
-          ).map(container,
-            object.spec.template.spec.containers.indexOf(container)
-          ).map(idx,
-            JSONPatch{
-              op: "add",
-              path: "/spec/template/spec/containers/" + string(idx) +
-                ((has(object.spec.template.spec.containers[idx].envFrom) && object.spec.template.spec.containers[idx].envFrom != null) ? "/envFrom/-" : "/envFrom"),
-              value: (has(object.spec.template.spec.containers[idx].envFrom) && object.spec.template.spec.containers[idx].envFrom != null)
-                ? dyn({"configMapRef": {"name": "nsenvvars"}})
-                : dyn([{"configMapRef": {"name": "nsenvvars"}}])
-            }
-          )
-        ) : []
-
-  # Mutation for CronJobs
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        object.kind == "CronJob" ?
-        (
-          (has(object.spec.jobTemplate.spec.template.spec.initContainers) && object.spec.jobTemplate.spec.template.spec.initContainers != null ?
-            object.spec.jobTemplate.spec.template.spec.initContainers.filter(container,
-              !exceptions.allowedImages.exists(image, image == container.image) &&
-              (!has(container.envFrom) || container.envFrom == null ||
-               !container.envFrom.exists(source, source.?configMapRef.?name.orValue("") == "nsenvvars"))
-            ).map(container,
-              object.spec.jobTemplate.spec.template.spec.initContainers.indexOf(container)
-            ).map(idx,
-              JSONPatch{
-                op: "add",
-                path: "/spec/jobTemplate/spec/template/spec/initContainers/" + string(idx) +
-                  ((has(object.spec.jobTemplate.spec.template.spec.initContainers[idx].envFrom) && object.spec.jobTemplate.spec.template.spec.initContainers[idx].envFrom != null) ? "/envFrom/-" : "/envFrom"),
-                value: (has(object.spec.jobTemplate.spec.template.spec.initContainers[idx].envFrom) && object.spec.jobTemplate.spec.template.spec.initContainers[idx].envFrom != null)
-                  ? dyn({"configMapRef": {"name": "nsenvvars"}})
-                  : dyn([{"configMapRef": {"name": "nsenvvars"}}])
-              }
-            ) : []
-          ) +
-          object.spec.jobTemplate.spec.template.spec.containers.filter(container,
-            !exceptions.allowedImages.exists(image, image == container.image) &&
-            (!has(container.envFrom) || container.envFrom == null ||
-             !container.envFrom.exists(source, source.?configMapRef.?name.orValue("") == "nsenvvars"))
-          ).map(container,
-            object.spec.jobTemplate.spec.template.spec.containers.indexOf(container)
-          ).map(idx,
-            JSONPatch{
-              op: "add",
-              path: "/spec/jobTemplate/spec/template/spec/containers/" + string(idx) +
-                ((has(object.spec.jobTemplate.spec.template.spec.containers[idx].envFrom) && object.spec.jobTemplate.spec.template.spec.containers[idx].envFrom != null) ? "/envFrom/-" : "/envFrom"),
-              value: (has(object.spec.jobTemplate.spec.template.spec.containers[idx].envFrom) && object.spec.jobTemplate.spec.template.spec.containers[idx].envFrom != null)
-                ? dyn({"configMapRef": {"name": "nsenvvars"}})
-                : dyn([{"configMapRef": {"name": "nsenvvars"}}])
-            }
-          )
-        ) : []
+        lists.range(variables.initContainers.size()).filter(i,
+          !exceptions.allowedImages.exists(image, image == variables.initContainers[i].image) &&
+          (!has(variables.initContainers[i].envFrom) || variables.initContainers[i].envFrom == null ||
+           !variables.initContainers[i].envFrom.exists(source, source.?configMapRef.?name.orValue("") == "nsenvvars"))
+        ).map(i,
+          JSONPatch{
+            op: "add",
+            path: variables.podSpecPath + "/initContainers/" + string(i) +
+              ((has(variables.initContainers[i].envFrom) && variables.initContainers[i].envFrom != null) ? "/envFrom/-" : "/envFrom"),
+            value: (has(variables.initContainers[i].envFrom) && variables.initContainers[i].envFrom != null)
+              ? dyn({"configMapRef": {"name": "nsenvvars"}})
+              : dyn([{"configMapRef": {"name": "nsenvvars"}}])
+          }
+        ) +
+        lists.range(variables.containers.size()).filter(i,
+          !exceptions.allowedImages.exists(image, image == variables.containers[i].image) &&
+          (!has(variables.containers[i].envFrom) || variables.containers[i].envFrom == null ||
+           !variables.containers[i].envFrom.exists(source, source.?configMapRef.?name.orValue("") == "nsenvvars"))
+        ).map(i,
+          JSONPatch{
+            op: "add",
+            path: variables.podSpecPath + "/containers/" + string(i) +
+              ((has(variables.containers[i].envFrom) && variables.containers[i].envFrom != null) ? "/envFrom/-" : "/envFrom"),
+            value: (has(variables.containers[i].envFrom) && variables.containers[i].envFrom != null)
+              ? dyn({"configMapRef": {"name": "nsenvvars"}})
+              : dyn([{"configMapRef": {"name": "nsenvvars"}}])
+          }
+        )
