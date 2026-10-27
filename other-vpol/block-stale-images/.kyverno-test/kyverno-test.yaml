@@ -8,16 +8,25 @@ policies:
 resources:
 - bad.yaml
 - good.yaml
+- rc-bad.yaml
 results:
 - kind: Pod
   policy: block-stale-images
   resources:
   - redis-bad
+  - redis-init-bad
   result: fail
   isValidatingPolicy: true
 - kind: Pod
   policy: block-stale-images
   resources:
   - redis-good
+  - redis-no-created-time
   result: pass
+  isValidatingPolicy: true
+- kind: ReplicationController
+  policy: block-stale-images
+  resources:
+  - default/redis-rc-bad
+  result: fail
   isValidatingPolicy: true
