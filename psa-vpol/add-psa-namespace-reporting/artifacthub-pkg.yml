@@ -1,0 +1,27 @@
+name: add-psa-namespace-reporting-vpol
+version: 1.0.0
+displayName: Add PSA Namespace Reporting in ValidatingPolicy
+description: >-
+  Audits Namespaces that have no non-empty Pod Security Admission label. A
+  non-empty enforce, audit, or warn label, or its corresponding version label,
+  satisfies this check.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/psa-vpol/add-psa-namespace-reporting/add-psa-namespace-reporting.yaml
+  ```
+keywords:
+  - kyverno
+  - Pod Security Admission
+  - ValidatingPolicy
+readme: |
+  Audits Namespaces that have no non-empty Pod Security Admission label. A non-empty `enforce`, `audit`, or `warn` label, or its corresponding `-version` label, satisfies this check.
+
+  The check recognizes the six standard PSA label keys and ignores unknown keys under the `pod-security.kubernetes.io/` prefix.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "Pod Security Admission, EKS Best Practices"
+  kyverno/kubernetesVersion: "1.24"
+  kyverno/subject: "Namespace"
+digest: d62f0a5380e8c6e9fbad0b6f4262e00b8a29061b8a365806ab3cca4d06d70fa8
+createdAt: "2026-10-27T15:00:00Z"
