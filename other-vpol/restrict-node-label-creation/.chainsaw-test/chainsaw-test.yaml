@@ -32,8 +32,6 @@ spec:
         file: exceptions.yaml
     - assert:
         file: policy-ready.yaml
-    - sleep:
-        duration: 10s
     - script:
         content: |
           set -eu
