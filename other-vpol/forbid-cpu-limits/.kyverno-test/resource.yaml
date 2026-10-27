@@ -47,4 +47,18 @@ spec:
     resources:
       requests:
         cpu: 10m
-
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-cpu-bad
+spec:
+  initContainers:
+  - name: init
+    image: busybox:1.35
+    resources:
+      limits:
+        cpu: 10m
+  containers:
+  - name: webserver
+    image: busybox:1.35
