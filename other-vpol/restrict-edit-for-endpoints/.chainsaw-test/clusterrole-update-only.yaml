@@ -6,3 +6,5 @@ rules:
 - apiGroups: [""]
   resources: [endpoints]
   verbs: [update]
+- nonResourceURLs: ["/healthz"]
+  verbs: [get]

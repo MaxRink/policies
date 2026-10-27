@@ -17,7 +17,7 @@ metadata:
       the system:aggregate-to-edit ClusterRole having edit permission of Endpoints.
       This policy, intended to run in background mode, checks if your cluster is vulnerable
       to CVE-2021-25740 by ensuring the system:aggregate-to-edit ClusterRole does not have
-      the edit permission of Endpoints.
+      write permissions on Endpoints or Endpoints subresources.
 spec:
   validationActions: 
     - Audit
@@ -31,12 +31,17 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["clusterroles"]
         resourceNames: ["system:aggregate-to-edit"]
+  variables:
+    - name: rules
+      expression: "has(object.rules) && object.rules != null ? object.rules : []"
   validations:
     - expression: >-
-        !object.rules.exists(rule,
-        ('endpoints' in rule.resources || '*' in rule.resources) &&
-        (('*' in rule.verbs && !(has(exceptions.allowedValues) && '*' in exceptions.allowedValues)) ||
-        rule.verbs.exists(verb, verb in ['create', 'update', 'patch', 'delete'] && !(has(exceptions.allowedValues) && verb in exceptions.allowedValues))))
+        !variables.rules.exists(rule,
+          has(rule.resources) && rule.resources != null &&
+          rule.resources.exists(resource, resource.contains('endpoints') || resource == '*') &&
+          has(rule.verbs) && rule.verbs != null &&
+          (('*' in rule.verbs && !(has(exceptions.allowedValues) && '*' in exceptions.allowedValues)) ||
+           rule.verbs.exists(verb, verb in ['create', 'update', 'patch', 'delete'] && !(has(exceptions.allowedValues) && verb in exceptions.allowedValues))))
       message: >-
         This cluster may still be vulnerable to CVE-2021-25740. The system:aggregate-to-edit ClusterRole
         should not have edit permission over Endpoints.
