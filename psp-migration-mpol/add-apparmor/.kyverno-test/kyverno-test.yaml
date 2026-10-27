@@ -6,6 +6,7 @@ policies:
 - ../add-apparmor.yaml
 resources:
 - resource.yaml
+- user-annotation.yaml
 - exception-resource.yaml
 exceptions:
 - exceptions.yaml
@@ -29,5 +30,12 @@ results:
   policy: add-apparmor-annotations
   resources:
   - pod02
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: patched-user-annotation.yaml
+  policy: add-apparmor-annotations
+  resources:
+  - foo/pod-existing
   result: pass
   isMutatingPolicy: true

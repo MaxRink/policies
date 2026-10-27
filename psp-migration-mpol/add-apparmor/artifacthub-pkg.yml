@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Add AppArmor Annotations
 createdAt: "2023-05-22T00:00:00.000Z"
 description: >-
-  In the earlier Pod Security Policy controller, it was possible to define a setting which would enable AppArmor for all the containers within a Pod so they may be assigned the desired profile. Assigning an AppArmor profile, accomplished via an annotation, is useful in that it allows secure defaults to be defined and may also result in passing other validation rules such as those in the Pod Security Standards. This policy mutates Pods to add an annotation for every container to enabled AppArmor at the runtime/default level.
+  In the earlier Pod Security Policy controller, it was possible to define a setting which would enable AppArmor for all the containers within a Pod so they may be assigned the desired profile. Assigning an AppArmor profile, accomplished via an annotation, is useful in that it allows secure defaults to be defined and may also result in passing other validation rules such as those in the Pod Security Standards. This policy adds the runtime/default AppArmor annotation only to containers without an existing profile, preserving explicit annotations.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/psp-migration-mpol/add-apparmor/add-apparmor.yaml
@@ -12,7 +12,7 @@ keywords:
   - kyverno
   - PSP Migration
 readme: |
-  In the earlier Pod Security Policy controller, it was possible to define a setting which would enable AppArmor for all the containers within a Pod so they may be assigned the desired profile. Assigning an AppArmor profile, accomplished via an annotation, is useful in that it allows secure defaults to be defined and may also result in passing other validation rules such as those in the Pod Security Standards. This policy mutates Pods to add an annotation for every container to enabled AppArmor at the runtime/default level.
+  In the earlier Pod Security Policy controller, it was possible to define a setting which would enable AppArmor for all the containers within a Pod so they may be assigned the desired profile. Assigning an AppArmor profile, accomplished via an annotation, is useful in that it allows secure defaults to be defined and may also result in passing other validation rules such as those in the Pod Security Standards. This policy adds the runtime/default AppArmor annotation only to containers without an existing profile, preserving explicit annotations.
   
   ### Fine-grained PolicyException use
 
@@ -24,8 +24,8 @@ readme: |
   `variables.containersToMutate` filters `variables.allContainers` against
   `exceptions.allowedImages`, populated from matching exceptions' `spec.images`.
   It excludes approved images across regular, init, and ephemeral containers
-  from AppArmor annotation patches, while all remaining containers receive
-  `runtime/default`. Image matching is exact, not a wildcard or prefix match.
+  from AppArmor annotation patches. Missing profiles are set to `runtime/default`,
+  while explicit profiles are preserved. Image matching is exact, not a wildcard or prefix match.
   See the [tested example](https://github.com/kyverno/policies/blob/main/psp-migration-mpol/add-apparmor/.kyverno-test/exceptions.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal mutation behavior.
@@ -35,4 +35,4 @@ annotations:
   kyverno/category: "PSP Migration"
   kyverno/kubernetesVersion: "1.24"
   kyverno/subject: "Pod,Annotation"
-digest: 00c51d0d6bac0eb81ce521850732e719d776bc9fe3d610b1cb3ee1a588aa2b1d
+digest: c1736e3950d3858afa29183d015dd2f304dade9267273869d3971b75508d50eb
