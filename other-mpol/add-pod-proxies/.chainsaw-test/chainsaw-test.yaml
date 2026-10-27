@@ -24,3 +24,9 @@ spec:
         file: podcontroller-resources.yaml
     - assert:
         file: podcontroller-patched.yaml
+  - name: step-04-large-container-list
+    try:
+    - apply:
+        file: large-pod.yaml
+    - assert:
+        file: large-pod-patched.yaml

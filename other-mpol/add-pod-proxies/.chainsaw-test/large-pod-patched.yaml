@@ -1,0 +1,103 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: large-proxy-chain
+spec:
+  initContainers:
+  - name: init-0
+    image: example/init:0
+  containers:
+  - name: app-0
+    image: example/app:0
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
+    - name: KEEP
+      value: 'yes'
+  - name: app-1
+    image: example/app:1
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
+    - name: KEEP
+      value: 'yes'
+  - name: app-2
+    image: example/app:2
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
+  - name: app-3
+    image: example/app:3
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
+  - name: app-4
+    image: example/app:4
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
+  - name: app-5
+    image: example/app:5
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
+  - name: app-6
+    image: example/app:6
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
+  - name: app-7
+    image: example/app:7
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
+  - name: app-8
+    image: example/app:8
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
+  - name: app-9
+    image: example/app:9
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
