@@ -6,6 +6,7 @@ policies:
 - ../validate-initdata-configmap.yaml
 resources:
 - resources.yaml
+- configmap-no-data.yaml
 results:
 - kind: ConfigMap
   policy: validate-initdata-configmap
@@ -24,4 +25,11 @@ results:
   resources:
   - default/regular-configmap
   result: skip
+  isValidatingPolicy: true
+- kind: ConfigMap
+  policy: validate-initdata-configmap
+  resources:
+  - default/initdata-no-data
+  - default/initdata-null-data
+  result: fail
   isValidatingPolicy: true
