@@ -33,5 +33,5 @@ annotations:
   kyverno/category: "Best Practices in VPOL"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: b23e506e1d090807a5b7ab60fd5681d902347dc4c0cf708220978dcf54b0f9f6
+digest: f1907782d6d60356d72a3a30fbfb93ae3bc50a2fb16f590fae3b2b3c17549828
 createdAt: "2025-05-05T13:19:12Z"

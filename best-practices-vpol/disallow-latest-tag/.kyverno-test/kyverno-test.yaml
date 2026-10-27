@@ -51,6 +51,7 @@ results:
   - init-latest-pod
   - ephemeral-latest-pod
   - latest-port-pod
+  - invalid-image
   result: fail
 - isValidatingPolicy: true
   kind: Deployment
