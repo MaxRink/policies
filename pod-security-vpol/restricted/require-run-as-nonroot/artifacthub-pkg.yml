@@ -31,7 +31,7 @@ readme: |
   Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
 annotations:
   kyverno/category: "Pod Security Standards (Restricted)"
-  kyverno/kubernetesVersion: "1.30+"
+  kyverno/kubernetesVersion: "1.35+"
   kyverno/subject: "Pod"
-digest: 48f85e8f09fd41afe159f960cb9d16a193acfa07b8bd9c15a30b69eb9805e727
+digest: 0fb11f504c714b199a963ee67cbbb2b91b164b974fae9a9e23bcc36b11a0e54c
 createdAt: "2025-03-13T23:26:58Z"
