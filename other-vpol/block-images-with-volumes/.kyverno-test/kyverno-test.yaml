@@ -7,6 +7,7 @@ policies:
 - ../block-images-with-volumes.yaml
 resources:
 - resource.yaml
+- replicationcontrollers.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -46,4 +47,16 @@ results:
   policy: block-images-with-volumes
   resources:
   - goodcronjob01
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: block-images-with-volumes
+  resources:
+  - default/volumeimage-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: block-images-with-volumes
+  resources:
+  - default/safeimage-rc
   result: pass
