@@ -1,0 +1,18 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: check-subjectaccessreview
+policies:
+- ../check-subjectaccessreview.yaml
+resources:
+- configmap.yaml
+userinfo: userinfo.yaml
+exceptions:
+- exception.yaml
+results:
+- isValidatingPolicy: true
+  kind: ConfigMap
+  policy: check-subjectaccessreview
+  resources:
+  - default/cli-excepted-configmap
+  result: pass
