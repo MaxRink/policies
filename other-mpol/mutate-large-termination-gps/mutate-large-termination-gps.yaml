@@ -22,6 +22,14 @@ spec:
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["pods", "replicationcontrollers"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs", "cronjobs"]
   
   evaluation:
     admission:
@@ -32,6 +40,9 @@ spec:
   matchConditions:
     - name: tgps-greater-than-50
       expression: >-
+        has(object.spec.jobTemplate) ?
+          (has(object.spec.jobTemplate.spec.template.spec.terminationGracePeriodSeconds) &&
+            object.spec.jobTemplate.spec.template.spec.terminationGracePeriodSeconds > 50) :
         has(object.spec.template) ?
           (has(object.spec.template.spec.terminationGracePeriodSeconds) &&
             object.spec.template.spec.terminationGracePeriodSeconds > 50) :
@@ -42,6 +53,20 @@ spec:
     - patchType: ApplyConfiguration
       applyConfiguration:
         expression: |
+          has(object.spec.jobTemplate) ?
+            Object{
+              spec: Object.spec{
+                jobTemplate: Object.spec.jobTemplate{
+                  spec: Object.spec.jobTemplate.spec{
+                    template: Object.spec.jobTemplate.spec.template{
+                      spec: Object.spec.jobTemplate.spec.template.spec{
+                        terminationGracePeriodSeconds: 50
+                      }
+                    }
+                  }
+                }
+              }
+            } :
           has(object.spec.template) ?
             Object{
               spec: Object.spec{
