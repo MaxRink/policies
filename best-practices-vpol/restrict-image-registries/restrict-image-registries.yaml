@@ -52,7 +52,12 @@ spec:
   validations:
           - expression: >-
               variables.allContainers.all(container,
-              (has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
-              (isImage(container.image) &&
-              image(container.image).registry() in ['eu.foo.io', 'bar.io']))
+              has(container.image) && container.image != null &&
+              ((has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
+              (isImage(container.image.split('@')[0]) &&
+              (!container.image.contains('@') ||
+              container.image.matches('^[^@]+@sha256:[0-9a-fA-F]{64}$') ||
+              container.image.matches('^[^@]+@sha384:[0-9a-fA-F]{96}$') ||
+              container.image.matches('^[^@]+@sha512:[0-9a-fA-F]{128}$')) &&
+              image(container.image.split('@')[0]).registry() in ['eu.foo.io', 'bar.io'])))
             message: "Unknown image registry."
