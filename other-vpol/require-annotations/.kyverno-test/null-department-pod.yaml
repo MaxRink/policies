@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-department-pod
+  annotations:
+    corp.org/department: null
+spec:
+  containers:
+    - name: app
+      image: nginx:1.25

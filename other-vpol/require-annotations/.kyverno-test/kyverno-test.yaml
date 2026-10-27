@@ -10,6 +10,7 @@ resources:
 - ../.chainsaw-test/podcontroller-bad.yaml
 - ../.chainsaw-test/podcontroller-good.yaml
 - replicationcontroller-bad.yaml
+- null-department-pod.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -17,6 +18,7 @@ results:
   resources:
   - badpod01
   - badpod02
+  - null-department-pod
   result: fail
 - isValidatingPolicy: true
   kind: ReplicationController
