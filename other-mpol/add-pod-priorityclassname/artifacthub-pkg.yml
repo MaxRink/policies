@@ -21,6 +21,7 @@ readme: |
   `spec.matchConditions` using the exact namespace and name.
   This policy uses a resource-scoped exception, so no `spec.images` or
   `spec.allowedValues` entry is needed.
+  Existing `priorityClassName` values are preserved.
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-mpol/add-pod-priorityclassname/.kyverno-test/exceptions.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal mutation behavior.
@@ -30,4 +31,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.23"
   kyverno/subject: "Pod"
-digest: 9a33640c165475018fdeea6fdeef17328feb70577ce2e2c95061c0535818ba19
+digest: 1b1b9b596355df3a9e4e92bad5a26a4d6c4fd9446acdd612dbfb74e50206b9dd

@@ -13,3 +13,6 @@ namespaceSelector:
 - labels:
     env: team-b
   name: team-b
+- labels:
+    env: development
+  name: team-c

@@ -53,10 +53,13 @@ spec:
       expression: 'variables.kind == "CronJob" ? object.spec.?jobTemplate.?spec.?template.?spec.orValue({}) : object.spec.?template.?spec.orValue({})'
     - name: has_priority
       expression: has(variables.pod_spec.priority)
+    - name: has_priority_class_name
+      expression: 'variables.pod_spec.?priorityClassName.orValue("") != ""'
   mutations:
     - patchType: JSONPatch
       jsonPatch:
         expression: >-
-          variables.has_priority ? 
-          [JSONPatch{op: "remove", path: variables.old_priority_path}, JSONPatch{op: "add", path: variables.priority_path, value: "non-production"}] : 
+          variables.has_priority_class_name ? [] :
+          variables.has_priority ?
+          [JSONPatch{op: "remove", path: variables.old_priority_path}, JSONPatch{op: "add", path: variables.priority_path, value: "non-production"}] :
           [JSONPatch{op: "add", path: variables.priority_path, value: "non-production"}]

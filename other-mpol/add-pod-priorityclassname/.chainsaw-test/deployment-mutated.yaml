@@ -22,3 +22,25 @@ spec:
         image: somejunkbusyboximage:1.28
         name: busybox
       priorityClassName: non-production
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: busybox-user-selected
+  name: busybox-user-selected
+  namespace: add-pod-priorityclassname
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox-user-selected
+  template:
+    metadata:
+      labels:
+        app: busybox-user-selected
+    spec:
+      priorityClassName: user-selected
+      containers:
+      - image: somejunkbusyboximage:1.28
+        name: busybox
