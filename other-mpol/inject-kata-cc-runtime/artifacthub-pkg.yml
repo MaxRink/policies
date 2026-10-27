@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Inject Kata Containers Runtime for Confidential Computing
 createdAt: "2026-04-08T00:00:00Z"
 description: >-
-  Automatically injects the runtimeClassName kata-cc to pods that have the label coco=enabled for running workloads in confidential containers using Kata Containers. Pods without the coco=enabled label are not modified.
+  Sets runtimeClassName to kata-cc for coco=enabled Pods at creation and in matching pod-controller templates. Existing Pods are not mutated on UPDATE because runtimeClassName is immutable.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-mpol/inject-kata-cc-runtime/inject-kata-cc-runtime.yaml
@@ -13,7 +13,7 @@ keywords:
   - Confidential Computing
   - MutatingPolicy
 readme: |
-  Automatically injects the runtimeClassName kata-cc to pods that have the label coco=enabled for running workloads in confidential containers using Kata Containers. Pods without the coco=enabled label are not modified.
+  Sets runtimeClassName to kata-cc for coco=enabled Pods at creation and in matching pod-controller templates. Existing Pods are not mutated on UPDATE because runtimeClassName is immutable.
   
   ### Fine-grained PolicyException use
 
@@ -30,4 +30,4 @@ readme: |
 annotations:
   kyverno/category: "Confidential Computing"
   kyverno/subject: "Pod"
-digest: c2a40d1450f64bd31a20ef5e654ce55b97c468806b2bc9b93ba79c4afcc74535
+digest: bd6b633333823afb7b52004a3f1617048bf34beab8a15ece849235b7f94f4ea3
