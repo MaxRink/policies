@@ -24,17 +24,21 @@ spec:
       enabled: true
     mutateExisting:
       enabled: false
+
+  variables:
+    - name: rules
+      expression: object.spec.?rules.orValue([])
   
   mutations:
     - patchType: JSONPatch
       jsonPatch:
         expression: |
-          object.spec.?rules.orValue([]).map(rule, 
-            has(rule.host) && rule.host.endsWith('.old.com') ?
+          lists.range(variables.rules.size()).map(i,
+            has(variables.rules[i].host) && variables.rules[i].host.endsWith('.old.com') ?
             JSONPatch{
               op: "replace",
-              path: "/spec/rules/" + string(object.spec.rules.indexOf(rule)) + "/host",
-              value: rule.host.substring(0, rule.host.size() - '.old.com'.size()) + '.new.com'
+              path: "/spec/rules/" + string(i) + "/host",
+              value: variables.rules[i].host.substring(0, variables.rules[i].host.size() - '.old.com'.size()) + '.new.com'
             } : null
           ).filter(patch, patch != null)
     - patchType: JSONPatch
