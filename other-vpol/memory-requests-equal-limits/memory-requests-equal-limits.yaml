@@ -32,8 +32,8 @@ spec:
     - expression: >-
         variables.allContainers.all(container,
         container.image in exceptions.allowedImages.orValue([]) ||
-        container.?resources.?requests.?memory ==
-        container.?resources.?limits.?memory ||
+        (!container.?resources.?requests.?memory.hasValue() &&
+        !container.?resources.?limits.?memory.hasValue()) ||
         (container.?resources.?requests.?memory.hasValue() &&
         container.?resources.?limits.?memory.hasValue() &&
         quantity(container.resources.requests.memory) == quantity(container.resources.limits.memory)))
