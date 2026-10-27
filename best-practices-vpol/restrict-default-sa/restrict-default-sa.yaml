@@ -1,0 +1,54 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: restrict-default-sa
+  annotations:
+    policies.kyverno.io/title: Restrict Use of Default Service Accounts
+    policies.kyverno.io/category: Best Practices in VPOL
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/minversion: 1.19.1
+    kyverno.io/kubernetes-version: "1.30+"
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/description: >-
+      Workloads must use a dedicated ServiceAccount instead of the namespace's default
+      ServiceAccount. The policy checks Pods and built-in Pod controllers, including
+      values supplied through the deprecated serviceAccount field.
+spec:
+  validationActions: [Audit]
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["pods", "replicationcontrollers"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs", "cronjobs"]
+  variables:
+    - name: podSpec
+      expression: >-
+        object.spec.?jobTemplate.?spec.?template.?spec.orValue(
+        object.spec.?template.?spec.orValue(object.spec))
+    - name: serviceAccountName
+      expression: >-
+        variables.podSpec.?serviceAccountName.orValue('') != ''
+          ? variables.podSpec.serviceAccountName
+          : (variables.podSpec.?serviceAccount.orValue('') != ''
+            ? variables.podSpec.serviceAccount
+            : 'default')
+  validations:
+    - expression: >-
+        variables.serviceAccountName != 'default' ||
+        exceptions.allowedValues.exists(value,
+          value == 'serviceAccountName:' + variables.serviceAccountName)
+      message: >-
+        Pods and controllers must use a dedicated ServiceAccount instead of the default
+        ServiceAccount. Set spec.serviceAccountName to a dedicated ServiceAccount.
