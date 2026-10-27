@@ -1,0 +1,68 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/chainsaw/main/.schemas/json/test-chainsaw-v1alpha1.json
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  creationTimestamp: null
+  name: disallow-static-aws-credentials
+spec:
+  template: false
+  steps:
+    - name: shared-exception-namespace
+      skipDelete: true
+      try:
+        - apply:
+            file: policy-exceptions-namespace.yaml
+    - name: policy
+      try:
+        - apply:
+            file: rbac-reporting.yaml
+        - script:
+            content: |
+              set -eu
+              for attempt in $(seq 1 30); do
+                ready=true
+                for verb in get list watch; do
+                  if ! kubectl auth can-i "$verb" secrets --all-namespaces --as=system:serviceaccount:kyverno:kyverno-reports-controller | grep -qx yes; then
+                    ready=false
+                  fi
+                done
+                if [ "$ready" = true ]; then exit 0; fi
+                sleep 1
+              done
+              echo "Secret reporting RBAC aggregation did not become observable for the reports controller" >&2
+              exit 1
+        - apply:
+            file: ../disallow-static-aws-credentials.yaml
+        - patch:
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              metadata:
+                name: disallow-static-aws-credentials
+              spec:
+                validationActions: [Deny]
+        - apply:
+            file: exception.yaml
+        - assert:
+            file: policy-ready.yaml
+    - name: credential-keys
+      try:
+        - apply:
+            file: secret-good.yaml
+        - apply:
+            expect:
+              - check:
+                  (contains($error, 'Policy disallow-static-aws-credentials failed')): true
+            file: secret-bad-data.yaml
+        - apply:
+            expect:
+              - check:
+                  (contains($error, 'Policy disallow-static-aws-credentials failed')): true
+            file: secret-bad-stringdata.yaml
+        - apply:
+            file: secret-exception.yaml
+        - apply:
+            expect:
+              - check:
+                  (contains($error, 'Policy disallow-static-aws-credentials failed')): true
+            file: secret-not-excepted.yaml

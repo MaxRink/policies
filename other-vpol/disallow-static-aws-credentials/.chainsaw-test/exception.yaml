@@ -1,0 +1,16 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: disallow-static-aws-credentials-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: disallow-static-aws-credentials
+  matchConditions:
+    - name: exact-secret
+      expression: >-
+        object.metadata.name == "aws-creds-exception" &&
+        object.metadata.namespace == "default"
+  allowedValues:
+    - aws-credential-key:aws_access_key_id

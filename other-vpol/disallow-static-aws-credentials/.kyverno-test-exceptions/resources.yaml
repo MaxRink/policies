@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-creds-exception
+  namespace: default
+type: Opaque
+data:
+  AWS_ACCESS_KEY_ID: RkFLRS1BV1MtQUNDRVNTLUtFWQ==
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-creds-partial-exception
+  namespace: default
+type: Opaque
+data:
+  AWS_ACCESS_KEY_ID: RkFLRS1BV1MtQUNDRVNTLUtFWQ==
+  AWS_SECRET_ACCESS_KEY: RkFLRS1BV1MtU0VDUkVULUtFWQ==
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-creds-not-excepted
+  namespace: default
+type: Opaque
+data:
+  AWS_ACCESS_KEY_ID: RkFLRS1BV1MtQUNDRVNTLUtFWQ==
