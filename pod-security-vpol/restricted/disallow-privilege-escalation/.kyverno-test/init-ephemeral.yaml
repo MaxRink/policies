@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-ephemeral-privilege-escalation
+spec:
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      allowPrivilegeEscalation: false
+  initContainers:
+  - name: init
+    image: test:latest
+    securityContext:
+      allowPrivilegeEscalation: true
+  ephemeralContainers:
+  - name: debug
+    image: test:latest
+    securityContext:
+      allowPrivilegeEscalation: true
