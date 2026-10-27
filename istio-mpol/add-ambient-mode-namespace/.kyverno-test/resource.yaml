@@ -11,3 +11,13 @@ metadata:
   labels:
     istio-injection: enabled
   name: sidecar-ns
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-system
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
