@@ -19,3 +19,15 @@ results:
   resources:
   - policy-test/test-pod-good
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-deprecated-registry
+  resources:
+  - policy-test/test-rc-bad
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-deprecated-registry
+  resources:
+  - policy-test/test-rc-good
+  result: pass
