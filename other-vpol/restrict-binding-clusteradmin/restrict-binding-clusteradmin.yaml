@@ -28,5 +28,5 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["rolebindings", "clusterrolebindings"]
   validations:
-    - expression: "object.roleRef.name != 'cluster-admin' || 'roleRef.name:cluster-admin' in exceptions.allowedValues"
+    - expression: "object.roleRef.kind != 'ClusterRole' || object.roleRef.name != 'cluster-admin' || 'roleRef.name:cluster-admin' in exceptions.allowedValues"
       message: "Binding to cluster-admin is not allowed."
