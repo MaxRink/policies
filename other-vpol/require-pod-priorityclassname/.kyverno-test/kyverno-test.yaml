@@ -7,12 +7,14 @@ policies:
 resources:
 - resource.yaml
 - replicationcontroller-bad.yaml
+- null-priorityclass-pod.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
   policy: require-pod-priorityclassname
   resources:
   - badpod01
+  - null-priorityclass-pod
   result: fail
 - isValidatingPolicy: true
   kind: ReplicationController
