@@ -11,9 +11,9 @@ metadata:
     kyverno.io/kubernetes-version: "1.30"
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      This policy restricts Pod images to approved registries defined globally in a ConfigMap
-      as a single string, newline-separated list, or YAML list with hyphens, and optionally
-      at the Namespace level via annotations. Uses contains() for compatibility with Kyverno 1.14.0.
+      This policy restricts container images in Pods and pod controllers to registries listed in
+      the default/clusterregistries ConfigMap or the Namespace annotation
+      corp.com/allowed-registries. Registry matching requires an exact host boundary.
 spec:
   validationActions: 
     - Audit
