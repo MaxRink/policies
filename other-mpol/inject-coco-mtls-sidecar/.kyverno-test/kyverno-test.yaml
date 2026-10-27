@@ -1,0 +1,57 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: inject-coco-mtls-sidecar
+policies:
+- ../inject-coco-mtls-sidecar.yaml
+resources:
+- resource.yaml
+- controllers.yaml
+- replicationcontroller.yaml
+exceptions:
+- exceptions.yaml
+context: context.yaml
+results:
+- kind: Pod
+  patchedResources: patchedResource.yaml
+  policy: inject-coco-mtls-sidecar
+  resources:
+  - coco-pod
+  - sibling-pod
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  policy: inject-coco-mtls-sidecar
+  resources:
+  - exception-pod
+  result: skip
+  isMutatingPolicy: true
+- kind: Pod
+  policy: inject-coco-mtls-sidecar
+  resources:
+  - no-label-pod
+  result: skip
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: controller-patched.yaml
+  policy: inject-coco-mtls-sidecar
+  resources: [coco-deployment]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: invalid-port-patched.yaml
+  policy: inject-coco-mtls-sidecar
+  resources: [invalid-port-pod]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: non-numeric-port-patched.yaml
+  policy: inject-coco-mtls-sidecar
+  resources: [non-numeric-port-pod]
+  result: pass
+  isMutatingPolicy: true
+- kind: ReplicationController
+  policy: inject-coco-mtls-sidecar
+  resources: [coco-replicationcontroller]
+  result: skip
+  isMutatingPolicy: true

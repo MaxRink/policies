@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coco-deployment
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: coco
+  template:
+    metadata:
+      labels:
+        app: coco
+        coco: enabled
+      annotations:
+        coco.io/sidecar-config: sidecar
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.20
+      - name: coco-sidecar
+        image: ghcr.io/confidential-containers/secure-sidecar:v1.0
+        ports:
+        - name: https
+          containerPort: 9443
+          protocol: TCP
+        env:
+        - name: TLS_CERT_URI
+          value: https://kbs.example.com/certs/tls.crt
+        - name: HTTPS_PORT
+          value: "9443"
+        - name: FORWARD_PORT
+          value: "9080"
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 50m
+          limits:
+            memory: 128Mi
+            cpu: 100m
