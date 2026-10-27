@@ -6,6 +6,8 @@ policies:
 - ../restrict-storageclass.yaml
 resources:
 - resource.yaml
+- storageclass-no-reclaim-policy.yaml
+- storageclass-null-reclaim-policy.yaml
 results:
 - isValidatingPolicy: true
   kind: StorageClass
@@ -19,3 +21,10 @@ results:
   resources:
   - goodstorageclass
   result: pass
+- isValidatingPolicy: true
+  kind: StorageClass
+  policy: restrict-storageclass
+  resources:
+  - missing-reclaim-policy
+  - null-reclaim-policy
+  result: fail
