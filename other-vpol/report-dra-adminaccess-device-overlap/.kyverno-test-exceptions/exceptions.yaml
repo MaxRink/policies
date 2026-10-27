@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: adminaccess-overlap-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: report-dra-adminaccess-device-overlap
+  matchConditions:
+    - name: exact-claim
+      expression: object.metadata.namespace == 'team-a' && object.metadata.name == 'admin-overlap'
+  allowedValues:
+    - report-dra-adminaccess-device-overlap:allow-exact-report
