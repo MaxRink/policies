@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-labels
+  labels:
+    foo: bar
+spec:
+  containers:
+  - name: app
+    image: app:v1

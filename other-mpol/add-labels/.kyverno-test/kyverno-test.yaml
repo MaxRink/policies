@@ -6,10 +6,25 @@ policies:
 - ../add-labels.yaml
 resources:
 - resource.yaml
+- existing-label.yaml
+- null-labels-resource.yaml
 - resource-exception.yaml
 exceptions:
 - exceptions.yaml
 results:
+- kind: Pod
+  patchedResources: null-labels-patched.yaml
+  policy: add-labels
+  resources: [null-labels]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: existing-label.yaml
+  policy: add-labels
+  resources:
+  - existing-label
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: patchedResource.yaml
   policy: add-labels
