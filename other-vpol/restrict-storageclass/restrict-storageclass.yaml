@@ -30,5 +30,5 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["storageclasses"]
   validations:
-    - expression: "object.reclaimPolicy == 'Delete' || object.reclaimPolicy in exceptions.allowedValues"
+    - expression: "object.?reclaimPolicy.orValue('') == 'Delete' || object.?reclaimPolicy.orValue('') in exceptions.allowedValues"
       message: "StorageClass must define a reclaimPolicy of Delete."
