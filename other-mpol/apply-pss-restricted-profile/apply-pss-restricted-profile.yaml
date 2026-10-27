@@ -68,6 +68,17 @@ spec:
         has(variables.podSpec.securityContext.seccompProfile.type) &&
         variables.podSpec.securityContext.seccompProfile.type in ["RuntimeDefault", "Localhost"] ?
         variables.podSpec.securityContext.seccompProfile : {"type": "RuntimeDefault"}
+    - name: containerIndices
+      expression: |
+        lists.range(size(variables.podSpec.containers)).filter(i,
+          !exceptions.allowedImages.exists(image, image == variables.podSpec.containers[i].image)
+        )
+    - name: initContainerIndices
+      expression: |
+        has(variables.podSpec.initContainers) ?
+          lists.range(size(variables.podSpec.initContainers)).filter(i,
+            !exceptions.allowedImages.exists(image, image == variables.podSpec.initContainers[i].image)
+          ) : []
   matchConditions:
     - name: skip-windows-pods
       expression: '!has(variables.podSpec.os) || variables.podSpec.os.name != "windows"'
@@ -133,24 +144,22 @@ spec:
       jsonPatch:
         expression: |
           (
-            variables.podSpec.containers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
-              !has(c.securityContext) ?
+            variables.containerIndices.map(i,
+              !has(variables.podSpec.containers[i].securityContext) ?
               JSONPatch{
                 op: "add",
-                path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext",
+                path: variables.podSpecPath + "/containers/" + string(i) + "/securityContext",
                 value: dyn({})
               } : null
             ).filter(p, p != null) +
-            (has(variables.podSpec.initContainers) ?
-              variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
-                !has(c.securityContext) ?
+            variables.initContainerIndices.map(i,
+                !has(variables.podSpec.initContainers[i].securityContext) ?
                 JSONPatch{
                   op: "add",
-                  path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext",
+                  path: variables.podSpecPath + "/initContainers/" + string(i) + "/securityContext",
                   value: dyn({})
                 } : null
-              ).filter(p, p != null) : []
-            )
+            ).filter(p, p != null)
           )
     
     # Mutation 3: Set privileged=false for all containers
@@ -158,21 +167,19 @@ spec:
       jsonPatch:
         expression: |
           (
-            variables.podSpec.containers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+            variables.containerIndices.map(i,
               JSONPatch{
                 op: "add",
-                path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/privileged",
+                path: variables.podSpecPath + "/containers/" + string(i) + "/securityContext/privileged",
                 value: dyn(false)
               }
             ) +
-            (has(variables.podSpec.initContainers) ?
-              variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+            variables.initContainerIndices.map(i,
                 JSONPatch{
                   op: "add",
-                  path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/privileged",
+                  path: variables.podSpecPath + "/initContainers/" + string(i) + "/securityContext/privileged",
                   value: dyn(false)
                 }
-              ) : []
             )
             )
     
@@ -181,21 +188,19 @@ spec:
       jsonPatch:
         expression: |
           (
-            variables.podSpec.containers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+            variables.containerIndices.map(i,
               JSONPatch{
                 op: "add",
-                path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/capabilities",
+                path: variables.podSpecPath + "/containers/" + string(i) + "/securityContext/capabilities",
                 value: dyn({"drop": dyn(["ALL"])})
               }
             ) +
-            (has(variables.podSpec.initContainers) ?
-              variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+            variables.initContainerIndices.map(i,
                 JSONPatch{
                   op: "add",
-                  path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/capabilities",
+                  path: variables.podSpecPath + "/initContainers/" + string(i) + "/securityContext/capabilities",
                   value: dyn({"drop": dyn(["ALL"])})
                 }
-              ) : []
             )
             )
     
@@ -204,21 +209,19 @@ spec:
       jsonPatch:
         expression: |
           (
-            variables.podSpec.containers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+            variables.containerIndices.map(i,
               JSONPatch{
                 op: "add",
-                path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/allowPrivilegeEscalation",
+                path: variables.podSpecPath + "/containers/" + string(i) + "/securityContext/allowPrivilegeEscalation",
                 value: dyn(false)
               }
             ) +
-            (has(variables.podSpec.initContainers) ?
-              variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+            variables.initContainerIndices.map(i,
                 JSONPatch{
                   op: "add",
-                  path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/allowPrivilegeEscalation",
+                  path: variables.podSpecPath + "/initContainers/" + string(i) + "/securityContext/allowPrivilegeEscalation",
                   value: dyn(false)
                 }
-              ) : []
             )
             )
     # Keep container-level overrides from weakening the pod-level defaults.
@@ -226,56 +229,62 @@ spec:
       jsonPatch:
         expression: |
           (
-            variables.podSpec.containers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+            variables.containerIndices.map(i,
               [
-                has(c.securityContext) && has(c.securityContext.runAsNonRoot) && !c.securityContext.runAsNonRoot ?
+                has(variables.podSpec.containers[i].securityContext) &&
+                  has(variables.podSpec.containers[i].securityContext.runAsNonRoot) &&
+                  !variables.podSpec.containers[i].securityContext.runAsNonRoot ?
                 JSONPatch{
                   op: "add",
-                  path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/runAsNonRoot",
+                  path: variables.podSpecPath + "/containers/" + string(i) + "/securityContext/runAsNonRoot",
                   value: dyn(true)
                 } : null,
-                has(c.securityContext) && has(c.securityContext.runAsUser) && c.securityContext.runAsUser == 0 ?
+                has(variables.podSpec.containers[i].securityContext) &&
+                  has(variables.podSpec.containers[i].securityContext.runAsUser) &&
+                  variables.podSpec.containers[i].securityContext.runAsUser == 0 ?
                 JSONPatch{
                   op: "add",
-                  path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/runAsUser",
+                  path: variables.podSpecPath + "/containers/" + string(i) + "/securityContext/runAsUser",
                   value: dyn(variables.podRunAsUser)
                 } : null,
-                has(c.securityContext) &&
-                  has(c.securityContext.seccompProfile) &&
-                  has(c.securityContext.seccompProfile.type) &&
-                  !(c.securityContext.seccompProfile.type in ["RuntimeDefault", "Localhost"]) ?
+                has(variables.podSpec.containers[i].securityContext) &&
+                  has(variables.podSpec.containers[i].securityContext.seccompProfile) &&
+                  has(variables.podSpec.containers[i].securityContext.seccompProfile.type) &&
+                  !(variables.podSpec.containers[i].securityContext.seccompProfile.type in ["RuntimeDefault", "Localhost"]) ?
                 JSONPatch{
                   op: "add",
-                  path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/seccompProfile",
+                  path: variables.podSpecPath + "/containers/" + string(i) + "/securityContext/seccompProfile",
                   value: dyn(variables.podSeccompProfile)
                 } : null
               ].filter(p, p != null)
             ).flatten() +
-            (has(variables.podSpec.initContainers) ?
-              variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+            variables.initContainerIndices.map(i,
                 [
-                  has(c.securityContext) && has(c.securityContext.runAsNonRoot) && !c.securityContext.runAsNonRoot ?
+                  has(variables.podSpec.initContainers[i].securityContext) &&
+                    has(variables.podSpec.initContainers[i].securityContext.runAsNonRoot) &&
+                    !variables.podSpec.initContainers[i].securityContext.runAsNonRoot ?
                   JSONPatch{
                     op: "add",
-                    path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/runAsNonRoot",
+                    path: variables.podSpecPath + "/initContainers/" + string(i) + "/securityContext/runAsNonRoot",
                     value: dyn(true)
                   } : null,
-                  has(c.securityContext) && has(c.securityContext.runAsUser) && c.securityContext.runAsUser == 0 ?
+                  has(variables.podSpec.initContainers[i].securityContext) &&
+                    has(variables.podSpec.initContainers[i].securityContext.runAsUser) &&
+                    variables.podSpec.initContainers[i].securityContext.runAsUser == 0 ?
                   JSONPatch{
                     op: "add",
-                    path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/runAsUser",
+                    path: variables.podSpecPath + "/initContainers/" + string(i) + "/securityContext/runAsUser",
                     value: dyn(variables.podRunAsUser)
                   } : null,
-                  has(c.securityContext) &&
-                    has(c.securityContext.seccompProfile) &&
-                    has(c.securityContext.seccompProfile.type) &&
-                    !(c.securityContext.seccompProfile.type in ["RuntimeDefault", "Localhost"]) ?
+                  has(variables.podSpec.initContainers[i].securityContext) &&
+                    has(variables.podSpec.initContainers[i].securityContext.seccompProfile) &&
+                    has(variables.podSpec.initContainers[i].securityContext.seccompProfile.type) &&
+                    !(variables.podSpec.initContainers[i].securityContext.seccompProfile.type in ["RuntimeDefault", "Localhost"]) ?
                   JSONPatch{
                     op: "add",
-                    path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/seccompProfile",
+                    path: variables.podSpecPath + "/initContainers/" + string(i) + "/securityContext/seccompProfile",
                     value: dyn(variables.podSeccompProfile)
                   } : null
                 ].filter(p, p != null)
-              ).flatten() : []
-            )
+              ).flatten()
           )

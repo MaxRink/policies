@@ -16,6 +16,7 @@ resources:
 - pod-disallowed-context.yaml
 - replicationcontroller-resource.yaml
 - windows-resource.yaml
+- many-containers.yaml
 exceptions:
 - exception.yaml
 results:
@@ -86,4 +87,10 @@ results:
   policy: apply-pss-restricted-profile
   resources: [windows-pod]
   result: skip
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: many-containers-patched.yaml
+  policy: apply-pss-restricted-profile
+  resources: [many-containers]
+  result: pass
   isMutatingPolicy: true
