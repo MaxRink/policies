@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - null-storage-class.yaml
+- null-volume-claims-statefulset.yaml
 results:
 - isValidatingPolicy: true
   kind: PersistentVolumeClaim
@@ -34,4 +35,5 @@ results:
   resources:
   - goodss
   - goodss-novct
+  - null-volume-claims
   result: pass

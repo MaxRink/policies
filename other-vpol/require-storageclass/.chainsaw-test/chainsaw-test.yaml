@@ -40,6 +40,8 @@ spec:
             ($error != null): true
         file: ../.kyverno-test/null-storage-class.yaml
     - apply:
+        file: ../.kyverno-test/null-volume-claims-statefulset.yaml
+    - apply:
         expect:
         - check:
             ($error != null): true
