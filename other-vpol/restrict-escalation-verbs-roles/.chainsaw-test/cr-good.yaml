@@ -25,6 +25,14 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
+  name: goodcr-nonresource
+rules:
+- nonResourceURLs: ["/healthz", "/livez"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
   name: empty-rules
 rules: 
 ---

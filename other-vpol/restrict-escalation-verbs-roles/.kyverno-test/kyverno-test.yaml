@@ -14,6 +14,8 @@ results:
   - badclusterrole01
   - badclusterrole02
   - badclusterrole03
+  - badclusterrole-userextra-scopes
+  - badclusterrole-userextra-wildcard
   result: fail
 - isValidatingPolicy: true
   kind: Role
@@ -27,6 +29,7 @@ results:
   resources:
   - goodclusterrole01
   - goodclusterrole02
+  - nonresource-rule
   - default-rules
   result: pass
 - isValidatingPolicy: true

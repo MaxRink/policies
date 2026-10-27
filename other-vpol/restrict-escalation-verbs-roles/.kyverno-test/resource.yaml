@@ -122,6 +122,24 @@ rules:
   verbs: ["impersonate"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: badclusterrole-userextra-scopes
+rules:
+- apiGroups: ["authentication.k8s.io"]
+  resources: ["userextras/scopes"]
+  verbs: ["impersonate"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: badclusterrole-userextra-wildcard
+rules:
+- apiGroups: ["authentication.k8s.io"]
+  resources: ["userextras/*"]
+  verbs: ["impersonate"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: goodrole01
@@ -154,4 +172,12 @@ kind: Role
 metadata:
   name: default-rules
 rules: null
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nonresource-rule
+rules:
+- nonResourceURLs: ["/healthz", "/livez"]
+  verbs: ["get"]
 ---
