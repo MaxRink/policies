@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - exception-resource.yaml
+- user-constraints-resource.yaml
 exceptions:
 - exception.yaml
 results:
@@ -21,4 +22,10 @@ results:
   policy: spread-pods
   resources: [exception-deployment]
   result: skip
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: user-constraints-resource.yaml
+  policy: spread-pods
+  resources: [user-constraints]
+  result: pass
   isMutatingPolicy: true
