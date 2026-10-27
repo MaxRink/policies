@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc-bad-gpu
+spec:
+  replicas: 1
+  selector:
+    app: rc-bad-gpu
+  template:
+    metadata:
+      labels:
+        app: rc-bad-gpu
+    spec:
+      containers:
+      - name: gpu
+        image: busybox:1.28
+        resources:
+          limits:
+            nvidia.com/gpu: 1
