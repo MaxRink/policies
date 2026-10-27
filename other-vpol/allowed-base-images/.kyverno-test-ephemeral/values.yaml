@@ -1,0 +1,15 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Values
+metadata:
+  name: values
+subresources:
+- parentResource:
+    kind: Pod
+    name: pods
+    namespaced: true
+    version: v1
+  subresource:
+    kind: Pod
+    name: pods/ephemeralcontainers
+    namespaced: true
+    version: v1
