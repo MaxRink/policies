@@ -6,6 +6,7 @@ policies:
 - ../imagepullpolicy-always.yaml
 resources:
 - resource.yaml
+- replicationcontroller.yaml
 results:
 - isValidatingPolicy: true
   kind: Deployment
@@ -33,3 +34,9 @@ results:
   resources:
   - myapp-pod-1
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: imagepullpolicy-always
+  resources:
+  - image-pull-bad-rc
+  result: fail
