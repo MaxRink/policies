@@ -9,6 +9,7 @@ resources:
 - exception-resource.yaml
 - other-namespace-resource.yaml
 - init-container-resource.yaml
+- replicationcontroller-resource.yaml
 exceptions:
 - exception.yaml
 results:
@@ -35,5 +36,11 @@ results:
   patchedResources: init-container-patched.yaml
   policy: apply-pss-restricted-profile
   resources: [init-container-restricted]
+  result: pass
+  isMutatingPolicy: true
+- kind: ReplicationController
+  patchedResources: replicationcontroller-patched.yaml
+  policy: apply-pss-restricted-profile
+  resources: [pss-replicationcontroller]
   result: pass
   isMutatingPolicy: true

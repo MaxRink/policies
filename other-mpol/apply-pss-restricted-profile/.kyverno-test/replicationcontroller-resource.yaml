@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: pss-replicationcontroller
+spec:
+  replicas: 1
+  selector:
+    app: pss-replicationcontroller
+  template:
+    metadata:
+      labels:
+        app: pss-replicationcontroller
+    spec:
+      containers:
+      - name: app
+        image: nginx
