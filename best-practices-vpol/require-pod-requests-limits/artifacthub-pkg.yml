@@ -13,7 +13,7 @@ keywords:
   - EKS Best Practices
   - VPOL
 readme: |
-  As application workloads share cluster resources, it is important to limit resources requested and consumed by each Pod. It is recommended to require resource requests and limits per Pod, especially for memory and CPU. If a Namespace level request or limit is specified, defaults will automatically be applied to each Pod based on the LimitRange configuration. This policy validates that all containers have something specified for memory and CPU requests and memory limits.
+  As application workloads share cluster resources, it is important to limit resources requested and consumed by each Pod. It is recommended to require resource requests and limits per Pod, especially for memory and CPU. If a Namespace level request or limit is specified, defaults will automatically be applied to each Pod based on the LimitRange configuration.   This policy validates that regular and init containers in Pods and supported Pod controller templates have something specified for memory and CPU requests and memory limits.
   
   ### Fine-grained PolicyException use
 
@@ -23,8 +23,8 @@ readme: |
   This policy accepts exact image references in `spec.images`; only matching
   images are exempted and all other images remain enforced.
   CEL reads these references through `exceptions.allowedImages`; `variables.allContainers`
-  includes regular and init containers. Ephemeral containers are excluded because Kubernetes
-  does not support resource requests or limits for them.
+  includes regular and init containers in Pods and supported controller templates. Ephemeral
+  containers are excluded because Kubernetes does not support resource requests or limits for them.
   See the [tested example](https://github.com/kyverno/policies/blob/main/best-practices-vpol/require-pod-requests-limits/.kyverno-test/exceptions.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal enforcement behavior.
@@ -34,5 +34,5 @@ annotations:
   kyverno/category: "Best Practices, EKS Best Practices in VPOL"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 722c3a0f60cb2bb762707f5f5a58ba84ffdde8101ed03b819821bec14d25b895
+digest: 6e39cd9ee09115e891a0f0547b4afa8896f857a339528ab1786b12af104075ef
 createdAt: "2025-05-05T13:19:12Z"
