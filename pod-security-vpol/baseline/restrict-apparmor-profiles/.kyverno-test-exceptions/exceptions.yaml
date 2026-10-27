@@ -1,0 +1,30 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: apparmor-values
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - name: restrict-apparmor-profiles
+    kind: ValidatingPolicy
+  allowedValues:
+  - appArmorProfile.type:Unconfined
+  - annotation:container.apparmor.security.beta.kubernetes.io/app:unconfined
+  matchConditions:
+  - name: exact-resources
+    expression: object.metadata.namespace == 'default' && object.metadata.name in ['exception-type', 'exception-annotation']
+---
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: apparmor-image
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - name: restrict-apparmor-profiles
+    kind: ValidatingPolicy
+  images:
+  - exempt.example/app:1
+  matchConditions:
+  - name: exact-resource
+    expression: object.metadata.namespace == 'default' && object.metadata.name == 'exception-image'

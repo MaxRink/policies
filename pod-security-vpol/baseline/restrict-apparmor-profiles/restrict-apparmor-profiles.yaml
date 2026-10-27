@@ -7,8 +7,8 @@ metadata:
     policies.kyverno.io/category: Pod Security Standards (Baseline) in ValidatingPolicy
     policies.kyverno.io/severity: medium
     policies.kyverno.io/subject: Pod, Annotation
-    policies.kyverno.io/minversion: 1.17.0
-    kyverno.io/kyverno-version: 1.14.0
+    policies.kyverno.io/minversion: 1.19.1
+    kyverno.io/kyverno-version: 1.19.1
     kyverno.io/kubernetes-version: "1.30+"
     policies.kyverno.io/description: >-
       On supported hosts, the `RuntimeDefault` AppArmor profile is applied by default. The baseline
@@ -63,15 +63,19 @@ spec:
   validations:
     - expression: >-
         (!has(variables.podSpec.securityContext) || !has(variables.podSpec.securityContext.appArmorProfile) ||
-          variables.podSpec.securityContext.appArmorProfile.?type.orValue('') in variables.allowedTypes) &&
+          variables.podSpec.securityContext.appArmorProfile.?type.orValue('') in variables.allowedTypes ||
+          ('appArmorProfile.type:' + variables.podSpec.securityContext.appArmorProfile.?type.orValue('')) in exceptions.allowedValues) &&
         variables.allContainers.all(container,
-          !has(container.securityContext) || !has(container.securityContext.appArmorProfile) ||
-          container.securityContext.appArmorProfile.?type.orValue('') in variables.allowedTypes) &&
+          container.image in exceptions.allowedImages ||
+          (!has(container.securityContext) || !has(container.securityContext.appArmorProfile) ||
+            container.securityContext.appArmorProfile.?type.orValue('') in variables.allowedTypes ||
+            ('appArmorProfile.type:' + container.securityContext.appArmorProfile.?type.orValue('')) in exceptions.allowedValues)) &&
         variables.annotations.all(key,
           !key.startsWith('container.apparmor.security.beta.kubernetes.io/') ||
           variables.annotations[key] == '' ||
           variables.annotations[key] == 'runtime/default' ||
-          variables.annotations[key].startsWith('localhost/'))
+          variables.annotations[key].startsWith('localhost/') ||
+          ('annotation:' + key + ':' + variables.annotations[key]) in exceptions.allowedValues)
       message: >-
         AppArmor profiles must be restricted. The fields spec.securityContext.appArmorProfile.type,
         spec.containers[*].securityContext.appArmorProfile.type,

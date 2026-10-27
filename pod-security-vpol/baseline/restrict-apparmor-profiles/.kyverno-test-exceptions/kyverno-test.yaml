@@ -1,0 +1,32 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-apparmor-profiles-exceptions
+policies:
+- ../restrict-apparmor-profiles.yaml
+resources:
+- exception-resources.yaml
+exceptions:
+- exceptions.yaml
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-apparmor-profiles
+  resources:
+  - exception-type
+  - exception-annotation
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-apparmor-profiles
+  resources:
+  - exception-type-sibling
+  - exception-annotation-sibling
+  - exception-image-sibling
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-apparmor-profiles
+  resources:
+  - exception-image
+  result: pass
