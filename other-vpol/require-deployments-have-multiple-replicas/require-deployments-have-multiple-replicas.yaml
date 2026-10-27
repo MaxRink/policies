@@ -25,6 +25,9 @@ spec:
         apiVersions: ["v1"]
         operations:  ["CREATE", "UPDATE"]
         resources:   ["deployments"]
+  variables:
+    - name: replicas
+      expression: "has(object.spec.replicas) && object.spec.replicas != null ? object.spec.replicas : 1"
   validations:
-    - expression: "object.spec.replicas > 1 || string(object.spec.replicas) in exceptions.allowedValues"
+    - expression: "variables.replicas > 1 || string(variables.replicas) in exceptions.allowedValues"
       message: "Deployments should have more than one replica to ensure availability."

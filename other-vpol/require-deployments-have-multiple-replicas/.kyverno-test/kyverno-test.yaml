@@ -6,6 +6,7 @@ policies:
 - ../require-deployments-have-multiple-replicas.yaml
 resources:
 - resource.yaml
+- replicas-default.yaml
 results:
 - isValidatingPolicy: true
   kind: Deployment
@@ -18,4 +19,6 @@ results:
   policy: deployment-has-multiple-replicas
   resources:
   - mydeploybad
+  - replicas-defaulted
+  - replicas-null
   result: fail

@@ -32,3 +32,8 @@ spec:
         - check:
             (contains($error, 'Deployments should have more than one replica')): true
         file: deploy-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Deployments should have more than one replica')): true
+        file: ../.kyverno-test/replicas-default.yaml
