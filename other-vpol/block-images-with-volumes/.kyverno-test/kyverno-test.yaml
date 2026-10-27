@@ -53,6 +53,7 @@ results:
   policy: block-images-with-volumes
   resources:
   - default/volumeimage-rc
+  - default/init-volume-rc
   result: fail
 - isValidatingPolicy: true
   kind: ReplicationController
