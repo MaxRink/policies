@@ -14,10 +14,16 @@ keywords:
 readme: |
   This policy performs some best practices validation on Application fields. Path or chart must be specified but never both. And destination.name or destination.server must be specified but never both.
 
+  ### PolicyException support
+
+  A `PolicyException` can exempt one exact Application with `spec.matchConditions`.
+  The exception must reference `application-field-validation` with kind
+  `ValidatingPolicy`; no partial `allowedValues` entry is used.
+
   Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
 annotations:
   kyverno/category: "Argo in CEL"
   kyverno/kubernetesVersion: "1.34-1.35"
   kyverno/subject: "Application"
-digest: f4aacc6b26908d849c53a7c9ddcc31b5c982701fb3528e27cbe1b90a2b4398fb
+digest: c237c1c8595345fc766a12f1cadad8d30da5b74d77c8fa4e6624b199ecd60e01
 createdAt: "2026-10-03T04:55:50Z"

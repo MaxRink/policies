@@ -7,6 +7,12 @@ policies:
 resources:
 - ../.chainsaw-test/bad-application.yaml
 - ../.chainsaw-test/good-application.yaml
+- null-path-application.yaml
+- null-name-application.yaml
+- missing-fields-application.yaml
+- exception-application.yaml
+exceptions:
+  - exceptions.yaml
 results:
 - policy: application-field-validation
   kind: Application
@@ -22,3 +28,15 @@ results:
   - goodapp01
   - goodapp02
   result: pass
+- policy: application-field-validation
+  kind: Application
+  resources:
+  - nullpathapp
+  - nullnameapp
+  - missingfieldsapp
+  result: fail
+- policy: application-field-validation
+  kind: Application
+  resources:
+  - exceptionapp
+  result: skip
