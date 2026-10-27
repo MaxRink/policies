@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-ephemeral-capabilities
+spec:
+  containers:
+  - name: app
+    image: test:latest
+  initContainers:
+  - name: init
+    image: test:latest
+    securityContext:
+      capabilities:
+        add:
+        - SYS_ADMIN
+  ephemeralContainers:
+  - name: debug
+    image: test:latest
+    securityContext:
+      capabilities:
+        add:
+        - SYS_ADMIN
