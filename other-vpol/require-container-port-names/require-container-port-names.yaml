@@ -43,5 +43,8 @@ spec:
     - name: allContainers
       expression: "variables.podSpec.containers + variables.podSpec.?initContainers.orValue([]) + variables.podSpec.?ephemeralContainers.orValue([])"
   validations:
-    - expression: "variables.allContainers.all(container, container.?ports.orValue([]).all(port, has(port.name) && port.name != ''))"
+    - expression: >-
+        variables.allContainers.all(container,
+        (container.?ports.orValue([]) == null ? [] : container.?ports.orValue([]))
+        .all(port, has(port.name) && port.name != ''))
       message: Name is required for every containerPort.

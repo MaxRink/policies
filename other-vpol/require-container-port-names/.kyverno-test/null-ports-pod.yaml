@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-ports-pod
+spec:
+  containers:
+    - name: app
+      image: nginx:1.25
+      ports: null

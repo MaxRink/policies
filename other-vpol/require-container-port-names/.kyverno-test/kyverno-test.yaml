@@ -10,6 +10,7 @@ resources:
 - ../.chainsaw-test/podcontroller-bad.yaml
 - ../.chainsaw-test/podcontroller-good.yaml
 - replicationcontroller-bad.yaml
+- null-ports-pod.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -31,6 +32,7 @@ results:
   resources:
   - goodpod01
   - goodpod02
+  - null-ports-pod
   result: pass
 - isValidatingPolicy: true
   kind: Deployment
