@@ -1,0 +1,18 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata: {name: fixed-deadline, namespace: policy-exceptions}
+spec:
+  policyRefs: [{name: job-timeout-enforcer, kind: ValidatingPolicy}]
+  allowedValues: ["172800"]
+  matchConditions:
+  - name: target
+    expression: "object.metadata.namespace == 'default' && object.metadata.name in ['exception-job-48h', 'exception-job-72h', 'exception-cronjob-48h', 'exception-job-no-timeout']"
+---
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata: {name: whole-job, namespace: policy-exceptions}
+spec:
+  policyRefs: [{name: job-timeout-enforcer, kind: ValidatingPolicy}]
+  matchConditions:
+  - name: target
+    expression: "object.metadata.namespace == 'default' && object.metadata.name == 'exception-whole-job'"

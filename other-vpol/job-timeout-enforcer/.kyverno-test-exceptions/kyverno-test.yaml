@@ -1,0 +1,11 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata: {name: job-timeout-enforcer-exceptions}
+policies: [../job-timeout-enforcer.yaml]
+resources: [exception-resources.yaml]
+exceptions: [exceptions.yaml]
+results:
+- {isValidatingPolicy: true, kind: Job, policy: job-timeout-enforcer, resources: [exception-job-48h], result: pass}
+- {isValidatingPolicy: true, kind: CronJob, policy: job-timeout-enforcer, resources: [exception-cronjob-48h], result: pass}
+- {isValidatingPolicy: true, kind: Job, policy: job-timeout-enforcer, resources: [exception-job-72h, other-job-48h, exception-job-no-timeout], result: fail}
+- {isValidatingPolicy: true, kind: Job, policy: job-timeout-enforcer, resources: [exception-whole-job], result: skip}

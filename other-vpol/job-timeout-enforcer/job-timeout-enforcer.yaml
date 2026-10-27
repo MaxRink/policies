@@ -1,0 +1,41 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: job-timeout-enforcer
+  annotations:
+    policies.kyverno.io/title: Enforce Job Timeouts
+    policies.kyverno.io/category: Resource Management
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/minversion: 1.19.1
+    kyverno.io/kubernetes-version: "1.30+"
+    policies.kyverno.io/subject: Job, CronJob
+    policies.kyverno.io/description: >-
+      Jobs without timeouts can run indefinitely, consuming cluster resources and potentially
+      indicating stuck workloads. This policy ensures all Jobs, including the Jobs created by
+      CronJobs, have an activeDeadlineSeconds set between 1 hour and 24 hours.
+spec:
+  validationActions: [Audit]
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
+  variables:
+  - name: jobSpec
+    expression: >-
+      object.spec.?jobTemplate.?spec.orValue(object.spec)
+  - name: deadlineSeconds
+    expression: >-
+      variables.jobSpec.?activeDeadlineSeconds
+  validations:
+  - expression: >-
+      variables.deadlineSeconds.hasValue() &&
+      variables.deadlineSeconds.value() != null &&
+      ((variables.deadlineSeconds.value() >= 3600 && variables.deadlineSeconds.value() <= 86400) ||
+        string(int(variables.deadlineSeconds.value())) in exceptions.allowedValues)
+    message: >-
+      Jobs must specify activeDeadlineSeconds between 3600 (1 hour) and 86400 (24 hours)
