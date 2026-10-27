@@ -57,3 +57,16 @@ spec:
         add: ["SYS_TIME"]
         drop:
           - ALL
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: badrc-capabilities
+spec:
+  selector: {app: badrc-capabilities}
+  template:
+    metadata: {labels: {app: badrc-capabilities}}
+    spec:
+      containers:
+      - name: app
+        image: ghcr.io/kyverno/test-busybox:1.35

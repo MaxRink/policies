@@ -48,3 +48,8 @@ spec:
         - check:
             (contains($error, 'Policy drop-all-capabilities failed')): true
         file: bad-podcontrollers.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy drop-all-capabilities failed')): true
+        file: bad-replicationcontroller.yaml
