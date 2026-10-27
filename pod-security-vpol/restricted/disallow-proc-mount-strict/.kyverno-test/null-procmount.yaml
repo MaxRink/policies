@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-procmount-container
+spec:
+  hostUsers: false
+  containers:
+  - name: app
+    image: dummyimagename
+    securityContext:
+      procMount: null
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-procmount-init
+spec:
+  hostUsers: false
+  initContainers:
+  - name: init
+    image: dummyimagename
+    securityContext:
+      procMount: null
+  containers:
+  - name: app
+    image: dummyimagename
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-procmount-ephemeral
+spec:
+  hostUsers: false
+  containers:
+  - name: app
+    image: dummyimagename
+  ephemeralContainers:
+  - name: debug
+    image: dummyimagename
+    targetContainerName: app
+    securityContext:
+      procMount: null

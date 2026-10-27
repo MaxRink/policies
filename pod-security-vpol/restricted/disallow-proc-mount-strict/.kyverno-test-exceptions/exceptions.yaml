@@ -1,0 +1,31 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: proc-mount-value
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - name: disallow-proc-mount-strict
+    kind: ValidatingPolicy
+  allowedValues:
+  - procMount:Unmasked
+  matchConditions:
+  - name: exact-workloads
+    expression: >-
+      object.metadata.namespace == 'default' &&
+      object.metadata.name in ['exception-partial', 'exception-token-wrong', 'exception-sibling']
+---
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: proc-mount-whole
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - name: disallow-proc-mount-strict
+    kind: ValidatingPolicy
+  matchConditions:
+  - name: exact-workload
+    expression: >-
+      object.metadata.namespace == 'default' &&
+      object.metadata.name == 'exception-whole'
