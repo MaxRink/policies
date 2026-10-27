@@ -11,8 +11,9 @@ metadata:
     kyverno.io/kyverno-version: 1.14.0
     kyverno.io/kubernetes-version: "1.31+"
     policies.kyverno.io/description: >-
-      SELinux options can be used to escalate privileges and should not be allowed. This policy
-      ensures that the `seLinuxOptions` field is undefined.
+      Empty and null SELinux values are treated as unset. Non-empty user and role values are
+      forbidden; type values must be one of the baseline allowed values for the target Kubernetes
+      version.
 spec:
   validationActions:
      - Audit
@@ -84,4 +85,4 @@ spec:
           container.?securityContext.?seLinuxOptions.?role.orValue('') == '' ||
           ('role:' + container.?securityContext.?seLinuxOptions.?role.orValue('')) in exceptions.allowedValues))
       message: >-
-        Setting the SELinux user or role is forbidden. The fields seLinuxOptions.user and seLinuxOptions.role must be unset or empty.
+        Setting a non-empty SELinux user or role is forbidden. The fields seLinuxOptions.user and seLinuxOptions.role must be unset or empty.
