@@ -35,14 +35,21 @@ spec:
   - name: step-02
     try:
     - apply:
+        file: ingress-update-same.yaml
+    - apply:
         file: exception-ingress.yaml
     - apply:
         file: ingress-good.yaml
     - apply:
         expect:
         - check:
-            (contains($error, 'The root path already exists in the cluster but not in the namespace.')): true
+            (contains($error, 'The Ingress path already exists in the cluster.')): true
         file: ingress-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'The Ingress path already exists in the cluster.')): true
+        file: ingress-bad-cross-namespace.yaml
     - delete:
         file: exceptions.yaml
     - script:
@@ -50,5 +57,5 @@ spec:
           for attempt in $(seq 1 20); do output=$(kubectl annotate ingress approved-ingress
           -n exception-ingress-ns kyverno.io/lifecycle-check=denied --overwrite --dry-run=server
           -o yaml 2>&1); status=$?; if test "$status" -ne 0; then echo "$output" | grep -F
-          "The root path already exists in the cluster but not in the namespace." >/dev/null
+          "The Ingress path already exists in the cluster." >/dev/null
           && exit 0; echo "$output"; exit 1; fi; sleep 1; done; echo "$output"; exit 1
