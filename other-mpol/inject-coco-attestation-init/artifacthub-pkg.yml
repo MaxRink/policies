@@ -13,7 +13,13 @@ keywords:
   - Confidential Computing
   - MutatingPolicy
 readme: |
-  Injects attestation verification init container into Confidential Computing enabled pods based on labels and ConfigMap configuration.
+  Adds a `coco-attestation-init` init container to Pods labeled `coco=enabled` that have the
+  `coco.io/init-config` annotation. The annotation names a ConfigMap in the Pod's namespace.
+  The policy also applies to Deployment, StatefulSet, DaemonSet, Job, and CronJob pod templates;
+  other controller kinds, including ReplicationControllers, are not matched.
+  Optional ConfigMap keys are `init_image`, `kbs_url`, and `timeout`; absent keys use the
+  defaults in the policy. These annotation and ConfigMap keys are this sample's configuration
+  interface, not native CoCo runtime annotations.
   
   ### Fine-grained PolicyException use
 
@@ -30,4 +36,4 @@ readme: |
 annotations:
   kyverno/category: "Confidential Computing"
   kyverno/subject: "Pod"
-digest: 5314d1a5259e16ec53ab63ef06fbed4d7b958a5523f7f09caff05116639a52dc
+digest: 8732b42ad1984304f886e2c17ddb5f468a4e8084f890411727e814c6dda2e124

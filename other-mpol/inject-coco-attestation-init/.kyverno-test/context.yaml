@@ -1,0 +1,15 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Context
+metadata:
+  name: inject-coco-attestation-init
+spec:
+  resources:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: attestation
+      namespace: default
+    data:
+      init_image: custom-registry.io/attestation-init:v1.0.0
+      kbs_url: https://kbs.example.com
+      timeout: "120"

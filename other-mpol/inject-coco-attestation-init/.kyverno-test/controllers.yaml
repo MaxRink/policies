@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coco-deployment
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: coco
+  template:
+    metadata:
+      labels:
+        app: coco
+        coco: enabled
+      annotations:
+        coco.io/init-config: attestation
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.21.0
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: coco-cronjob
+  namespace: default
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: coco
+            coco: enabled
+          annotations:
+            coco.io/init-config: attestation
+        spec:
+          containers:
+          - name: app
+            image: nginx:1.21.0
+          restartPolicy: OnFailure

@@ -74,7 +74,12 @@ spec:
         }
     patchType: ApplyConfiguration
   variables:
-  - expression: "object.metadata.annotations['coco.io/init-config']"
+  - expression: |
+      request.object.kind == "Pod" ?
+      request.object.metadata.annotations['coco.io/init-config'] :
+      request.object.kind == "CronJob" ?
+      request.object.spec.jobTemplate.spec.template.metadata.annotations['coco.io/init-config'] :
+      request.object.spec.template.metadata.annotations['coco.io/init-config']
     name: configMapName
   - expression: "object.metadata.namespace"
     name: namespace

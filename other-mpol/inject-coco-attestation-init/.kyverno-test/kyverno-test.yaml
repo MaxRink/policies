@@ -1,0 +1,51 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: inject-coco-attestation-init
+policies:
+- ../inject-coco-attestation-init.yaml
+resources:
+- resource.yaml
+- controllers.yaml
+- replicationcontroller.yaml
+exceptions:
+- exceptions.yaml
+context: context.yaml
+results:
+- kind: Pod
+  patchedResources: patchedResource.yaml
+  policy: inject-coco-attestation-init
+  resources:
+  - coco-pod
+  - sibling-pod
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  policy: inject-coco-attestation-init
+  resources:
+  - exception-pod
+  result: skip
+  isMutatingPolicy: true
+- kind: Pod
+  policy: inject-coco-attestation-init
+  resources:
+  - no-label-pod
+  result: skip
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: controllers-patched.yaml
+  policy: inject-coco-attestation-init
+  resources: [coco-deployment]
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: controllers-patched.yaml
+  policy: inject-coco-attestation-init
+  resources: [coco-cronjob]
+  result: pass
+  isMutatingPolicy: true
+- kind: ReplicationController
+  policy: inject-coco-attestation-init
+  resources: [coco-replicationcontroller]
+  result: skip
+  isMutatingPolicy: true
