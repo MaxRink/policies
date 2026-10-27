@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - exception-resources.yaml
+- null-fields.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -97,4 +98,10 @@ results:
   - goodpod04
   - goodpod05
   - goodpod06
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-capabilities
+  resources:
+  - null-capabilities
   result: pass
