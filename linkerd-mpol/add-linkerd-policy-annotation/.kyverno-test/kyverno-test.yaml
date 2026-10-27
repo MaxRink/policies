@@ -1,0 +1,16 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: add-linkerd-policy-annotation
+policies:
+- ../add-linkerd-policy-annotation.yaml
+resources:
+- resource.yaml
+results:
+- kind: Namespace
+  patchedResources: patched.yaml
+  policy: add-linkerd-policy-annotation
+  resources:
+  - test
+  result: pass
+  isMutatingPolicy: true
