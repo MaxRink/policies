@@ -1,0 +1,9 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Values
+policies:
+- name: restrict-deprecated-registry
+  resources:
+  - name: test-pod-ephemeral-bad
+    values:
+      request.operation: UPDATE
+      request.subResource: ephemeralcontainers
