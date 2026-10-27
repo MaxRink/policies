@@ -32,12 +32,12 @@ spec:
       expression: >-
         resource.Get("v1", "configmaps", "default", "allowed-pod-priorities")
     - name: namespaceName
-      expression: "namespaceObject.metadata.name"
+      expression: "object.metadata.namespace"
     - name: priorities
-      expression: "variables.namespaceName in variables.prior.data ? variables.prior.data[variables.namespaceName].split(', ') : []"
+      expression: "variables.prior.?data[?variables.namespaceName].orValue('').split(', ').filter(priority, priority != '')"
   validations:
     - expression: "variables.priorities == [] || object.spec.priorityClassName in variables.priorities || exceptions.allowedValues.exists(value, value == 'priorityClass:' + object.spec.?priorityClassName.orValue(''))"
-      message: >-
-        'The Pod PriorityClass ' + object.spec.priorityClassName +
+      messageExpression: >-
+        'The Pod PriorityClass ' + object.spec.?priorityClassName.orValue('') +
         ' is not in the list of the following PriorityClasses allowed in this Namespace: ' +
-        variables.prior.data[variables.namespaceName]
+        variables.prior.?data[?variables.namespaceName].orValue('')

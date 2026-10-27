@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: unconfigured-priority
+  namespace: pod-priority-ns
+spec:
+  priorityClassName: arbitrary
+  containers:
+  - name: test
+    image: busybox:1.35
