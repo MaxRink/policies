@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: exception-appset
+  namespace: default
+spec:
+  generators:
+  - list:
+      elements:
+      - cluster: engineering-dev
+        url: https://1.2.3.4
+  template:
+    metadata:
+      name: '{{cluster}}-guestbook'
+    spec:
+      project: not-exception-appset
+      source:
+        repoURL: https://github.com/infra-team/cluster-deployments.git
+        targetRevision: HEAD
+        path: guestbook
+      destination:
+        server: '{{url}}'
+        namespace: guestbook

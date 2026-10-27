@@ -7,6 +7,11 @@ policies:
 resources:
 - ../.chainsaw-test/bad-appset.yaml
 - ../.chainsaw-test/good-appset.yaml
+- missing-project-appset.yaml
+- null-project-appset.yaml
+- exception-appset.yaml
+exceptions:
+  - exceptions.yaml
 results:
 - policy: applicationset-name-matches-project
   kind: ApplicationSet
@@ -18,3 +23,14 @@ results:
   resources:
   - guestbook
   result: pass
+- policy: applicationset-name-matches-project
+  kind: ApplicationSet
+  resources:
+  - missing-project
+  - null-project
+  result: fail
+- policy: applicationset-name-matches-project
+  kind: ApplicationSet
+  resources:
+  - exception-appset
+  result: skip

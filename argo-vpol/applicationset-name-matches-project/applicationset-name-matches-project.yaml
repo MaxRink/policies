@@ -27,4 +27,5 @@ spec:
         resources: [applicationsets]
   validations:
     - message: "The name must match the project."
-      expression: "object.spec.template.spec.project == object.metadata.name"
+      expression: >-
+        object.?spec.orValue({}).?template.orValue({}).?spec.orValue({}).?project.orValue('') == object.metadata.name
