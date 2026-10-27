@@ -8,6 +8,7 @@ description: >-
   DaemonSet because the new pods are not scheduled the way regular pods are. It would require
   parallel scheduling logic that is not proper to Kubernetes. Therefore, eviction of regular 
   pods should happen instead. This can be achieved with the priority class system-node-critical.
+  The policy ensures this priority class is set on every DaemonSet.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/karpenter-mpol/add-karpenter-daemonset-priority-class/add-karpenter-daemonset-priority-class.yaml
@@ -21,6 +22,7 @@ readme: |
   DaemonSet because the new pods are not scheduled the way regular pods are. It would require
   parallel scheduling logic that is not proper to Kubernetes. Therefore, eviction of regular 
   pods should happen instead. This can be achieved with the priority class system-node-critical.
+  The policy ensures this priority class is set on every DaemonSet.
   
   ### Fine-grained PolicyException use
 
@@ -38,4 +40,4 @@ annotations:
   kyverno/category: "Karpenter"
   kyverno/kubernetesVersion: "1.26"
   kyverno/subject: "DaemonSet"
-digest: 0bbc3dd4458f62b7a1266db8a593cd4226ea668b1d1e7769193edeac47540348
+digest: a78e737de8ee1ed43c4fd1b55aba6609ba15c40a8608335ae8f7da1c47350314
