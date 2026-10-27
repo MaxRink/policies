@@ -1,0 +1,40 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: require-workload-serviceaccount-irsa
+policies:
+  - ../require-workload-serviceaccount-irsa.yaml
+resources:
+  - resources.yaml
+results:
+  - isValidatingPolicy: true
+    kind: ServiceAccount
+    policy: require-workload-serviceaccount-irsa
+    resources:
+      - default/aws-irsa-role
+      - default/aws-cn-irsa-role
+      - default/aws-gov-irsa-role
+      - default/one-character-role-name
+    result: pass
+  - isValidatingPolicy: true
+    kind: ServiceAccount
+    policy: require-workload-serviceaccount-irsa
+    resources:
+      - default/no-aws-access
+      - default/aws-access-false
+    result: skip
+  - isValidatingPolicy: true
+    kind: ServiceAccount
+    policy: require-workload-serviceaccount-irsa
+    resources:
+      - default/no-role-annotation
+      - default/empty-role-annotation
+      - default/short-arn
+      - default/short-account
+      - default/wrong-service
+      - default/empty-role-name
+      - default/trailing-role-slash
+      - default/double-slash-role
+      - default/unsupported-partition
+      - default/role-without-slash
+    result: fail
