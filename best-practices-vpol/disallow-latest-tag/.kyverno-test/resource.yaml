@@ -46,6 +46,15 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
+  name: invalid-image
+spec:
+  containers:
+  - name: app
+    image: ""
+---
+apiVersion: v1
+kind: Pod
+metadata:
   name: init-latest-pod
 spec:
   initContainers:
