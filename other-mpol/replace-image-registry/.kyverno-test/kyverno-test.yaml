@@ -6,6 +6,7 @@ policies:
 - ../replace-image-registry.yaml
 resources:
 - resource.yaml
+- registry-port-resource.yaml
 results:
 - kind: Pod
   patchedResources: patchedResource1.yaml
@@ -19,5 +20,12 @@ results:
   policy: replace-image-registry
   resources:
   - myapp-pod2
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: registry-port-patched.yaml
+  policy: replace-image-registry
+  resources:
+  - registry-port
   result: pass
   isMutatingPolicy: true
