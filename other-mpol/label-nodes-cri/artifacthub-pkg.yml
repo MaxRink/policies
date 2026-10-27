@@ -30,4 +30,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.23"
   kyverno/subject: "Node, Label"
-digest: eeba1d66b7aa067edb1b6305478ecff18dc510e4e13f5a3d661c7744b8edced6
+digest: a2bb5081b49c4eeb03f0e0954a317aeecd0e49daceaa6b10feaacaf0eaa0656f
