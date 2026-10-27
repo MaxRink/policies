@@ -2,7 +2,7 @@ name: ensure-probes-different-vpol
 version: 1.0.0
 displayName: Validate Probes in ValidatingPolicy
 description: >-
-  Liveness and readiness probes accomplish different goals, and setting both to the same is an anti-pattern and often results in app problems in the future. This policy checks that liveness and readiness probes are not equal.
+  Liveness and readiness probes accomplish different goals, and setting both to the same is an anti-pattern and often results in app problems in the future. This policy checks that liveness and readiness probes are not equal; if both are absent, they are considered equal and the workload fails.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/ensure-probes-different/ensure-probes-different.yaml
@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 44408d2508b1b8c223ab14faad8fc464e49b045f3d028cc64550d36d81c1e424
+digest: a50a397d193c9e1b7f4c2172e62d0ee97fdaf93018bf1d8fa201a6414b8df085
 
 
 createdAt: "2025-05-11T17:46:12Z"
