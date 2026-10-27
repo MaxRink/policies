@@ -11,13 +11,11 @@ metadata:
     kyverno.io/kyverno-version: 1.10.0
     kyverno.io/kubernetes-version: "1.25"
     policies.kyverno.io/description: >-
-      Kubecost is able to modify container resource requests and limits dynamically
-      based upon observed utilization patterns and recommendations. This provides an
-      easy way to automatically improve allocation of cluster resources by increasing
-      efficiency. This policy will annotate all Deployments which have the label
-      `env=test` with `request.autoscaling.kubecost.com/enabled="true"` if the annotation
-      is not already present. Other annotations may be added according to need and users
-      should see the documentation for a complete list.
+      This policy sets `request.autoscaling.kubecost.com/enabled="true"` on Deployments
+      labeled `env=test` when the annotation is absent. Current IBM Kubecost 2.x
+      request-right-sizing documentation does not document this per-Deployment
+      annotation; verify that your deployed Kubecost version supports it before relying
+      on automated rightsizing.
 spec:
   matchConstraints:
     resourceRules:
