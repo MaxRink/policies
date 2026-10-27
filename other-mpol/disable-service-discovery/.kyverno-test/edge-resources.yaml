@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sibling-pod
+  namespace: team-a
+spec:
+  dnsPolicy: None
+  enableServiceLinks: true
+  initContainers: null
+  ephemeralContainers: []
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empty-fields-pod
+  namespace: team-a
+spec:
+  dnsPolicy: ""
+  enableServiceLinks: null
+  initContainers: []
+  ephemeralContainers: null
+  containers:
+  - name: app
+    image: nginx:1.27
