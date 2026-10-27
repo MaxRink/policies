@@ -29,4 +29,4 @@ readme: |
 annotations:
   kyverno/category: "Multi-Tenancy"
   kyverno/subject: "RoleBinding"
-digest: 6f4d60898d5c884138ff8466d415783919f14969d9b8961867237d1af978a19d
+digest: 45ef1ed6ba9475a0846b59394e4b1fafc4b205cafecd003bd93a34b515df345f
