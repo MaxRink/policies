@@ -1,0 +1,26 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: label-existing-namespaces
+policies:
+- ../label-existing-namespaces.yaml
+resources:
+- resource.yaml
+exceptions:
+- exceptions.yaml
+results:
+- kind: Namespace
+  patchedResources: patchedResource.yaml
+  policy: label-existing-namespaces
+  resources:
+  - namespace
+  - sibling-namespace
+  - existing-label-namespace
+  result: pass
+  isMutatingPolicy: true
+- kind: Namespace
+  policy: label-existing-namespaces
+  resources:
+  - exception-namespace
+  result: skip
+  isMutatingPolicy: true
