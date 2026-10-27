@@ -53,5 +53,5 @@ spec:
           - expression: >-
               variables.allContainers.all(container,
               (has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
-              container.image.startsWith('eu.foo.io/') || container.image.startsWith('bar.io/'))
+              image(container.image).registry() in ['eu.foo.io', 'bar.io'])
             message: "Unknown image registry."
