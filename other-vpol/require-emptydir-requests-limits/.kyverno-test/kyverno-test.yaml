@@ -9,6 +9,7 @@ resources:
 - resource-pass.yaml
 - resource-skip.yaml
 - replicationcontroller-bad.yaml
+- no-resources-pod.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -17,6 +18,8 @@ results:
   policy: require-emptydir-requests-and-limits
   resources:
   - fail-pod
+  - pod-no-resources
+  - pod-null-resources
   - exception-emptydir-wrong-token
   - exception-emptydir-sibling-name
   - exception-emptydir-sibling-volume
