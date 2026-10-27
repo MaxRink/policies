@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-labels-pod
+  labels: null
+spec:
+  containers:
+    - name: app
+      image: nginx:1.25
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-version-label-pod
+  labels:
+    corp.org/version: null
+spec:
+  containers:
+    - name: app
+      image: nginx:1.25
