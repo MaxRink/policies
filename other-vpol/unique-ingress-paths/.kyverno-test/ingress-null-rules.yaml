@@ -1,0 +1,13 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: null-rules-ingress
+  namespace: default
+  uid: null-rules-uid
+spec:
+  defaultBackend:
+    service:
+      name: demo
+      port:
+        number: 80
+  rules: null

@@ -2,7 +2,7 @@ name: unique-ingress-paths
 version: 1.0.0
 displayName: Unique Ingress Path
 description: >-
-  Just like the need to ensure uniqueness among Ingress hosts, there is a need to have the paths be unique as well. This policy checks an incoming Ingress to ensure its root path does not conflict with another root path in a different Namespace. It requires that incoming Ingress resources have a single rule with a single path only and assumes the root path is specified explicitly in an existing Ingress rule (ex., when blocking /foo/bar /foo must exist by itself and not part of /foo/baz).
+  This policy rejects each Ingress path that exactly matches a path in any other Ingress in the cluster. Paths are compared literally, without host or path normalization.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/unique-ingress-paths/unique-ingress-paths.yaml
@@ -11,7 +11,7 @@ keywords:
   - kyverno
   - Sample
 readme: |
-  Just like the need to ensure uniqueness among Ingress hosts, there is a need to have the paths be unique as well. This policy checks an incoming Ingress to ensure its root path does not conflict with another root path in a different Namespace. It requires that incoming Ingress resources have a single rule with a single path only and assumes the root path is specified explicitly in an existing Ingress rule (ex., when blocking /foo/bar /foo must exist by itself and not part of /foo/baz).
+  This policy rejects each Ingress path that exactly matches a path in any other Ingress in the cluster. Paths are compared literally, without host or path normalization.
   
   ### Fine-grained PolicyException use
 
@@ -29,6 +29,6 @@ readme: |
 annotations:
   kyverno/category: "Sample"
   kyverno/subject: "Ingress"
-digest: 72032941e66d66b343ca0f24abb924fe503fd20267c0fbf3769235b67de2dd66
+digest: 664051c1f53dbc8144521835dc1edb2693ebc1905533b56d46a34269a7e1c4a1
 
 createdAt: "2025-05-11T17:46:10Z"
