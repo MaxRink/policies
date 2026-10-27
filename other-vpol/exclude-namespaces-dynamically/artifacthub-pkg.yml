@@ -2,7 +2,7 @@ name: exclude-namespaces-dynamically-vpol
 version: 1.0.0
 displayName: Exclude Namespaces Dynamically in ValidatingPolicy
 description: >-
-  It's common where policy lookups need to consider a mapping to many possible values rather than a static mapping. This is a sample which demonstrates how to dynamically look up an allow list of Namespaces from a ConfigMap where the ConfigMap stores an array of strings. This policy validates that any Pods created outside of the list of Namespaces have the label `foo` applied.
+  This policy looks up a comma-separated namespace allowlist from a ConfigMap and requires Pods and supported workload templates outside that list to have the label `foo`. If the ConfigMap or its `exclude` key is absent, no namespace is excluded.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/exclude-namespaces-dynamically/exclude-namespaces-dynamically.yaml
@@ -12,7 +12,7 @@ keywords:
   - Sample
   - ValidatingPolicy
 readme: |
-  It's common where policy lookups need to consider a mapping to many possible values rather than a static mapping. This is a sample which demonstrates how to dynamically look up an allow list of Namespaces from a ConfigMap where the ConfigMap stores an array of strings. This policy validates that any Pods created outside of the list of Namespaces have the label `foo` applied.
+  This policy looks up a comma-separated namespace allowlist from a ConfigMap and requires Pods and supported workload templates outside that list to have the label `foo`. If the ConfigMap or its `exclude` key is absent, no namespace is excluded.
   
   ### Fine-grained PolicyException use
 
@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Namespace, Pod"
-digest: 9d42a71118f84b2512bddf4d31c8e72f8dbf2dea706dae5dbb2ad57ffc069a5d
+digest: e5153ada6037677024ad21759d2a05f59043f08e2276a1eb9bce9a80e5e59d99
 
 
 createdAt: "2025-05-11T17:46:11Z"

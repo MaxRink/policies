@@ -1,0 +1,21 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: exclude-namespaces-example
+policies:
+- ../exclude-namespaces-dynamically.yaml
+resources:
+- resources.yaml
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: exclude-namespaces-example
+  resources:
+  - missing-label
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: exclude-namespaces-example
+  resources:
+  - has-label
+  result: pass

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: namespace-filters
+  namespace: default
+data:
+  exclude: "exclude-ns, exclude-ns-2"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: missing-label
+  namespace: default
+spec:
+  containers:
+  - name: app
+    image: busybox
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: has-label
+  namespace: default
+  labels:
+    foo: bar
+spec:
+  containers:
+  - name: app
+    image: busybox
