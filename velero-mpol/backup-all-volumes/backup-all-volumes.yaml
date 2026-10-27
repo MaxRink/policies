@@ -14,7 +14,7 @@ metadata:
       value being a comma-separated list of the volumes mounted to that Pod. This policy
       automatically annotates Pods (and Pod controllers) which refer to a PVC so that
       all volumes are listed in the aforementioned annotation if a Namespace with the label
-      `velero-backup-pvc=true`.
+      `velero-backup-pvc=true`, while preserving an annotation already supplied by the workload.
 spec:
   evaluation:
     admission:
@@ -79,7 +79,8 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        object.kind == "Pod" && variables.podVolumesList != '' ?
+        object.kind == "Pod" && variables.podVolumesList != '' &&
+        !("backup.velero.io/backup-volumes" in object.metadata.?annotations.orValue({})) ?
         (
           !has(object.metadata.annotations) ?
           [
@@ -102,7 +103,8 @@ spec:
     jsonPatch:
       expression: |
         (object.kind == "Deployment" || object.kind == "DaemonSet" || object.kind == "StatefulSet") && 
-        variables.deploymentVolumesList != '' ?
+        variables.deploymentVolumesList != '' &&
+        !("backup.velero.io/backup-volumes" in object.spec.?template.?metadata.?annotations.orValue({})) ?
         (
           !has(object.spec.template.metadata.annotations) ?
           [
@@ -124,7 +126,8 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        object.kind == "Job" && variables.jobVolumesList != '' ?
+        object.kind == "Job" && variables.jobVolumesList != '' &&
+        !("backup.velero.io/backup-volumes" in object.spec.?template.?metadata.?annotations.orValue({})) ?
         (
           !has(object.spec.template.metadata.annotations) ?
           [
@@ -146,7 +149,8 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        object.kind == "CronJob" && variables.cronjobVolumesList != '' ?
+        object.kind == "CronJob" && variables.cronjobVolumesList != '' &&
+        !("backup.velero.io/backup-volumes" in object.spec.?jobTemplate.?spec.?template.?metadata.?annotations.orValue({})) ?
         (
           !has(object.spec.jobTemplate.spec.template.metadata.annotations) ?
           [

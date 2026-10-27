@@ -6,6 +6,7 @@ policies:
 - ../backup-all-volumes.yaml
 resources:
 - resource.yaml
+- annotated-pod.yaml
 - exception-resource.yaml
 exceptions:
 - exceptions.yaml
@@ -35,6 +36,13 @@ results:
   policy: backup-all-volumes
   resources:
   - foo/first
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: annotated-pod.yaml
+  policy: backup-all-volumes
+  resources:
+  - foo/already-annotated
   result: pass
   isMutatingPolicy: true
 variables: values.yaml
