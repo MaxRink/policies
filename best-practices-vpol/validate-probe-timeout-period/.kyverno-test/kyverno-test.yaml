@@ -1,0 +1,71 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: validate-probe-timeout-period
+policies:
+- ../validate-probe-timeout-period.yaml
+resources:
+- resource.yaml
+exceptions:
+- exceptions.yaml
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-probe-timeout-period
+  resources: [good-defaults]
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-probe-timeout-period
+  resources: [good-no-probes]
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-probe-timeout-period
+  resources: [good-init-scope]
+  result: pass
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: validate-probe-timeout-period
+  resources: [good-deployment]
+  result: pass
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: validate-probe-timeout-period
+  resources: [bad-deployment]
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-probe-timeout-period
+  resources: [bad-liveness-equal]
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-probe-timeout-period
+  resources: [bad-readiness-greater]
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-probe-timeout-period
+  resources: [bad-default-timeout-equal]
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-probe-timeout-period
+  resources: [bad-startup-default-period]
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-probe-timeout-period
+  resources: [bad-sidecar-probe]
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-probe-timeout-period
+  resources: [exception-probe-only]
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-probe-timeout-period
+  resources: [exception-other-probe-still-fails]
+  result: fail

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-probe
+spec:
+  containers:
+  - name: app
+    image: nginx:1.29
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      timeoutSeconds: 10
+      periodSeconds: 10

@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: probe-timeout-period-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - kind: ValidatingPolicy
+    name: validate-probe-timeout-period
+  allowedValues:
+  - probe-timeout-period:app:livenessProbe
+  matchConditions:
+  - name: exact-pod
+    expression: object.kind == 'Pod' && object.metadata.namespace == 'test' && object.metadata.name in ['exception-probe-only', 'exception-other-probe-still-fails']

@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bad-deployment
+spec:
+  selector:
+    matchLabels:
+      app: bad
+  template:
+    metadata:
+      labels:
+        app: bad
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.29
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          timeoutSeconds: 10
+          periodSeconds: 10
