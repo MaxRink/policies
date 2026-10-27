@@ -6,6 +6,7 @@ policies:
 - ../docker-socket-requires-label.yaml
 resources:
 - resource.yaml
+- replicationcontroller.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -22,4 +23,9 @@ results:
   - nginx-allow-2
   - nginx-allow-3
   result: pass
-
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: docker-socket-check
+  resources:
+  - docker-socket-bad-rc
+  result: fail
