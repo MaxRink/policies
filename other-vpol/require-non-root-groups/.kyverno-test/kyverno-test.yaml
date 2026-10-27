@@ -8,6 +8,7 @@ policies:
 - ./check-fsgroup.yaml
 resources:
 - resource.yaml
+- replicationcontroller-bad.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -107,6 +108,12 @@ results:
   - badpod13
   - badpod14
   - badpod15
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: require-non-root-groups
+  resources:
+  - root-group-rc
   result: fail
 - isValidatingPolicy: true
   kind: CronJob
