@@ -12,8 +12,6 @@ spec:
         file: rbac-ephemeralcontainers.yaml
     - apply:
         file: rbac-ephemeralcontainers-reports.yaml
-    - sleep:
-        duration: 5s
     - script:
         content: |
           set -eu

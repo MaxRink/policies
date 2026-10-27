@@ -14,8 +14,6 @@ spec:
     try:
     - apply:
         file: rbac-reporting.yaml
-    - sleep:
-        duration: 5s
     - script:
         content: |
           set -eu
