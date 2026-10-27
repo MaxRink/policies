@@ -1,0 +1,23 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: add-privileged-existing-namespaces
+policies:
+- ../add-privileged-existing-namespaces.yaml
+resources:
+- resources.yaml
+results:
+- kind: Namespace
+  patchedResources: privileged.yaml
+  policy: add-privileged-existing-namespaces
+  resources:
+  - new-ns
+  result: pass
+  isMutatingPolicy: true
+- kind: Namespace
+  policy: add-privileged-existing-namespaces
+  resources:
+  - baseline-ns
+  - kube-system
+  result: skip
+  isMutatingPolicy: true
