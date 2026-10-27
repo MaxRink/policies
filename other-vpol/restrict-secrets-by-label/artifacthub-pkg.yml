@@ -1,0 +1,28 @@
+name: restrict-secrets-by-label-vpol
+version: 1.0.0
+displayName: Restrict Protected Secrets in Pods
+description: >-
+  Rejects Pods and pod templates that consume Secrets labeled status=protected through env, envFrom, Secret volumes, or projected Secret volumes.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-secrets-by-label/permissions.yaml
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-secrets-by-label/restrict-secrets-by-label.yaml
+  ```
+keywords:
+  - kyverno
+  - Other
+  - ValidatingPolicy
+readme: |
+  Rejects Pods and supported controller templates that consume a Secret labeled `status: protected` through `env`, `envFrom`, Secret volumes, or projected Secret volumes. It inspects regular, init, and ephemeral container entries. The policy is distinct from `other-vpol/restrict-secrets-by-name`: that policy allows Secrets by a `safe-` name prefix, while this one evaluates the referenced Secret's `status` label, regardless of its name.
+
+  The policy looks up each referenced Secret at admission time. Its background evaluation is disabled. A referenced Secret must already exist and be readable by the Kyverno admission controller; a missing or unreadable Secret causes an evaluation error and is rejected by the explicit `failurePolicy: Fail`. The accompanying `permissions.yaml` grants the admission controller `get` access to Secrets cluster-wide; this allows Kyverno to read Secret data as well as metadata, so review that access before installing it.
+
+  Kubernetes currently disallows `env` and `envFrom` on ephemeral containers; the CLI test includes an ephemeral-container case to ensure optional container fields are evaluated safely. Pod-level Secret volumes, including projected volumes, remain covered.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "Other in Vpol"
+  kyverno/kubernetesVersion: "1.30"
+  kyverno/subject: "Pod, Secret"
+digest: ca1e4b0ec09ac275eb1ae457f21ab7cf9cbf11817650e8d3014fb4c22b8d9076
+createdAt: "2026-10-27T00:00:00Z"

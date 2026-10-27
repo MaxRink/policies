@@ -1,0 +1,77 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/chainsaw/main/.schemas/json/test-chainsaw-v1alpha1.json
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-secrets-by-label
+spec:
+  template: false
+  steps:
+    - name: configure-policy
+      try:
+        - apply:
+            file: ../permissions.yaml
+        - apply:
+            file: secrets.yaml
+        - apply:
+            file: ../restrict-secrets-by-label.yaml
+        - patch:
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              metadata:
+                name: restrict-secrets-by-label
+              spec:
+                validationActions: [Deny]
+        - assert:
+            file: policy-ready.yaml
+    - name: check-secret-references
+      try:
+        - apply:
+            file: good-pod.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: bad-env-pod.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: bad-envfrom-pod.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: bad-volume-pod.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: bad-projected-pod.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: bad-init-pod.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: missing-secret-pod.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: bad-deployment.yaml
+    - name: cleanup
+      try:
+        - delete:
+            ref:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              name: restrict-secrets-by-label
+        - delete:
+            ref:
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: ClusterRole
+              name: kyverno:restrict-secrets-by-label:secrets:get
