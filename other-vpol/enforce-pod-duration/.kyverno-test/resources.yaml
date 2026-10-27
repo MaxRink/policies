@@ -13,10 +13,70 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
+  name: test-lifetime-invalid
+  namespace: test
+  annotations:
+    pod.kubernetes.io/lifetime: tomorrow
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.12
+---
+apiVersion: v1
+kind: Pod
+metadata:
   name: test-lifetime-fail
   namespace: test
   annotations:
     pod.kubernetes.io/lifetime: 24h
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.12
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-lifetime-leading-decimal
+  namespace: test
+  annotations:
+    pod.kubernetes.io/lifetime: .5h
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.12
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-lifetime-trailing-decimal
+  namespace: test
+  annotations:
+    pod.kubernetes.io/lifetime: 1.h
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.12
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-lifetime-micro-sign-microsecond
+  namespace: test
+  annotations:
+    pod.kubernetes.io/lifetime: 1µs
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.12
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-lifetime-greek-mu-microsecond
+  namespace: test
+  annotations:
+    pod.kubernetes.io/lifetime: 1μs
 spec:
   containers:
   - name: nginx
