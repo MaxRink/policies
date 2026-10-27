@@ -1,0 +1,27 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: disallow-static-aws-credentials
+policies:
+  - ../disallow-static-aws-credentials.yaml
+resources:
+  - resources.yaml
+results:
+  - isValidatingPolicy: true
+    kind: Secret
+    policy: disallow-static-aws-credentials
+    resources:
+      - default/aws-creds-data
+      - default/aws-creds-lowercase-data
+      - default/aws-creds-stringdata
+      - default/aws-alias-stringdata
+    result: fail
+  - isValidatingPolicy: true
+    kind: Secret
+    policy: disallow-static-aws-credentials
+    resources:
+      - default/app-config
+      - default/aws-value-under-unrelated-key
+      - default/empty-secret
+      - default/null-secret
+    result: pass
