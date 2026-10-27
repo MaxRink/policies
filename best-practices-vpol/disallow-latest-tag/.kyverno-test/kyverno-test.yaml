@@ -41,6 +41,8 @@ results:
   - myapp-pod
   - registry-port-pod
   - ipv6-registry-pod
+  - digest-pod
+  - latest-tag-digest-pod
   result: pass
 - isValidatingPolicy: true
   kind: Pod
@@ -48,6 +50,7 @@ results:
   resources:
   - init-latest-pod
   - ephemeral-latest-pod
+  - latest-port-pod
   result: fail
 - isValidatingPolicy: true
   kind: Deployment
