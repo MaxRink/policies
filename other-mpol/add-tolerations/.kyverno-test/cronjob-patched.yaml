@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-tolerations
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          tolerations:
+          - key: org.com/role
+            operator: Equal
+            value: service
+            effect: NoSchedule
+          containers:
+          - name: app
+            image: app:v1
+          restartPolicy: OnFailure
