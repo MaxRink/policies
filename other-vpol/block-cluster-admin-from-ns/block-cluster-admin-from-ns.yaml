@@ -20,8 +20,6 @@ spec:
       expression: 'request.userInfo.username == "testuser"'
     - name: isTestNamespace
       expression: 'request.namespace == "testnamespace"'
-    - name: hasClusterAdminRole
-      expression: 'request.userInfo.groups.exists(group, group == "system:masters") || request.userInfo.groups.exists(group, group.contains("cluster-admin"))'
     - name: isBlockedOperation
       expression: 'request.operation in ["CREATE", "UPDATE", "DELETE"]'
   matchConstraints:
