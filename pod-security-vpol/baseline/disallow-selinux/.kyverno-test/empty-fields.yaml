@@ -1,0 +1,77 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empty-pod-type
+spec:
+  securityContext:
+    seLinuxOptions:
+      type: ""
+  containers:
+  - name: app
+    image: test:latest
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empty-pod-user
+spec:
+  securityContext:
+    seLinuxOptions:
+      user: ""
+  containers:
+  - name: app
+    image: test:latest
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empty-pod-role
+spec:
+  securityContext:
+    seLinuxOptions:
+      role: ""
+  containers:
+  - name: app
+    image: test:latest
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empty-container-type
+spec:
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      seLinuxOptions:
+        type: ""
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empty-init-user
+spec:
+  initContainers:
+  - name: init
+    image: test:latest
+    securityContext:
+      seLinuxOptions:
+        user: ""
+  containers:
+  - name: app
+    image: test:latest
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empty-ephemeral-role
+spec:
+  ephemeralContainers:
+  - name: debug
+    image: test:latest
+    securityContext:
+      seLinuxOptions:
+        role: ""
+  containers:
+  - name: app
+    image: test:latest
