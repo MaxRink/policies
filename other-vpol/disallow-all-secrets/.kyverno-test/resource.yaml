@@ -98,4 +98,20 @@ spec:
   containers:
   - name: test-container
     image: registry.k8s.io/busybox
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-secret-pod
+  namespace: default
+spec:
+  initContainers:
+  - name: init
+    image: busybox
+    envFrom:
+    - secretRef:
+        name: credentials
+  containers:
+  - name: app
+    image: busybox
     
