@@ -24,6 +24,8 @@ readme: |
   images are exempted and all other images remain enforced.
   CEL reads these references through `exceptions.allowedImages`; `variables.allContainers`
   includes regular, init, and ephemeral containers.
+  Background reporting for `pods/ephemeralcontainers` requires the reports controller to have
+  `get`, `list`, and `watch` access; see the [sample ClusterRoles](https://github.com/kyverno/policies/blob/main/other-vpol/restrict-deprecated-registry/.chainsaw-test/ephemeral-rbac.yaml).
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-vpol/restrict-deprecated-registry/.kyverno-test-exceptions/exceptions.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal enforcement behavior.
@@ -33,7 +35,7 @@ annotations:
   kyverno/category: "Best Practices, EKS Best Practices in vpol"
   kyverno/kubernetesVersion: "1.27-1.28"
   kyverno/subject: "Pod"
-digest: 4aee76e9fff94a120ae13075b46edb0a6fe81497ba491e8149e3e770c580fec4
+digest: d4ca71a67b994a77e1857b3a42bb6411c4021eb6bb113250a40d53db660c0b04
 
 
 createdAt: "2025-05-11T17:46:11Z"
