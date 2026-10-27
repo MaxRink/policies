@@ -41,11 +41,15 @@ spec:
     image: nginx:latest
     envFrom:
     - configMapRef:
+        name: somenvars
+    - configMapRef:
         name: nsenvvars
   containers:
   - name: pod02-01
     image: nginx:latest
     envFrom:
+    - configMapRef:
+        name: somenvars
     - configMapRef:
         name: nsenvvars
   - name: pod02-02
