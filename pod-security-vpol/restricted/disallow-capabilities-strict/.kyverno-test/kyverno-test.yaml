@@ -8,6 +8,7 @@ policies:
 resources:
 - resource.yaml
 - null-fields.yaml
+- init-ephemeral.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -122,6 +123,12 @@ results:
   policy: disallow-capabilities-strict
   resources:
   - null-drop-capabilities
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-capabilities-strict
+  resources:
+  - init-ephemeral-capabilities
   result: fail
 - isValidatingPolicy: true
   kind: CronJob
