@@ -51,9 +51,25 @@ spec:
         variables.isCronJob ? object.spec.jobTemplate.spec.template.spec.containers :
         []
 
+    - name: initContainers
+      expression: >-
+        variables.isPod && has(object.spec.initContainers) ? object.spec.initContainers :
+        variables.isController && has(object.spec.template.spec.initContainers) ? object.spec.template.spec.initContainers :
+        variables.isCronJob && has(object.spec.jobTemplate.spec.template.spec.initContainers) ? object.spec.jobTemplate.spec.template.spec.initContainers :
+        []
+
     - name: resolvedContainers
       expression: >-
         variables.containers.map(container, {
+          'name': container.name,
+          'originalImage': container.image,
+          'image': exceptions.allowedImages.exists(image, image == container.image) ?
+            container.image : image.GetMetadata(container.image).resolvedImage
+        })
+
+    - name: resolvedInitContainers
+      expression: >-
+        variables.initContainers.map(container, {
           'name': container.name,
           'originalImage': container.image,
           'image': exceptions.allowedImages.exists(image, image == container.image) ?
@@ -68,10 +84,15 @@ spec:
           Object{
             spec: Object.spec{
               containers: variables.resolvedContainers.map(rc,
-                exceptions.allowedImages.exists(image, image == rc.originalImage) ? object.spec.containers[variables.resolvedContainers.indexOf(rc)] :
                 Object.spec.containers{
                   name: rc.name,
-                  image: rc.image
+                  image: exceptions.allowedImages.exists(image, image == rc.originalImage) ? rc.originalImage : rc.image
+                }
+              ),
+              initContainers: variables.resolvedInitContainers.map(rc,
+                Object.spec.initContainers{
+                  name: rc.name,
+                  image: exceptions.allowedImages.exists(image, image == rc.originalImage) ? rc.originalImage : rc.image
                 }
               )
             }
@@ -86,10 +107,15 @@ spec:
               template: Object.spec.template{
                   spec: Object.spec.template.spec{
                   containers: variables.resolvedContainers.map(rc,
-                    exceptions.allowedImages.exists(image, image == rc.originalImage) ? object.spec.template.spec.containers[variables.resolvedContainers.indexOf(rc)] :
                     Object.spec.template.spec.containers{
                       name: rc.name,
-                      image: rc.image
+                      image: exceptions.allowedImages.exists(image, image == rc.originalImage) ? rc.originalImage : rc.image
+                    }
+                  ),
+                  initContainers: variables.resolvedInitContainers.map(rc,
+                    Object.spec.template.spec.initContainers{
+                      name: rc.name,
+                      image: exceptions.allowedImages.exists(image, image == rc.originalImage) ? rc.originalImage : rc.image
                     }
                   )
                 }
@@ -108,10 +134,15 @@ spec:
                   template: Object.spec.jobTemplate.spec.template{
                       spec: Object.spec.jobTemplate.spec.template.spec{
                       containers: variables.resolvedContainers.map(rc,
-                        exceptions.allowedImages.exists(image, image == rc.originalImage) ? object.spec.jobTemplate.spec.template.spec.containers[variables.resolvedContainers.indexOf(rc)] :
                         Object.spec.jobTemplate.spec.template.spec.containers{
                           name: rc.name,
-                          image: rc.image
+                          image: exceptions.allowedImages.exists(image, image == rc.originalImage) ? rc.originalImage : rc.image
+                        }
+                      ),
+                      initContainers: variables.resolvedInitContainers.map(rc,
+                        Object.spec.jobTemplate.spec.template.spec.initContainers{
+                          name: rc.name,
+                          image: exceptions.allowedImages.exists(image, image == rc.originalImage) ? rc.originalImage : rc.image
                         }
                       )
                     }

@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Resolve Image to Digest
 createdAt: "2023-04-10T20:30:06.000Z"
 description: >-
-  Image tags are mutable and the change of an image can result in the same tag. This policy resolves the image digest of each image in a container and replaces the image with the fully resolved reference which includes the digest rather than tag.
+  Image tags are mutable and the change of an image can result in the same tag. This policy resolves the image digest of each image in containers and initContainers and replaces the image with the fully resolved reference which includes the digest rather than tag.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-mpol/resolve-image-to-digest/resolve-image-to-digest.yaml
@@ -12,7 +12,7 @@ keywords:
   - kyverno
   - Other
 readme: |
-  Image tags are mutable and the change of an image can result in the same tag. This policy resolves the image digest of each image in a container and replaces the image with the fully resolved reference which includes the digest rather than tag.
+  Image tags are mutable and the change of an image can result in the same tag. This policy resolves the image digest of each image in containers and initContainers and replaces the image with the fully resolved reference which includes the digest rather than tag.
   
   ### Fine-grained PolicyException use
 
@@ -23,8 +23,8 @@ readme: |
   `variables.resolvedContainers` retains each incoming image in `originalImage`
   and skips `image.GetMetadata` for exact exempt images. Mutation checks
   `originalImage`, not the resolved digest, to preserve the entire original
-  regular container. Non-exempt images are still resolved and replaced in Pods
-  and explicitly matched controller templates.
+  container or initContainer. Non-exempt images are still resolved and replaced
+  in Pods and explicitly matched controller templates.
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-mpol/resolve-image-to-digest/.kyverno-test/exception.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal mutation behavior.
@@ -34,4 +34,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.23"
   kyverno/subject: "Pod"
-digest: 706992f46a2114a41fc986b7196101bf8e99490b8173e6453f0f569ffc405380
+digest: 5d89c0871c5934ae49ada1a5e5dc6d7e9dec58205ef0e888aed4eff88d6b21ea
