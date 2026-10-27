@@ -9,7 +9,13 @@ resources:
 - exception-resource.yaml
 - other-namespace-resource.yaml
 - init-container-resource.yaml
+- upgrade-pod.yaml
+- preserve-container-settings.yaml
+- pod-context-resource.yaml
+- deployment-context-resource.yaml
+- pod-disallowed-context.yaml
 - replicationcontroller-resource.yaml
+- windows-resource.yaml
 exceptions:
 - exception.yaml
 results:
@@ -18,6 +24,37 @@ results:
   policy: apply-pss-restricted-profile
   resources:
   - mypod
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: upgrade-pod-patched.yaml
+  policy: apply-pss-restricted-profile
+  resources: [upgrade-pod]
+  operation: UPDATE
+  result: skip
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: preserve-container-settings-patched.yaml
+  policy: apply-pss-restricted-profile
+  resources: [preserve-container-settings]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: pod-context-patched.yaml
+  policy: apply-pss-restricted-profile
+  resources: [pod-custom-context]
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: deployment-context-patched.yaml
+  policy: apply-pss-restricted-profile
+  resources: [deployment-custom-context]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: pod-disallowed-context-patched.yaml
+  policy: apply-pss-restricted-profile
+  resources: [pod-disallowed-context]
   result: pass
   isMutatingPolicy: true
 - kind: Pod
@@ -43,4 +80,10 @@ results:
   policy: apply-pss-restricted-profile
   resources: [pss-replicationcontroller]
   result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: windows-patched.yaml
+  policy: apply-pss-restricted-profile
+  resources: [windows-pod]
+  result: skip
   isMutatingPolicy: true

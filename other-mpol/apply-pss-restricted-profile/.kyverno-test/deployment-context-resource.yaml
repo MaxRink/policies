@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-custom-context
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: deployment-custom-context
+  template:
+    metadata:
+      labels:
+        app: deployment-custom-context
+    spec:
+      securityContext:
+        fsGroup: 1000
+        runAsGroup: 65532
+        runAsNonRoot: true
+        runAsUser: 65532
+        seccompProfile:
+          type: Localhost
+          localhostProfile: profiles/deployment.json
+      containers:
+      - name: app
+        image: nginx

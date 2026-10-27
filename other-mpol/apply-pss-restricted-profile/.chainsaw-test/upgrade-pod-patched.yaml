@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: upgrade-pod
+  namespace: default
+  labels:
+    upgrade-test: updated
+spec:
+  securityContext:
+    fsGroup: 2000
+    runAsGroup: 3000
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: app
+    image: nginx
+  initContainers:
+  - name: setup
+    image: busybox
+  (containers[0].securityContext == `null`): true
+  (initContainers[0].securityContext == `null`): true

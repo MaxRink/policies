@@ -13,11 +13,6 @@ spec:
         drop:
         - ALL
       privileged: false
-      runAsGroup: 3000
-      runAsNonRoot: true
-      runAsUser: 1000
-      seccompProfile:
-        type: RuntimeDefault
   initContainers:
   - name: setup
     image: busybox
@@ -27,7 +22,6 @@ spec:
         drop:
         - ALL
       privileged: false
-      runAsGroup: 3000
       runAsNonRoot: true
       runAsUser: 1000
       seccompProfile:
