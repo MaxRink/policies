@@ -84,3 +84,14 @@ spec:
   - emptyDir:
       sizeLimit: 100Mi
     name: bar
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod05
+  namespace: add-emptydir-sizelimit
+spec:
+  automountServiceAccountToken: false
+  containers:
+  - name: busybox
+    image: zfmvbxzmhvc:1.35
