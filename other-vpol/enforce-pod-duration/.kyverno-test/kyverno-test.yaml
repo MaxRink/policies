@@ -12,10 +12,15 @@ results:
   policy: pod-lifetime
   resources:
   - test-lifetime-fail
+  - test-lifetime-invalid
   result: fail
 - isValidatingPolicy: true
   kind: Pod
   policy: pod-lifetime
   resources:
   - test-lifetime-pass
+  - test-lifetime-leading-decimal
+  - test-lifetime-trailing-decimal
+  - test-lifetime-micro-sign-microsecond
+  - test-lifetime-greek-mu-microsecond
   result: pass
