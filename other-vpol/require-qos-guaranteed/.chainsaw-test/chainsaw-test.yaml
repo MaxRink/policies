@@ -48,4 +48,9 @@ spec:
         expect:
         - check:
             ($error != null): true
+        file: ../.kyverno-test/null-cpu-pod.yaml
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
         file: ../.kyverno-test/replicationcontroller-bad.yaml

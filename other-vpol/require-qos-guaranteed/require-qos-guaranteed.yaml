@@ -49,29 +49,33 @@ spec:
     - name: guaranteed
       expression: >-
         variables.qosContainers.all(container,
-        has(container.resources) &&
+        has(container.resources) && container.resources != null &&
         container.resources.?requests.orValue({}).?cpu.hasValue() &&
+        container.resources.?requests.orValue({}).?cpu.orValue(null) != null &&
         container.resources.?requests.orValue({}).?memory.hasValue() &&
+        container.resources.?requests.orValue({}).?memory.orValue(null) != null &&
         container.resources.?limits.orValue({}).?cpu.hasValue() &&
+        container.resources.?limits.orValue({}).?cpu.orValue(null) != null &&
         container.resources.?limits.orValue({}).?memory.hasValue() &&
-        quantity(container.resources.requests.orValue({}).cpu).asApproximateFloat() > 0 &&
-        quantity(container.resources.requests.orValue({}).memory).asApproximateFloat() > 0 &&
-        quantity(container.resources.limits.orValue({}).cpu).asApproximateFloat() > 0 &&
-        quantity(container.resources.limits.orValue({}).memory).asApproximateFloat() > 0 &&
-        quantity(container.resources.requests.orValue({}).cpu) == quantity(container.resources.limits.orValue({}).cpu) &&
-        quantity(container.resources.requests.orValue({}).memory) == quantity(container.resources.limits.orValue({}).memory))
+        container.resources.?limits.orValue({}).?memory.orValue(null) != null &&
+        quantity(container.resources.?requests.orValue({}).?cpu.orValue('0')).asApproximateFloat() > 0 &&
+        quantity(container.resources.?requests.orValue({}).?memory.orValue('0')).asApproximateFloat() > 0 &&
+        quantity(container.resources.?limits.orValue({}).?cpu.orValue('0')).asApproximateFloat() > 0 &&
+        quantity(container.resources.?limits.orValue({}).?memory.orValue('0')).asApproximateFloat() > 0 &&
+        quantity(container.resources.?requests.orValue({}).?cpu.orValue('0')) == quantity(container.resources.?limits.orValue({}).?cpu.orValue('0')) &&
+        quantity(container.resources.?requests.orValue({}).?memory.orValue('0')) == quantity(container.resources.?limits.orValue({}).?memory.orValue('0')))
     - name: bestEffort
       expression: >-
         variables.qosContainers.all(container,
-        !has(container.resources) ||
-        !(container.resources.?requests.orValue({}).?cpu.hasValue() ||
-        container.resources.?requests.orValue({}).?memory.hasValue() ||
-        container.resources.?limits.orValue({}).?cpu.hasValue() ||
-        container.resources.?limits.orValue({}).?memory.hasValue()) ||
-        (quantity(container.resources.?requests.orValue({}).?cpu.orValue('0')).asApproximateFloat() == 0.0 &&
-        quantity(container.resources.?requests.orValue({}).?memory.orValue('0')).asApproximateFloat() == 0.0 &&
-        quantity(container.resources.?limits.orValue({}).?cpu.orValue('0')).asApproximateFloat() == 0.0 &&
-        quantity(container.resources.?limits.orValue({}).?memory.orValue('0')).asApproximateFloat() == 0.0))
+        !has(container.resources) || container.resources == null ||
+        !(container.resources.?requests.orValue({}).?cpu.hasValue() && container.resources.?requests.orValue({}).?cpu.orValue(null) != null ||
+        container.resources.?requests.orValue({}).?memory.hasValue() && container.resources.?requests.orValue({}).?memory.orValue(null) != null ||
+        container.resources.?limits.orValue({}).?cpu.hasValue() && container.resources.?limits.orValue({}).?cpu.orValue(null) != null ||
+        container.resources.?limits.orValue({}).?memory.hasValue() && container.resources.?limits.orValue({}).?memory.orValue(null) != null) ||
+        (quantity((container.resources.?requests.orValue({}).?cpu.orValue('0') == null ? '0' : container.resources.?requests.orValue({}).?cpu.orValue('0'))).asApproximateFloat() == 0.0 &&
+        quantity((container.resources.?requests.orValue({}).?memory.orValue('0') == null ? '0' : container.resources.?requests.orValue({}).?memory.orValue('0'))).asApproximateFloat() == 0.0 &&
+        quantity((container.resources.?limits.orValue({}).?cpu.orValue('0') == null ? '0' : container.resources.?limits.orValue({}).?cpu.orValue('0'))).asApproximateFloat() == 0.0 &&
+        quantity((container.resources.?limits.orValue({}).?memory.orValue('0') == null ? '0' : container.resources.?limits.orValue({}).?memory.orValue('0'))).asApproximateFloat() == 0.0))
     - name: qosClass
       expression: "variables.guaranteed ? 'Guaranteed' : variables.bestEffort ? 'BestEffort' : 'Burstable'"
   validations:
