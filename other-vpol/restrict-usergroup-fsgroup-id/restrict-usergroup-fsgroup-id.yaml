@@ -23,14 +23,25 @@ spec:
       enabled: true
   matchConstraints:
     resourceRules:
-    - apiGroups:   [""]
+    - apiGroups: [""]
       apiVersions: ["v1"]
-      operations:  ["CREATE", "UPDATE"]
-      resources:   ["pods"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
+  variables:
+    - name: podSpec
+      expression: object.spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec.?template.?spec.orValue(object.spec))
   validations:
-    - expression: "object.spec.?securityContext.?runAsUser.orValue(1) == 1000 || exceptions.allowedValues.exists(value, value == 'runAsUser:' + string(object.spec.?securityContext.?runAsUser.orValue(1)))"
+    - expression: "variables.podSpec.?securityContext.?runAsUser.orValue(1) == 1000 || exceptions.allowedValues.exists(value, value == 'runAsUser:' + string(variables.podSpec.?securityContext.?runAsUser.orValue(1)))"
       message: "User ID should be 1000."
-    - expression: "object.spec.?securityContext.?runAsGroup.orValue(1) == 3000 || exceptions.allowedValues.exists(value, value == 'runAsGroup:' + string(object.spec.?securityContext.?runAsGroup.orValue(1)))"
+    - expression: "variables.podSpec.?securityContext.?runAsGroup.orValue(1) == 3000 || exceptions.allowedValues.exists(value, value == 'runAsGroup:' + string(variables.podSpec.?securityContext.?runAsGroup.orValue(1)))"
       message: "Group ID should be 3000."
-    - expression: "object.spec.?securityContext.?fsGroup.orValue(1) == 2000 || exceptions.allowedValues.exists(value, value == 'fsGroup:' + string(object.spec.?securityContext.?fsGroup.orValue(1)))"
+    - expression: "variables.podSpec.?securityContext.?fsGroup.orValue(1) == 2000 || exceptions.allowedValues.exists(value, value == 'fsGroup:' + string(variables.podSpec.?securityContext.?fsGroup.orValue(1)))"
       message: "fs Group should be 2000."
