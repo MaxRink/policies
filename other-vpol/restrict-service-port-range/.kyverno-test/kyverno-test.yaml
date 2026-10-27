@@ -6,6 +6,7 @@ policies:
 - ../restrict-service-port-range.yaml
 resources:
 - resource.yaml
+- service-no-ports.yaml
 results:
 - isValidatingPolicy: true
   kind: Service
@@ -25,3 +26,11 @@ results:
   resources:
   - mixed-service
   result: fail
+- isValidatingPolicy: true
+  kind: Service
+  policy: restrict-service-port-range
+  resources:
+  - external-service-no-ports
+  - external-service-null-ports
+  - external-service-empty-ports
+  result: pass
