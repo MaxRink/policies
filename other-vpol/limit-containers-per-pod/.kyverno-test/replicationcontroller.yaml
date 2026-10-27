@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: too-many-containers-rc
+spec:
+  replicas: 1
+  selector:
+    app: too-many-containers-rc
+  template:
+    metadata:
+      labels:
+        app: too-many-containers-rc
+    spec:
+      containers:
+      - {name: c1, image: busybox}
+      - {name: c2, image: busybox}
+      - {name: c3, image: busybox}
+      - {name: c4, image: busybox}
+      - {name: c5, image: busybox}
