@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-env
+spec:
+  containers:
+  - name: app
+    image: app:v1
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com
