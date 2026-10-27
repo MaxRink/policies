@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: large-rules-ingress
+  namespace: default
+spec:
+  rules:
+  - host: app-01.old.com
+    http: {paths: []}
+  - host: app-02.old.com
+    http: {paths: []}
+  - host: app-03.old.com
+    http: {paths: []}
+  - host: app-04.old.com
+    http: {paths: []}
+  - host: app-05.old.com
+    http: {paths: []}
+  - host: app-06.old.com
+    http: {paths: []}
+  - host: app-07.old.com
+    http: {paths: []}
+  - host: app-08.old.com
+    http: {paths: []}
+  - host: app-09.old.com
+    http: {paths: []}
+  - host: app-10.old.com
+    http: {paths: []}
+  - host: app-11.old.com
+    http: {paths: []}
+  - host: app-12.old.com
+    http: {paths: []}
