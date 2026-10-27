@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Node
+metadata:
+  name: crio-node
+  labels:
+    runtime: cri-o
+status:
+  nodeInfo:
+    containerRuntimeVersion: cri-o://1.29.2

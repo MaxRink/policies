@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Label Nodes with CRI Runtime
 createdAt: "2023-04-10T20:30:04.000Z"
 description: >-
-  CRI engines log in different formats. Loggers deployed as DaemonSets don't know which format to apply because they can't see this information. By Kyverno writing a label to each node with its runtime, loggers can use node label selectors to know which parsing logic to use. This policy detects the CRI engine in use and writes a label to the Node called `runtime` with it. The Node resource filter should be removed and users may need to grant the Kyverno ServiceAccount permission to update Nodes.
+  CRI engines log in different formats. Loggers deployed as DaemonSets don't know which format to apply because they can't see this information. By Kyverno writing a label to each node with its runtime, loggers can use node label selectors to know which parsing logic to use. This policy detects Docker, containerd, or CRI-O and writes a `runtime` label with the runtime name. The Node resource filter should be removed and users may need to grant the Kyverno ServiceAccount permission to update Nodes.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-mpol/label-nodes-cri/label-nodes-cri.yaml
@@ -12,7 +12,7 @@ keywords:
   - kyverno
   - other
 readme: |
-  CRI engines log in different formats. Loggers deployed as DaemonSets don't know which format to apply because they can't see this information. By Kyverno writing a label to each node with its runtime, loggers can use node label selectors to know which parsing logic to use. This policy detects the CRI engine in use and writes a label to the Node called `runtime` with it. The Node resource filter should be removed and users may need to grant the Kyverno ServiceAccount permission to update Nodes.
+  CRI engines log in different formats. Loggers deployed as DaemonSets don't know which format to apply because they can't see this information. By Kyverno writing a label to each node with its runtime, loggers can use node label selectors to know which parsing logic to use. This policy detects Docker, containerd, or CRI-O and writes a `runtime` label with the runtime name. The Node resource filter should be removed and users may need to grant the Kyverno ServiceAccount permission to update Nodes.
   
   ### Fine-grained PolicyException use
 
@@ -30,4 +30,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.23"
   kyverno/subject: "Node, Label"
-digest: 30859ee0d6a2f8be1f7f07582afddb2188a348d69177c634849be7457ec898de
+digest: eeba1d66b7aa067edb1b6305478ecff18dc510e4e13f5a3d661c7744b8edced6
