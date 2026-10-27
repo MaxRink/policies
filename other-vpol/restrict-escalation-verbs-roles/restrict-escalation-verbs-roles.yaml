@@ -33,11 +33,18 @@ spec:
       expression: "['*', 'clusterroles', 'roles']"
     - name: verbs
       expression: "['*', 'bind', 'escalate', 'impersonate']"
+    - name: impersonateApiGroups
+      expression: "['*', '', 'authentication.k8s.io']"
+    - name: impersonateResources
+      expression: "['*', 'users', 'groups', 'serviceaccounts', 'userextras', 'uids']"
   validations:
     - expression: >-
         object.rules == null || 
         !object.rules.exists(rule,
-        rule.apiGroups.exists(apiGroup, apiGroup in variables.apiGroups) &&
-        rule.resources.exists(resource, resource in variables.resources) &&
-        rule.verbs.exists(verb, verb in variables.verbs && !('verb:' + verb in exceptions.allowedValues)))
+        (rule.apiGroups.exists(apiGroup, apiGroup in variables.apiGroups) &&
+         rule.resources.exists(resource, resource in variables.resources) &&
+         rule.verbs.exists(verb, verb in variables.verbs && !('verb:' + verb in exceptions.allowedValues))) ||
+        (rule.apiGroups.exists(apiGroup, apiGroup in variables.impersonateApiGroups) &&
+         rule.resources.exists(resource, resource in variables.impersonateResources) &&
+         rule.verbs.exists(verb, verb in ['*', 'impersonate'] && !('verb:' + verb in exceptions.allowedValues))))
       message: "Use of verbs `escalate`, `bind`, and `impersonate` are forbidden."
