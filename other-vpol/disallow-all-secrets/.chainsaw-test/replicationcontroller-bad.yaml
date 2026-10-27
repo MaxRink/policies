@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: secret-rc
+spec:
+  replicas: 1
+  selector:
+    app: secret-rc
+  template:
+    metadata:
+      labels:
+        app: secret-rc
+    spec:
+      volumes:
+      - name: secret
+        secret:
+          secretName: credentials
+      containers:
+      - name: app
+        image: ghcr.io/kyverno/test-busybox:1.35
