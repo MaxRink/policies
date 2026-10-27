@@ -23,6 +23,12 @@ spec:
         file: kuttlresource.yaml
     - assert:
         file: resource-mutated.yaml
+  - name: step-02-existing-volume
+    try:
+    - apply:
+        file: existing-volume.yaml
+    - assert:
+        file: existing-volume-patched.yaml
   - name: step-03-exception
     try:
     - apply:

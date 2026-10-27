@@ -6,11 +6,19 @@ policies:
 - ../add-volume-deployment.yaml
 resources:
 - resource.yaml
+- resource-existing-volume.yaml
 results:
 - kind: Deployment
   patchedResources: patchedResource.yaml
   policy: add-volume
   resources:
   - mydeploy
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: patchedResource-existing-volume.yaml
+  policy: add-volume
+  resources:
+  - mydeploy-existing-vault-volume
   result: pass
   isMutatingPolicy: true
