@@ -1,0 +1,66 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: report-dra-adminaccess-namespaces
+spec:
+  steps:
+    - name: shared-exception-namespace
+      skipDelete: true
+      try:
+        - apply:
+            file: policy-exceptions-namespace.yaml
+    - name: apply-and-check-policy
+      try:
+        - apply:
+            file: rbac-reporting.yaml
+        - script:
+            content: |
+              set -eu
+              for attempt in $(seq 1 30); do
+                ready=true
+                for controller in kyverno-admission-controller kyverno-background-controller kyverno-reports-controller; do
+                  if ! kubectl auth can-i list namespaces --as="system:serviceaccount:kyverno:$controller" | grep -qx yes; then
+                    ready=false
+                  fi
+                done
+                if [ "$ready" = true ]; then
+                  exit 0
+                fi
+                sleep 1
+              done
+              echo 'Namespace reporting RBAC did not aggregate for Kyverno controllers'
+              exit 1
+        - apply:
+            file: ../report-dra-adminaccess-namespaces.yaml
+        - assert:
+            file: policy-ready.yaml
+        - apply:
+            file: policy-exception.yaml
+        - script:
+            content: |
+              set -eu
+              kubectl delete namespace dra-adminaccess-exception --wait=true --ignore-not-found=true
+              kubectl label namespace "$NAMESPACE" resource.kubernetes.io/admin-access=true --overwrite
+              kubectl create namespace dra-adminaccess-exception
+              kubectl label namespace dra-adminaccess-exception resource.kubernetes.io/admin-access=true --overwrite
+              report=''
+              for attempt in $(seq 1 60); do
+                report=$(kubectl get clusterpolicyreport -o jsonpath='{range .items[*]}{.scope.kind}:{.scope.name}:{range .results[*]}{.policy}:{.result}{"\n"}{end}{end}' 2>/dev/null || true)
+                if printf '%s\n' "$report" | grep -Fqx "Namespace:$NAMESPACE:report-dra-adminaccess-namespaces:fail"; then
+                  if printf '%s\n' "$report" | grep -Fqx 'Namespace:dra-adminaccess-exception:report-dra-adminaccess-namespaces:fail'; then
+                    printf '%s\n' "$report"
+                    echo "the exact Namespace PolicyException did not suppress its report"
+                    exit 1
+                  fi
+                  printf '%s\n' "$report"
+                  exit 0
+                fi
+                sleep 2
+              done
+              printf '%s\n' "$report"
+              echo "timed out waiting for the non-excepted Namespace report"
+              exit 1
+      finally:
+        - script:
+            content: |
+              kubectl delete namespace dra-adminaccess-exception --wait=true --ignore-not-found=true

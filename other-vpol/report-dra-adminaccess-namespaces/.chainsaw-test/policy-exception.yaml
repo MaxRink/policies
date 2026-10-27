@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: dra-adminaccess-namespace-report
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: report-dra-adminaccess-namespaces
+  matchConditions:
+    - name: exact-namespace
+      expression: object.metadata.name == 'dra-adminaccess-exception'
+  allowedValues:
+    - report-dra-adminaccess-namespaces:allow-exact-report

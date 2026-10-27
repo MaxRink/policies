@@ -1,0 +1,23 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: report-dra-adminaccess-namespaces-exception
+policies:
+  - ../report-dra-adminaccess-namespaces.yaml
+resources:
+  - resources.yaml
+exceptions:
+  - exceptions.yaml
+results:
+  - isValidatingPolicy: true
+    policy: report-dra-adminaccess-namespaces
+    kind: Namespace
+    resources:
+      - adminaccess-exception
+    result: pass
+  - isValidatingPolicy: true
+    policy: report-dra-adminaccess-namespaces
+    kind: Namespace
+    resources:
+      - adminaccess-sibling
+    result: fail

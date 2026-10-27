@@ -1,0 +1,40 @@
+name: report-dra-adminaccess-namespaces-vpol
+version: 1.0.0
+displayName: Report Namespaces With DRA AdminAccess Enabled
+description: >-
+  Report namespaces carrying resource.kubernetes.io/admin-access=true. Creating
+  a DRA claim in one of these namespaces can request adminAccess, which bypasses
+  ordinary device access-mode restrictions. This audit-only policy provides
+  visibility without blocking namespace operations.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/report-dra-adminaccess-namespaces/report-dra-adminaccess-namespaces.yaml
+  ```
+keywords:
+  - kyverno
+  - Other
+  - ValidatingPolicy
+  - Dynamic Resource Allocation
+readme: |
+  This policy continuously reports namespaces carrying
+  `resource.kubernetes.io/admin-access=true`. Kubernetes uses this label when
+  authorizing DRA `adminAccess` requests; every principal allowed to create
+  claims in a labeled namespace may be able to request this access mode.
+
+  The policy is audit-only. It does not prevent or alter namespace operations.
+
+  ### Fine-grained PolicyException use
+
+  To suppress this report for one Namespace, reference the `ValidatingPolicy`
+  `report-dra-adminaccess-namespaces` in `spec.policyRefs`, match the exact
+  `request.name`, and set `spec.allowedValues` to
+  `report-dra-adminaccess-namespaces:allow-exact-report`. Other labeled
+  namespaces remain reported. See the [tested exception](https://github.com/kyverno/policies/blob/main/other-vpol/report-dra-adminaccess-namespaces/.kyverno-test-exceptions/exceptions.yaml).
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "Other"
+  kyverno/kubernetesVersion: "1.34"
+  kyverno/subject: "Namespace"
+digest: ff1363344629e396418edd33978bac8ae29359acfe4653f1e676c9c0e71af867
+createdAt: "2026-10-27T17:49:00Z"
