@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: add-services-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - name: k6t-add-services
+      kind: GeneratingPolicy
+  matchConditions:
+    - name: exact-vmi
+      expression: object.metadata.namespace == 'default' && object.metadata.name == 'exception-vmi'

@@ -1,0 +1,24 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: add-services
+policies:
+  - ../add-services.yaml
+resources:
+  - resource.yaml
+exceptions:
+  - exceptions.yaml
+results:
+  - generatedResource: generatedResource.yaml
+    kind: VirtualMachineInstance
+    policy: k6t-add-services
+    resources:
+      - vmi-name
+    result: pass
+    isGeneratingPolicy: true
+  - kind: VirtualMachineInstance
+    policy: k6t-add-services
+    resources:
+      - exception-vmi
+    result: skip
+    isGeneratingPolicy: true
