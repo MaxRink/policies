@@ -54,19 +54,19 @@ spec:
       ( variables.filter || exceptions.allowedValues.exists(value, value == request.namespace) || (has(object.metadata.labels) && 'foo' in object.metadata.labels)) :
       request.kind.kind in ['Deployment', 'CronJob'] ? true : false
     messageExpression: >-
-      'Pods must have the "foo" label in metadata.labels unless in namespaces: ' + variables.excludedNamespaces + 
+      'Pods must have the "foo" label in metadata.labels unless in namespaces: ' + variables.excludedNamespaces +
       (has(object.metadata.labels) && 'foo' in object.metadata.labels ? ', but the label is present.' : ', but no "foo" label is found.')
   - expression: >
       request.kind.kind == 'Deployment' ? 
       (  variables.filter || exceptions.allowedValues.exists(value, value == request.namespace) || has(object.spec.template.metadata) && has(object.spec.template.metadata.labels) && 'foo' in object.spec.template.metadata.labels) :
       request.kind.kind in ['Pod', 'CronJob'] ? true : false
     messageExpression: >-
-      'Deployments must have the "foo" label in the Pod template metadata.labels unless in namespaces: ' + variables.excludedNamespaces + 
+      'Deployments must have the "foo" label in the Pod template metadata.labels unless in namespaces: ' + variables.excludedNamespaces +
       (has(object.spec.template.metadata) && has(object.spec.template.metadata.labels) && 'foo' in object.spec.template.metadata.labels ? ', but the label is present.' : ', but no "foo" label is found.')
   - expression: >
       request.kind.kind == 'CronJob' ? 
       ( variables.filter || exceptions.allowedValues.exists(value, value == request.namespace) || has(object.spec.jobTemplate.spec.template.metadata) && has(object.spec.jobTemplate.spec.template.metadata.labels) && 'foo' in object.spec.jobTemplate.spec.template.metadata.labels) :
       request.kind.kind in ['Pod', 'Deployment'] ? true : false
     messageExpression: >-
-      'CronJobs must have the "foo" label in the Pod template metadata.labels unless in namespaces: ' + variables.excludedNamespaces + 
+      'CronJobs must have the "foo" label in the Pod template metadata.labels unless in namespaces: ' + variables.excludedNamespaces +
       (has(object.spec.jobTemplate.spec.template.metadata) && has(object.spec.jobTemplate.spec.template.metadata.labels) && 'foo' in object.spec.jobTemplate.spec.template.metadata.labels ? ', but the label is present.' : ', but no "foo" label is found.')
