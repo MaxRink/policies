@@ -35,3 +35,15 @@ results:
   - exception-labels
   result: pass
   isValidatingPolicy: true
+- kind: ReplicationController
+  policy: require-labels
+  resources:
+  - badrc-labels
+  result: fail
+  isValidatingPolicy: true
+- kind: CronJob
+  policy: require-labels
+  resources:
+  - badcronjob-top-label-only
+  result: fail
+  isValidatingPolicy: true

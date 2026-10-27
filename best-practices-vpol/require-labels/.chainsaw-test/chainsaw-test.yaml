@@ -45,3 +45,20 @@ spec:
         - check:
             (contains($error, 'Policy require-labels failed')): true
         file: bad-podcontrollers.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy require-labels failed')): true
+        file: bad-replicationcontroller.yaml
+  - name: cronjob-template-labels
+    try:
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy require-labels failed')): true
+        file: bad-cronjob-top-label-only.yaml
+    finally:
+    - script:
+        content: |
+          NAMESPACE=default
+          kubectl delete cronjob badcronjob-top-label-only --ignore-not-found -n "$NAMESPACE"

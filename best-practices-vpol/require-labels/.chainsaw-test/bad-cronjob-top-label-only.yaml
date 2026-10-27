@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: badcronjob-top-label-only
+  namespace: default
+  labels:
+    app.kubernetes.io/name: incorrectly-on-controller
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: app
+            image: ghcr.io/kyverno/test-busybox:1.35

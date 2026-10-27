@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: badrc-labels
+spec:
+  selector: {app: badrc-labels}
+  template:
+    metadata:
+      labels: {app: badrc-labels}
+    spec:
+      containers:
+      - name: app
+        image: ghcr.io/kyverno/test-busybox:1.35
