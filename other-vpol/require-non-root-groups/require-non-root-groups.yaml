@@ -48,14 +48,30 @@ spec:
       expression: >-
         variables.podSpec.containers + variables.podSpec.?initContainers.orValue([]) +
         variables.podSpec.?ephemeralContainers.orValue([])
+    - name: podRunAsGroup
+      expression: >-
+        variables.podSpec.?securityContext.?runAsGroup.orValue(-1) == null
+        ? -1 : variables.podSpec.?securityContext.?runAsGroup.orValue(-1)
+    - name: supplementalGroups
+      expression: >-
+        variables.podSpec.?securityContext.?supplementalGroups.orValue([]) == null
+        ? [] : variables.podSpec.?securityContext.?supplementalGroups.orValue([])
+    - name: fsGroup
+      expression: >-
+        variables.podSpec.?securityContext.?fsGroup.orValue(1) == null
+        ? 1 : variables.podSpec.?securityContext.?fsGroup.orValue(1)
   validations:
     - expression: >-
         (
-          (variables.podSpec.?securityContext.?runAsGroup.orValue(-1) > 0 || ('runAsGroup:' + string(variables.podSpec.?securityContext.?runAsGroup.orValue(-1))) in exceptions.allowedValues) &&
-          variables.allContainers.all(container, container.?securityContext.?runAsGroup.orValue(1) > 0 || ('runAsGroup:' + string(container.?securityContext.?runAsGroup.orValue(1))) in exceptions.allowedValues)
+          (variables.podRunAsGroup > 0 || ('runAsGroup:' + string(variables.podRunAsGroup)) in exceptions.allowedValues) &&
+          variables.allContainers.all(container,
+            (container.?securityContext.?runAsGroup.orValue(1) == null ? 1 : container.?securityContext.?runAsGroup.orValue(1)) > 0 ||
+            ('runAsGroup:' + string(container.?securityContext.?runAsGroup.orValue(1) == null ? 1 : container.?securityContext.?runAsGroup.orValue(1))) in exceptions.allowedValues)
         ) ||
         (
-          variables.allContainers.all(container, container.?securityContext.?runAsGroup.orValue(-1) > 0 || ('runAsGroup:' + string(container.?securityContext.?runAsGroup.orValue(-1))) in exceptions.allowedValues)
+          variables.allContainers.all(container,
+            (container.?securityContext.?runAsGroup.orValue(-1) == null ? -1 : container.?securityContext.?runAsGroup.orValue(-1)) > 0 ||
+            ('runAsGroup:' + string(container.?securityContext.?runAsGroup.orValue(-1) == null ? -1 : container.?securityContext.?runAsGroup.orValue(-1))) in exceptions.allowedValues)
         )
       message: >-
         Running with root group IDs is disallowed. The fields
@@ -64,13 +80,13 @@ spec:
         spec.ephemeralContainers[*].securityContext.runAsGroup must be
         set to a value greater than zero.
     - expression: >-
-        variables.podSpec.?securityContext.?supplementalGroups.orValue([]).all(group, group > 0 || ('supplementalGroups:' + string(group)) in exceptions.allowedValues)
+        variables.supplementalGroups.all(group, group > 0 || ('supplementalGroups:' + string(group)) in exceptions.allowedValues)
       message: >-
         Containers cannot run with a root primary or supplementary GID. The field
         spec.securityContext.supplementalGroups must be unset or
         set to a value greater than zero.
     - expression: >-
-        variables.podSpec.?securityContext.?fsGroup.orValue(1) > 0 || ('fsGroup:' + string(variables.podSpec.?securityContext.?fsGroup.orValue(1))) in exceptions.allowedValues
+        variables.fsGroup > 0 || ('fsGroup:' + string(variables.fsGroup)) in exceptions.allowedValues
       message: >-
         Containers cannot run with a root primary or supplementary GID. The field
         spec.securityContext.fsGroup must be unset or set to a value greater than zero.

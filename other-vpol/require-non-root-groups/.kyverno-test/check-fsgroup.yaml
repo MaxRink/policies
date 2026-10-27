@@ -29,6 +29,7 @@ spec:
       resources:   ["pods"]
   validations:
     - expression: >-
+        object.spec.?securityContext.?fsGroup.orValue(1) != null &&
         object.spec.?securityContext.?fsGroup.orValue(1) > 0
       message: >-
         Containers cannot run with a root primary or supplementary GID. The field
