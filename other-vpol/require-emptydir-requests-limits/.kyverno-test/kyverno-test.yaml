@@ -10,6 +10,7 @@ resources:
 - resource-skip.yaml
 - replicationcontroller-bad.yaml
 - no-resources-pod.yaml
+- null-volume-mounts-pod.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -37,6 +38,7 @@ results:
   - pass-pod-01
   - pass-pod-02
   - exception-emptydir
+  - null-volume-mounts-pod
   result: pass
 - isValidatingPolicy: true
   kind: Pod

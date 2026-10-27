@@ -49,3 +49,5 @@ spec:
         - check:
             ($error != null): true
         file: ../.kyverno-test/no-resources-pod.yaml
+    - apply:
+        file: ../.kyverno-test/null-volume-mounts-pod.yaml
