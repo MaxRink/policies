@@ -41,4 +41,39 @@ spec:
           drop: ["ALL"]  
         seccompProfile:
           type: "RuntimeDefault"
-
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: test-rc-bad
+  namespace: policy-test
+spec:
+  replicas: 1
+  selector:
+    app: test-rc-bad
+  template:
+    metadata:
+      labels:
+        app: test-rc-bad
+    spec:
+      containers:
+      - name: test
+        image: k8s.gcr.io/google-containers/pause:3.2
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: test-rc-good
+  namespace: policy-test
+spec:
+  replicas: 1
+  selector:
+    app: test-rc-good
+  template:
+    metadata:
+      labels:
+        app: test-rc-good
+    spec:
+      containers:
+      - name: test
+        image: registry.k8s.io/google-containers/pause:3.2
