@@ -11,6 +11,8 @@ spec:
   - name: step-01
     try:
     - apply:
+        file: ephemeral-rbac.yaml
+    - apply:
         file: ../disallow-all-secrets.yaml
     - patch:
         resource:
@@ -39,3 +41,21 @@ spec:
         - check:
             (contains($error, 'Policy no-secrets failed')): true
         file: podcontrollers-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy no-secrets failed')): true
+        file: replicationcontroller-bad.yaml
+    - apply:
+        file: ephemeral-pod.yaml
+    - script:
+        content: |
+          set -eu
+          if output=$(kubectl patch pod secret-ephemeral -n default --subresource=ephemeralcontainers --type=strategic --patch '{"spec":{"ephemeralContainers":[{"name":"debug","image":"busybox","env":[{"name":"TOKEN","valueFrom":{"secretKeyRef":{"name":"credentials","key":"token"}}}] }]}}' 2>&1); then
+            echo 'expected the ephemeral Secret reference to be denied'
+            exit 1
+          fi
+          echo "$output" | grep -F 'No Secrets from env' >/dev/null
+    finally:
+    - script:
+        content: kubectl delete pod secret-ephemeral -n default --ignore-not-found

@@ -6,6 +6,7 @@ policies:
 - ../disallow-all-secrets.yaml
 resources:
 - resource.yaml
+- rc-secret.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -16,6 +17,7 @@ results:
   - default/projected-secret-pod
   - default/partial-secret-pod
   - default/secret-env-pod
+  - default/init-secret-pod
   result: fail
 - isValidatingPolicy: true
   kind: Pod
@@ -23,3 +25,9 @@ results:
   resources:
   - default/good-pod
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: no-secrets
+  resources:
+  - default/rc-secret
+  result: fail
