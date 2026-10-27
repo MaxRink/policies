@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-ephemeral-hostprocess
+spec:
+  os:
+    name: windows
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      windowsOptions:
+        hostProcess: false
+  initContainers:
+  - name: init
+    image: test:latest
+    securityContext:
+      windowsOptions:
+        hostProcess: true
+  ephemeralContainers:
+  - name: debug
+    image: test:latest
+    securityContext:
+      windowsOptions:
+        hostProcess: true
