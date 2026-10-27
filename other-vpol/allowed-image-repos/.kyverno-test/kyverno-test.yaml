@@ -6,6 +6,7 @@ policies:
 - ../allowed-image-repos.yaml
 resources:
 - resource.yaml
+- replicationcontrollers.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -68,6 +69,18 @@ results:
   - goodpod-tagged
   - goodpod-digest
   - goodpod-tag-digest
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: allowed-image-repos
+  resources:
+  - default/badrepository-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: allowed-image-repos
+  resources:
+  - default/allowedrepository-rc
   - goodpod-registry-tagged
   - goodpod-registry-digest
   - goodpod-port-digest
