@@ -10,6 +10,7 @@ resources:
 - resource-exception.yaml
 - exception-sibling.yaml
 - ../.chainsaw-test/podcontrollers.yaml
+- many-containers.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -93,5 +94,11 @@ results:
   policy: always-pull-images
   resources:
   - job01
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: many-containers-patched.yaml
+  policy: always-pull-images
+  resources: [many-containers]
   result: pass
   isMutatingPolicy: true

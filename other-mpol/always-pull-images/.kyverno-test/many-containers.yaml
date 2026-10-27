@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: many-containers
+spec:
+  containers:
+  - {name: app-01, image: nginx:1.27}
+  - {name: app-02, image: nginx:1.27}
+  - {name: app-03, image: nginx:1.27}
+  - {name: app-04, image: nginx:1.27}
+  - {name: app-05, image: nginx:1.27}
+  - {name: app-06, image: nginx:1.27}
+  - {name: app-07, image: nginx:1.27}
+  - {name: app-08, image: nginx:1.27}
+  initContainers:
+  - {name: setup-01, image: busybox:1.36}
+  - {name: setup-02, image: busybox:1.36}
