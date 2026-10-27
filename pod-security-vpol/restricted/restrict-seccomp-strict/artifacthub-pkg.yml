@@ -35,5 +35,5 @@ annotations:
   kyverno/category: "Pod Security Standards (Restricted)"
   kyverno/kubernetesVersion: "1.30+"
   kyverno/subject: "Pod"
-digest: fd22b77d67e01e17e4f0083f605736adce25f4a4486e90879a3350a9e918b0ac
+digest: c529a636e456e73888769706b7306d1edf57978a9c9d60723581f7c8ab9f9055
 createdAt: "2025-03-13T23:26:58Z"

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-seccomp
+spec:
+  securityContext:
+    seccompProfile:
+      type: null
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      seccompProfile:
+        type: null
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-container-seccomp-inherited
+spec:
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      seccompProfile:
+        type: null
