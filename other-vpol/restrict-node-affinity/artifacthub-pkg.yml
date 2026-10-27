@@ -2,7 +2,7 @@ name: restrict-node-affinity-vpol
 version: 1.0.0
 displayName: Restrict Node Affinity in ValidatingPolicy
 description: >-
-  Pods may use several mechanisms to prefer scheduling on a set of nodes, and nodeAffinity is one of them. nodeAffinity uses expressions to select eligible nodes for scheduling decisions and may override intended placement options by cluster administrators. This policy ensures that nodeAffinity is not used in a Pod spec.
+  Pods may use several mechanisms to prefer scheduling on a set of nodes, and nodeAffinity is one of them. nodeAffinity uses expressions to select eligible nodes for scheduling decisions and may override intended placement options by cluster administrators. This policy ensures that nodeAffinity is not used in Pod or pod-controller specs.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-node-affinity/restrict-node-affinity.yaml
@@ -12,7 +12,7 @@ keywords:
   - Other
   - ValidatingPolicy
 readme: |
-  Pods may use several mechanisms to prefer scheduling on a set of nodes, and nodeAffinity is one of them. nodeAffinity uses expressions to select eligible nodes for scheduling decisions and may override intended placement options by cluster administrators. This policy ensures that nodeAffinity is not used in a Pod spec.
+  Pods may use several mechanisms to prefer scheduling on a set of nodes, and nodeAffinity is one of them. nodeAffinity uses expressions to select eligible nodes for scheduling decisions and may override intended placement options by cluster administrators. This policy ensures that nodeAffinity is not used in Pod or pod-controller specs.
   
   ### Fine-grained PolicyException use
 
@@ -30,7 +30,7 @@ annotations:
   kyverno/category: "Other in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 5e7c693815a1de1b656fd68ba878c6ce21753f263caf9d5b95121ecf97b7826e
+digest: ca5fe38a55ca9a23315a397406d53b696785d9efe794b53e840574f7519ec1c8
 
 
 createdAt: "2025-05-11T17:46:11Z"
