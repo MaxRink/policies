@@ -1,0 +1,82 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: validate-probe-timeout-period
+  annotations:
+    policies.kyverno.io/title: Validate Probe Timeout Period
+    policies.kyverno.io/category: Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/minversion: 1.19.1
+    kyverno.io/kubernetes-version: "1.28+"
+    policies.kyverno.io/description: >-
+      Probe timeoutSeconds should be less than periodSeconds to reduce overlapping
+      probe executions. This policy checks liveness, readiness, and startup probes
+      on Pods, Deployments, StatefulSets, and DaemonSets, including regular
+      containers and restartable init containers. It uses Kubernetes defaults of
+      1 second for timeoutSeconds and 10 seconds for periodSeconds.
+spec:
+  validationActions: [Audit]
+  autogen:
+    podControllers:
+      controllers: [deployments, statefulsets, daemonsets]
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      resources: ["pods"]
+      operations: ["CREATE", "UPDATE"]
+  variables:
+  - name: containers
+    expression: >-
+      object.spec.containers +
+      object.spec.?initContainers.orValue([]).filter(container, container.?restartPolicy.orValue('') == 'Always')
+  validations:
+  - expression: >-
+      variables.containers.all(container,
+        !has(container.livenessProbe) ||
+        (has(exceptions.allowedValues) &&
+          ('probe-timeout-period:' + container.name + ':livenessProbe') in exceptions.allowedValues) ||
+        container.livenessProbe.?timeoutSeconds.orValue(1) < container.livenessProbe.?periodSeconds.orValue(10)
+      )
+    messageExpression: >-
+      'Container ' + variables.containers.filter(container,
+        has(container.livenessProbe) &&
+        !(has(exceptions.allowedValues) &&
+          ('probe-timeout-period:' + container.name + ':livenessProbe') in exceptions.allowedValues) &&
+        container.livenessProbe.?timeoutSeconds.orValue(1) >= container.livenessProbe.?periodSeconds.orValue(10)
+      ).map(container, container.name + '/livenessProbe').join(', ') +
+      ' must have timeoutSeconds less than periodSeconds'
+  - expression: >-
+      variables.containers.all(container,
+        !has(container.readinessProbe) ||
+        (has(exceptions.allowedValues) &&
+          ('probe-timeout-period:' + container.name + ':readinessProbe') in exceptions.allowedValues) ||
+        container.readinessProbe.?timeoutSeconds.orValue(1) < container.readinessProbe.?periodSeconds.orValue(10)
+      )
+    messageExpression: >-
+      'Container ' + variables.containers.filter(container,
+        has(container.readinessProbe) &&
+        !(has(exceptions.allowedValues) &&
+          ('probe-timeout-period:' + container.name + ':readinessProbe') in exceptions.allowedValues) &&
+        container.readinessProbe.?timeoutSeconds.orValue(1) >= container.readinessProbe.?periodSeconds.orValue(10)
+      ).map(container, container.name + '/readinessProbe').join(', ') +
+      ' must have timeoutSeconds less than periodSeconds'
+  - expression: >-
+      variables.containers.all(container,
+        !has(container.startupProbe) ||
+        (has(exceptions.allowedValues) &&
+          ('probe-timeout-period:' + container.name + ':startupProbe') in exceptions.allowedValues) ||
+        container.startupProbe.?timeoutSeconds.orValue(1) < container.startupProbe.?periodSeconds.orValue(10)
+      )
+    messageExpression: >-
+      'Container ' + variables.containers.filter(container,
+        has(container.startupProbe) &&
+        !(has(exceptions.allowedValues) &&
+          ('probe-timeout-period:' + container.name + ':startupProbe') in exceptions.allowedValues) &&
+        container.startupProbe.?timeoutSeconds.orValue(1) >= container.startupProbe.?periodSeconds.orValue(10)
+      ).map(container, container.name + '/startupProbe').join(', ') +
+      ' must have timeoutSeconds less than periodSeconds'
