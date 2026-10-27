@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sidecar-ns
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    istio.io/dataplane-mode: ambient
+  name: ambient-ns
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    istio-injection: disabled
+  name: disabled-sidecar-ns
