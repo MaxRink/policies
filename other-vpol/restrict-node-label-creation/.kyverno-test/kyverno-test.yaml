@@ -13,4 +13,5 @@ results:
   policy: restrict-node-label-creation
   resources:
   - node-update-without-change
+  - node-update-empty-unchanged
   result: skip

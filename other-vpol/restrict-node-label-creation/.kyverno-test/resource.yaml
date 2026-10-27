@@ -4,3 +4,10 @@ metadata:
   name: node-update-without-change
   labels:
     foo: unchanged
+---
+apiVersion: v1
+kind: Node
+metadata:
+  name: node-update-empty-unchanged
+  labels:
+    foo: ""
