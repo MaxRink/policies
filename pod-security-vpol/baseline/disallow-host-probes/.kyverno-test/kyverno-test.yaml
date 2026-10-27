@@ -8,6 +8,12 @@ resources:
 - resource.yaml
 results:
 - isValidatingPolicy: true
+  kind: ReplicationController
+  policy: disallow-host-probes
+  resources:
+  - badreplicationcontroller
+  result: fail
+- isValidatingPolicy: true
   kind: CronJob
   policy: disallow-host-probes
   resources:
@@ -76,4 +82,10 @@ results:
   - goodpod04
   - goodpod05
   - goodpod06
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: disallow-host-probes
+  resources:
+  - goodreplicationcontroller
   result: pass

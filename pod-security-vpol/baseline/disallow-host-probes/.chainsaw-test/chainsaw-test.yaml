@@ -41,3 +41,8 @@ spec:
         - check:
             ($error != null): true
         file: podcontroller-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Probes and lifecycle handlers must not set a host')): true
+        file: replicationcontroller-bad.yaml
