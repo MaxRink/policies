@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Deployment, StatefulSet"
-digest: 778b40194122539d630a22f678e4fbcce05b4fbe18729c68874cd0c3b69710f5
+digest: 0702528d711b38187dc5de2e584d72ec73bb515a51d195d3af08f40efa721620
 
 
 createdAt: "2025-05-11T17:46:11Z"
