@@ -38,5 +38,9 @@ spec:
         expect:
         - check:
             ($error != null): true
+        file: ../.kyverno-test/null-storage-class.yaml
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
         file: pvc-bad.yaml
-
