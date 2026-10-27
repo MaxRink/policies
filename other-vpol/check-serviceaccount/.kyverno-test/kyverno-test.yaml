@@ -15,6 +15,12 @@ results:
   - bad-pod
   result: fail
 - isValidatingPolicy: true
+  kind: ReplicationController
+  policy: check-sa
+  resources:
+  - restrict-sa-ns/bad-controller
+  result: fail
+- isValidatingPolicy: true
   kind: Pod
   policy: check-sa
   resources:

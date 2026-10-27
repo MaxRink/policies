@@ -60,6 +60,7 @@ spec:
           if kubectl apply -f pod-bad.yaml; then exit 1; else echo "badpod01 failed to create"; fi
           kubectl apply -f podcontroller-good.yaml
           if kubectl apply -f podcontroller-bad.yaml; then exit 1; else echo "badpodcontrollers failed to create"; fi
+          if kubectl apply -f replicationcontroller-bad.yaml; then exit 1; else echo "bad replicationcontroller failed to create"; fi
     finally:
     - script:
         content: |
@@ -77,3 +78,7 @@ spec:
         content: |
           set -e
           kubectl delete -f podcontroller-bad.yaml --ignore-not-found
+    - script:
+        content: |
+          set -e
+          kubectl delete -f replicationcontroller-bad.yaml --ignore-not-found
