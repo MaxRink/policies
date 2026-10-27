@@ -30,7 +30,7 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Service"
-digest: c6155f47ae5606e170ac27e2cad0f5e6bbd0d80c795a17b7dc723507d4cb01e9
+digest: 5c372ac674d20626c5ff9650a44b0252d4277c171be5aafcbd6f9dc9905308b5
 
 
 createdAt: "2025-05-11T17:46:11Z"
