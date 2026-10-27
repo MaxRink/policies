@@ -28,6 +28,11 @@ spec:
   - name: step-02
     try:
     - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy restrict-secrets-by-name failed')): true
+        file: replicationcontroller-bad.yaml
+    - apply:
         file: pod-good.yaml
     - apply:
         expect:
