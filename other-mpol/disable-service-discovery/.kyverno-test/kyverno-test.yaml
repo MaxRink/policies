@@ -5,6 +5,9 @@ policies: [../disable-service-discovery.yaml]
 resources:
 - baseline-resource.yaml
 - exception-resource.yaml
+- edge-resources.yaml
+- replicationcontroller.yaml
+- ../.chainsaw-test/podcontrollers.yaml
 exceptions:
 - exception.yaml
 results:
@@ -18,4 +21,28 @@ results:
   policy: disable-service-discovery
   resources: [exception-pod]
   result: skip
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: edge-patched.yaml
+  policy: disable-service-discovery
+  resources: [sibling-pod, empty-fields-pod]
+  result: pass
+  isMutatingPolicy: true
+- kind: ReplicationController
+  patchedResources: replicationcontroller-patched.yaml
+  policy: disable-service-discovery
+  resources: [replicationcontroller]
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: ../.chainsaw-test/podcontrollers-patched.yaml
+  policy: disable-service-discovery
+  resources: [deployment01]
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: ../.chainsaw-test/podcontrollers-patched.yaml
+  policy: disable-service-discovery
+  resources: [cronjob01]
+  result: pass
   isMutatingPolicy: true
