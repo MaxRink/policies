@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - replicationcontroller.yaml
+- controllers.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -28,4 +29,10 @@ results:
   policy: docker-socket-check
   resources:
   - docker-socket-bad-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: docker-socket-check
+  resources:
+  - docker-socket-bad-deployment
   result: fail

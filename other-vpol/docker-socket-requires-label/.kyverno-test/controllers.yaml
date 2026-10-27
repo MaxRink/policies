@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-socket-bad-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: docker-socket-bad-deployment
+  template:
+    metadata:
+      labels:
+        app: docker-socket-bad-deployment
+    spec:
+      containers:
+      - name: app
+        image: busybox
+      volumes:
+      - name: docker
+        hostPath:
+          path: /var/run/docker.sock
