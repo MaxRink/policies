@@ -1,0 +1,16 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: allowed-base-images-no-configmap
+policies:
+- ../allowed-base-images.yaml
+resources:
+- resource.yaml
+context: context.yaml
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: allowed-base-images
+  resources:
+  - default/base-image-without-config
+  result: fail
