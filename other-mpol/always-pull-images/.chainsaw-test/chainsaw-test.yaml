@@ -101,9 +101,28 @@ spec:
     - script:
         content: |
           set -eu
-          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=first --image=registry.example/skip-first:1
-          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=middle --image=registry.example/mutate-middle:1
-          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=last --image=registry.example/skip-last:1
+          result=
+          ready=false
+          for attempt in $(seq 1 60); do
+            if result="$(kubectl patch pod ephemeral-update-pod -n default \
+              --subresource=ephemeralcontainers --type=merge --dry-run=server \
+              --patch='{"spec":{"ephemeralContainers":[{"name":"exception-probe","image":"registry.example/skip-first:1","imagePullPolicy":"IfNotPresent"},{"name":"mutation-probe","image":"registry.example/mutate-middle:1","imagePullPolicy":"IfNotPresent"}]}}' \
+              -o json 2>&1)"; then
+              if printf '%s' "$result" | jq -e \
+                '.spec.ephemeralContainers[-2].imagePullPolicy == "IfNotPresent" and .spec.ephemeralContainers[-1].imagePullPolicy == "Always"' >/dev/null 2>&1; then
+                ready=true
+                break
+              fi
+            fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then
+            printf 'timed out waiting for PolicyException to exempt an ephemeral container; last probe result:\n%s\n' "$result" >&2
+            exit 1
+          fi
+          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=first --image=registry.example/skip-first:1 --image-pull-policy=IfNotPresent
+          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=middle --image=registry.example/mutate-middle:1 --image-pull-policy=IfNotPresent
+          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=last --image=registry.example/skip-last:1 --image-pull-policy=IfNotPresent
     - assert:
         file: ephemeral-pod-patched.yaml
   - name: step-05-ephemeral-revocation
@@ -117,6 +136,6 @@ spec:
     - script:
         content: |
           set -eu
-          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=after-revocation --image=registry.example/skip-first:1
+          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=after-revocation --image=registry.example/skip-first:1 --image-pull-policy=IfNotPresent
     - assert:
         file: ephemeral-pod-revoked-patched.yaml
