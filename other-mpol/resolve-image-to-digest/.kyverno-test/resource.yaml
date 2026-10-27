@@ -3,9 +3,17 @@ kind: Pod
 metadata: {name: partial-exception, namespace: default}
 spec:
   containers:
-  - {name: first, image: registry.invalid/exempt:1}
+  - name: first
+    image: registry.invalid/exempt:1
+    command: ["sh", "-c"]
+    args: ["echo exempt"]
   - {name: middle, image: registry.example/mutate:1}
   - {name: last, image: registry.invalid/exempt:1}
+  initContainers:
+  - name: init-exempt
+    image: registry.invalid/exempt:1
+    command: ["sh", "-c"]
+    args: ["echo init exempt"]
 ---
 apiVersion: v1
 kind: Pod

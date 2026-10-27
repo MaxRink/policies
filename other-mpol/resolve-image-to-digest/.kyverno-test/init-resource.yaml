@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-image
+spec:
+  initContainers:
+  - name: init
+    image: registry.example/mutate:1
+  containers:
+  - name: app
+    image: registry.example/mutate:1

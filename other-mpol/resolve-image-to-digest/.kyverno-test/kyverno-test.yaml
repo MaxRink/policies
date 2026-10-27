@@ -2,7 +2,7 @@ apiVersion: cli.kyverno.io/v1alpha1
 kind: Test
 metadata: {name: resolve-image-to-digest-exception-lookup}
 policies: [../resolve-image-to-digest.yaml]
-resources: [resource.yaml]
+resources: [resource.yaml, init-resource.yaml, init-controller-resource.yaml]
 exceptions: [exception.yaml]
 context: context.yaml
 results:
@@ -10,5 +10,29 @@ results:
   kind: Pod
   resources: [default/partial-exception, default/sibling, other/partial-exception, default/scope-target, other/scope-target]
   patchedResources: patched.yaml
+  result: pass
+  isMutatingPolicy: true
+- policy: resolve-image-to-digest
+  kind: Pod
+  resources: [default/init-image]
+  patchedResources: init-patched.yaml
+  result: pass
+  isMutatingPolicy: true
+- policy: resolve-image-to-digest
+  kind: Deployment
+  resources: [default/init-deployment]
+  patchedResources: init-controller-patched.yaml
+  result: pass
+  isMutatingPolicy: true
+- policy: resolve-image-to-digest
+  kind: Deployment
+  resources: [default/partial-exception]
+  patchedResources: init-controller-patched.yaml
+  result: pass
+  isMutatingPolicy: true
+- policy: resolve-image-to-digest
+  kind: CronJob
+  resources: [default/init-cronjob]
+  patchedResources: init-controller-patched.yaml
   result: pass
   isMutatingPolicy: true
