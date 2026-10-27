@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: preserve-excepted-pod
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - name: clean-bare-pods
+      kind: DeletingPolicy
+  matchConditions:
+    - name: exact-pod
+      expression: object.metadata.namespace == 'default' && object.metadata.name == 'excepted-pod'

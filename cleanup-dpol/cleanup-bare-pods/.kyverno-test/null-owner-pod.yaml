@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-owner-pod
+  namespace: default
+  ownerReferences: null
+spec:
+  containers:
+    - name: test
+      image: busybox

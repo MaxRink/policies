@@ -26,5 +26,5 @@ spec:
         resources: ["pods"]
   conditions:
     - name: is-bare-pod
-      expression: "!has(object.metadata.ownerReferences) || size(object.metadata.ownerReferences) == 0"
+      expression: "object.metadata.?ownerReferences.orValue([]) == null || size(object.metadata.?ownerReferences.orValue([])) == 0"
   schedule: "*/5 * * * *"

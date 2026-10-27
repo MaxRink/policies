@@ -1,0 +1,30 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: cleanup-bare-pods
+policies:
+  - ../cleanup-bare-pods.yaml
+resources:
+  - bare-pod.yaml
+  - null-owner-pod.yaml
+  - owned-pod.yaml
+  - excepted-pod.yaml
+exceptions:
+  - exceptions.yaml
+results:
+  - policy: clean-bare-pods
+    kind: Pod
+    resources:
+      - bare-pod
+      - null-owner-pod
+    result: pass
+  - policy: clean-bare-pods
+    kind: Pod
+    resources:
+      - owned-pod
+    result: fail
+  - policy: clean-bare-pods
+    kind: Pod
+    resources:
+      - excepted-pod
+    result: fail
