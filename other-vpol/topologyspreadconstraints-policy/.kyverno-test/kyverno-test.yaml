@@ -12,6 +12,7 @@ resources:
 - resource-skip.yaml
 - deployment-no-replicas.yaml
 - deployment-null-replicas.yaml
+- deployment-invalid-replicas-type.yaml
 results:
 - isValidatingPolicy: true
   kind: StatefulSet
@@ -44,4 +45,10 @@ results:
   resources:
   - default/no-replicas
   - default/null-replicas
+  result: skip
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: topologyspreadconstraints-policy
+  resources:
+  - default/invalid-replicas-type
   result: skip
