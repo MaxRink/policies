@@ -19,7 +19,7 @@ metadata:
 spec:
   nodeSelector:
     kubernetes.io/arch: amd64
-    karpenter.sh/capacity-type: spot
+    karpenter.sh/capacity-type: on-demand
   containers:
     - name: busybox
       image: ghcr.io/kyverno/test-busybox:1.35

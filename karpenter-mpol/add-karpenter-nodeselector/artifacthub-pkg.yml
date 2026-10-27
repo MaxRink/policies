@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Add Karpenter nodeSelector
 createdAt: "2023-04-10T20:11:12.000Z"
 description: >-
-  Selecting the correct Node(s) provisioned by Karpenter is a way to specify the appropriate resource landing zone for a workload. This policy injects a nodeSelector map into the Pod based on the Namespace type where it is deployed.
+  Selecting the correct Node(s) provisioned by Karpenter is a way to specify the appropriate resource landing zone for a workload. This policy adds missing Karpenter capacity-type and architecture selectors based on Namespace type while preserving selectors already set by the workload.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/karpenter-mpol/add-karpenter-nodeselector/add-karpenter-nodeselector.yaml
@@ -13,7 +13,7 @@ keywords:
   - Karpenter
   - EKS Best Practices
 readme: |
-  Selecting the correct Node(s) provisioned by Karpenter is a way to specify the appropriate resource landing zone for a workload. This policy injects a nodeSelector map into the Pod based on the Namespace type where it is deployed.
+  Selecting the correct Node(s) provisioned by Karpenter is a way to specify the appropriate resource landing zone for a workload. This policy adds missing Karpenter capacity-type and architecture selectors based on Namespace type while preserving selectors already set by the workload.
   
   ### Fine-grained PolicyException use
 
@@ -31,4 +31,4 @@ annotations:
   kyverno/category: "Karpenter, EKS Best Practices"
   kyverno/kubernetesVersion: "1.23"
   kyverno/subject: "Pod"
-digest: 98b98e1fec7aefdccbe5274c3ca57e53bc4fd806a1547e395e8cad1507349f06
+digest: 52cd8000b35f2b58cb4d3d97466abad428d6449f21841540cbdb0342b95ee763
