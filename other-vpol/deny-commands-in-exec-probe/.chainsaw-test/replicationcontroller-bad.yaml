@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: bad-probe-rc
+spec:
+  replicas: 1
+  selector:
+    app: bad-probe-rc
+  template:
+    metadata:
+      labels:
+        app: bad-probe-rc
+    spec:
+      containers:
+      - name: app
+        image: ghcr.io/kyverno/test-busybox:1.35
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - jcmd | grep Main

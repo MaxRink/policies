@@ -26,13 +26,43 @@ spec:
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
       resources:   ["pods"]
+    - apiGroups:   [""]
+      apiVersions: ["v1"]
+      operations:  ["CREATE", "UPDATE"]
+      resources:   ["replicationcontrollers"]
+    - apiGroups:   ["apps"]
+      apiVersions: ["v1"]
+      operations:  ["CREATE", "UPDATE"]
+      resources:   ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    - apiGroups:   ["batch"]
+      apiVersions: ["v1"]
+      operations:  ["CREATE", "UPDATE"]
+      resources:   ["jobs", "cronjobs"]
   matchConditions:
     - name: check-liveness-probes-commands-exist
       expression: >-
-        object.spec.containers.exists(container, size(container.?livenessProbe.?exec.?command.orValue([])) > 0)
+        object.spec.?jobTemplate.?spec.?template.?spec.?containers.orValue([]).exists(container,
+          size(container.?livenessProbe.?exec.?command.orValue([])) > 0) ||
+        object.spec.?jobTemplate.?spec.?template.?spec.?initContainers.orValue([]).exists(container,
+          size(container.?livenessProbe.?exec.?command.orValue([])) > 0) ||
+        object.spec.?template.?spec.?containers.orValue([]).exists(container,
+          size(container.?livenessProbe.?exec.?command.orValue([])) > 0) ||
+        object.spec.?template.?spec.?initContainers.orValue([]).exists(container,
+          size(container.?livenessProbe.?exec.?command.orValue([])) > 0) ||
+        object.spec.?containers.orValue([]).exists(container,
+          size(container.?livenessProbe.?exec.?command.orValue([])) > 0) ||
+        object.spec.?initContainers.orValue([]).exists(container,
+          size(container.?livenessProbe.?exec.?command.orValue([])) > 0) ||
+        object.spec.?ephemeralContainers.orValue([]).exists(container,
+          size(container.?livenessProbe.?exec.?command.orValue([])) > 0)
+  variables:
+    - name: podSpec
+      expression: object.spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec.?template.?spec.orValue(object.spec))
+    - name: allContainers
+      expression: variables.podSpec.containers + variables.podSpec.?initContainers.orValue([]) + variables.podSpec.?ephemeralContainers.orValue([])
   validations:
     - expression: >-
-        object.spec.containers.all(container, 
+        variables.allContainers.all(container,
         !container.?livenessProbe.?exec.?command.orValue([]).exists(command, 
         (command.matches('\\bjcmd\\b') || command.matches('\\bps\\b') || command.matches('\\bls\\b')) && !('probe-command:' + command in exceptions.allowedValues)))
       message: Cannot use commands `jcmd`, `ps`, or `ls` in liveness probes.

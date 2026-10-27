@@ -37,3 +37,13 @@ spec:
         - check:
             (contains($error, 'Policy deny-commands-in-exec-probe failed')): true
         file: podcontrollers-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy deny-commands-in-exec-probe failed')): true
+        file: replicationcontroller-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy deny-commands-in-exec-probe failed')): true
+        file: pod-init-sidecar-bad.yaml
