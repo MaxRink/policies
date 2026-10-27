@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-creds-data
+  namespace: default
+type: Opaque
+data:
+  AWS_ACCESS_KEY_ID: RkFLRS1BV1MtQUNDRVNTLUtFWQ==
+  AWS_SECRET_ACCESS_KEY: RkFLRS1BV1MtU0VDUkVULUtFWQ==
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-creds-lowercase-data
+  namespace: default
+type: Opaque
+data:
+  aws_access_key_id: RkFLRS1BV1MtQUNDRVNTLUtFWQ==
+  aws_secret_access_key: RkFLRS1BV1MtU0VDUkVULUtFWQ==
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-creds-stringdata
+  namespace: default
+type: Opaque
+stringData:
+  AWS_SECRET_ACCESS_KEY: fake-secret-value
+  AWS_SESSION_TOKEN: fake-session-token
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-alias-stringdata
+  namespace: default
+type: Opaque
+stringData:
+  AWS_ACCESS_KEY: fake-access-value
+  aws_secret_key: fake-secret-value
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-config
+  namespace: default
+type: Opaque
+data:
+  DATABASE_URL: cG9zdGdyZXM6Ly91c2VyOnBhc3NAZGI6NTQzMi9teWRi
+  API_TOKEN: c29tZS1hcGktdG9rZW4=
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: aws-value-under-unrelated-key
+  namespace: default
+type: Opaque
+data:
+  credentials: RkFLRS1BV1MtQUNDRVNTLUtFWQ==
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: empty-secret
+  namespace: default
+type: Opaque
+data: {}
+stringData: {}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: null-secret
+  namespace: default
+type: Opaque
+data: null
+stringData: null

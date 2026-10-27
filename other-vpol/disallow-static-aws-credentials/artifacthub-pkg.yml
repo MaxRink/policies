@@ -1,0 +1,43 @@
+name: disallow-static-aws-credentials
+version: 1.0.0
+displayName: Disallow Static AWS Credentials
+createdAt: "2026-10-27T00:00:00.000Z"
+description: >-
+  Audits Secret data and stringData keys that conventionally hold AWS access keys,
+  secret keys, or session tokens. Key matching is case-insensitive; values under
+  unrelated keys are not inspected.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/disallow-static-aws-credentials/disallow-static-aws-credentials.yaml
+  ```
+keywords:
+  - kyverno
+  - AWS, EKS Best Practices
+  - ValidatingPolicy
+readme: |
+  Audits Secret `data` and `stringData` keys that conventionally hold AWS access keys,
+  secret keys, or session tokens. Matching is case-insensitive and detects keys such as
+  `AWS_ACCESS_KEY_ID`, `aws_access_key_id`, `AWS_SECRET_ACCESS_KEY`, and `aws_secret_key`.
+  The `data` values are base64-encoded at admission, but the policy checks key names, not
+  decoded values. Credentials stored under unrelated key names are not detected.
+
+  Background reports require the Kyverno reports controller to get, list, and watch
+  Secrets cluster-wide. The Chainsaw fixture provides this through an aggregated
+  ClusterRole; grant this access only if cluster-wide Secret read permission is acceptable.
+
+  ### Fine-grained PolicyException use
+
+  Enable PolicyException support in Kyverno, reference the `ValidatingPolicy` named
+  `disallow-static-aws-credentials` in `spec.policyRefs`, and restrict the exception with
+  `spec.matchConditions` to the exact Secret. Add a value such as
+  `aws-credential-key:aws_access_key_id` to `spec.allowedValues` to permit only that key;
+  other credential keys remain subject to the policy. See the [tested example](https://github.com/kyverno/policies/blob/main/other-vpol/disallow-static-aws-credentials/.kyverno-test/exceptions.yaml).
+  With PolicyException support disabled, or when no exception matches, the policy keeps
+  its normal enforcement behavior.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "AWS, EKS Best Practices"
+  kyverno/kubernetesVersion: "1.26-1.37"
+  kyverno/subject: "Secret"
+digest: 9a717fa3a706a866c7ffa42a43b0eb8dda424262fd9fed693c4e7a1dac309f10
