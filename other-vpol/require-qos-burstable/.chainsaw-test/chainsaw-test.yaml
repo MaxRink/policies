@@ -43,4 +43,9 @@ spec:
         expect:
         - check:
             (contains($error, 'The Pod must have Burstable QoS')): true
+        file: ../.kyverno-test/null-resources-pod.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'The Pod must have Burstable QoS')): true
         file: ../.kyverno-test/replicationcontroller-bad.yaml
