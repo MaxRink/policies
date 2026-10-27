@@ -3,5 +3,6 @@ kind: ReplicaSet
 metadata:
   name: empty-replicaset
   namespace: default
+  creationTimestamp: "2000-01-01T00:00:00Z"
 spec:
   replicas: 0

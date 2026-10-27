@@ -1,0 +1,8 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: null-timestamp
+  namespace: default
+  creationTimestamp: null
+spec:
+  replicas: 0
