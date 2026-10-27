@@ -13,22 +13,42 @@ metadata:
       of the Node on which they run. In most scenarios, this should be forbidden. In others,
       it may be useful to silently remove those hostPath volumes rather than blocking the Pod.
       This policy removes all hostPath volumes and their volumeMount references from all containers
-      within a Pod.
+      within Pods and supported pod-controller templates.
 spec:
   evaluation:
     admission:
       enabled: true
   matchConstraints:
     resourceRules:
-      - apiGroups: [""]
-        apiVersions: ["v1"]
-        operations: ["CREATE", "UPDATE"]
-        resources: ["pods"]
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
   variables:
+    - name: isCronJob
+      expression: has(object.spec.jobTemplate)
+    - name: isController
+      expression: has(object.spec.template)
+    - name: podSpec
+      expression: >-
+        variables.isCronJob ? object.spec.jobTemplate.spec.template.spec :
+        variables.isController ? object.spec.template.spec : object.spec
+    - name: specPath
+      expression: >-
+        variables.isCronJob ? "/spec/jobTemplate/spec/template/spec" :
+        variables.isController ? "/spec/template/spec" : "/spec"
     - name: hostpathVolumes
       expression: |
-        has(object.spec.volumes) ? 
-          object.spec.volumes.filter(v, has(v.hostPath)).map(v, v.name) : 
+        has(variables.podSpec.volumes) ?
+          variables.podSpec.volumes.filter(v, has(v.hostPath)).map(v, v.name) :
           []
     - name: hasHostPath
       expression: |
@@ -43,51 +63,51 @@ spec:
           [
             JSONPatch{
               op: "replace",
-              path: "/spec/volumes",
-              value: object.spec.volumes.filter(v, !has(v.hostPath))
+              path: variables.specPath + "/volumes",
+              value: variables.podSpec.volumes.filter(v, !has(v.hostPath))
             }
           ] +
-          object.spec.containers.map(c,
+          variables.podSpec.containers.map(c,
             has(c.volumeMounts) ?
               (c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name)).size() > 0 ?
                 JSONPatch{
                   op: "replace",
-                  path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/volumeMounts",
+                  path: variables.specPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/volumeMounts",
                   value: c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name))
                 } :
                 JSONPatch{
                   op: "remove",
-                  path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/volumeMounts"
+                  path: variables.specPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/volumeMounts"
                 })
             : JSONPatch{op: "test", path: "/", value: null}
           ).filter(p, p.op != "test") +
-          (has(object.spec.initContainers) ?
-            object.spec.initContainers.map(c,
+          (has(variables.podSpec.initContainers) ?
+            variables.podSpec.initContainers.map(c,
               has(c.volumeMounts) ?
                 (c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name)).size() > 0 ?
                   JSONPatch{
                     op: "replace",
-                    path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/volumeMounts",
+                    path: variables.specPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/volumeMounts",
                     value: c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name))
                   } :
                   JSONPatch{
                     op: "remove",
-                    path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/volumeMounts"
+                    path: variables.specPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/volumeMounts"
                   })
               : JSONPatch{op: "test", path: "/", value: null}
             ).filter(p, p.op != "test") : []) +
-          (has(object.spec.ephemeralContainers) ?
-            object.spec.ephemeralContainers.map(c,
+          (has(variables.podSpec.ephemeralContainers) ?
+            variables.podSpec.ephemeralContainers.map(c,
               has(c.volumeMounts) ?
                 (c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name)).size() > 0 ?
                   JSONPatch{
                     op: "replace",
-                    path: "/spec/ephemeralContainers/" + string(object.spec.ephemeralContainers.indexOf(c)) + "/volumeMounts",
+                    path: variables.specPath + "/ephemeralContainers/" + string(variables.podSpec.ephemeralContainers.indexOf(c)) + "/volumeMounts",
                     value: c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name))
                   } :
                   JSONPatch{
                     op: "remove",
-                    path: "/spec/ephemeralContainers/" + string(object.spec.ephemeralContainers.indexOf(c)) + "/volumeMounts"
+                    path: variables.specPath + "/ephemeralContainers/" + string(variables.podSpec.ephemeralContainers.indexOf(c)) + "/volumeMounts"
                   })
               : JSONPatch{op: "test", path: "/", value: null}
             ).filter(p, p.op != "test") : [])
