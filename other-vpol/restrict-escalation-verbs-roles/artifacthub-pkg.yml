@@ -32,7 +32,7 @@ annotations:
   kyverno/category: "Security in vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Role, ClusterRole, RBAC"
-digest: 3ed869ce6dafb50c189ba2bbaf8c659e2e536ae853fff15202e810748c87b4f1
+digest: 3528282f1fd6614668038344810ec9496501d93d9c6e48a38572e9201533a098
 
 
 createdAt: "2025-05-11T17:46:11Z"

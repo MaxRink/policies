@@ -51,5 +51,17 @@ rules:
 - apiGroups: ["*"]
   resources: ["*"]
   verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: badcr05
+rules:
+- apiGroups: [""]
+  resources: ["users", "groups", "serviceaccounts"]
+  verbs: ["impersonate"]
+- apiGroups: ["authentication.k8s.io"]
+  resources: ["userextras"]
+  verbs: ["impersonate"]
 
   

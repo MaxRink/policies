@@ -13,6 +13,7 @@ results:
   resources:
   - badclusterrole01
   - badclusterrole02
+  - badclusterrole03
   result: fail
 - isValidatingPolicy: true
   kind: Role
