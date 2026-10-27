@@ -6,10 +6,39 @@ policies:
 - ../add-nodeSelector.yaml
 resources:
 - resource.yaml
+- existing-selector.yaml
+- null-selector-resource.yaml
+- controller-resource.yaml
+- cronjob-resource.yaml
 - exception-resource.yaml
 exceptions:
 - exception.yaml
 results:
+- kind: Pod
+  patchedResources: null-selector-patched.yaml
+  policy: add-nodeselector
+  resources: [null-selector]
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: controller-patched.yaml
+  policy: add-nodeselector
+  resources: [controller-selector]
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: cronjob-patched.yaml
+  policy: add-nodeselector
+  resources: [cronjob-selector]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: selector-patched.yaml
+  policy: add-nodeselector
+  resources:
+  - existing-selector
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: patchedResource.yaml
   policy: add-nodeselector

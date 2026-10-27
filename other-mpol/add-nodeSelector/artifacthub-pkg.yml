@@ -21,6 +21,8 @@ readme: |
   `spec.matchConditions` using the exact request identity.
   This policy uses a resource-scoped exception, so no `spec.images` or
   `spec.allowedValues` entry is needed.
+  Existing `foo` and `color` node selector values are preserved; the policy
+  only adds either key when it is absent.
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-mpol/add-nodeSelector/.kyverno-test/exception.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal mutation behavior.
@@ -29,4 +31,4 @@ readme: |
 annotations:
   kyverno/category: "Sample"
   kyverno/subject: "Pod"
-digest: 32b07c6d98cb6424ed7073e3cac42d7049a96294e513665f9176c0ab29ae381e
+digest: f68adffb88fba34f0159654d49c8cb3117c6a9bcab5d16ab65c6110f078f6451

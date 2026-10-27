@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: existing-selector
+spec:
+  nodeSelector:
+    foo: custom
+    color: orange
+    zone: west
+  containers:
+  - name: app
+    image: app:v1

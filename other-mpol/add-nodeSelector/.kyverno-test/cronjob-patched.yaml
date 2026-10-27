@@ -1,0 +1,17 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-selector
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          nodeSelector:
+            foo: bar
+            color: orange
+          containers:
+          - name: app
+            image: app:v1
+        restartPolicy: OnFailure
