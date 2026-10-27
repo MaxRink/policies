@@ -9,10 +9,10 @@ metadata:
     policies.kyverno.io/minversion: 1.19.1
     kyverno.io/kyverno-version: 1.15.0
     kyverno.io/kubernetes-version: "1.30"
-    policies.kyverno.io/subject: Ingress, Pod
+    policies.kyverno.io/subject: Ingress, Pod, ReplicationController, Deployment, DaemonSet, StatefulSet, ReplicaSet, Job, CronJob
     policies.kyverno.io/description: >-
-      This policy ensures that Ingress resources do not have certain disallowed annotations and that the ingress-nginx
-      controller Pod is running version 1.11.2 or higher. It checks for the presence of the
+      This policy ensures that Ingress resources do not have certain disallowed annotations and that ingress-nginx
+      controller Pods and templates use version 1.11.2 or higher. It checks for the presence of the
       `nginx.ingress.kubernetes.io/server-snippet` annotation and disallows its usage, enforces specific values 
       for `auth-tls-verify-client`, and ensures that the ingress-nginx controller image is of the required version.
 spec:
@@ -22,9 +22,11 @@ spec:
   - name: isIngress
     expression: "object.kind == 'Ingress'"
   - name: isPod
-    expression: "object.kind == 'Pod'"
+    expression: "object.kind in ['Pod', 'ReplicationController', 'Deployment', 'DaemonSet', 'StatefulSet', 'ReplicaSet', 'Job', 'CronJob']"
+  - name: podSpec
+    expression: object.spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec.?template.?spec.orValue(object.spec))
   - name: allContainers
-    expression: "variables.isPod ? object.spec.containers + object.spec.?initContainers.orValue([]) + object.spec.?ephemeralContainers.orValue([]) : []"
+    expression: "variables.isPod ? variables.podSpec.containers + variables.podSpec.?initContainers.orValue([]) + variables.podSpec.?ephemeralContainers.orValue([]) : []"
   - name: controllerContainers
     expression: "variables.allContainers.filter(c, c.name == 'controller')"
   - name: authTlsAnnotation
@@ -50,6 +52,45 @@ spec:
       - pods
       operations:
       - CREATE
+      - UPDATE
+      apiGroups:
+      - ""
+      apiVersions:
+      - v1
+    - resources:
+      - replicationcontrollers
+      operations:
+      - CREATE
+      - UPDATE
+      apiGroups:
+      - ""
+      apiVersions:
+      - v1
+    - resources:
+      - deployments
+      - daemonsets
+      - statefulsets
+      - replicasets
+      operations:
+      - CREATE
+      - UPDATE
+      apiGroups:
+      - apps
+      apiVersions:
+      - v1
+    - resources:
+      - jobs
+      - cronjobs
+      operations:
+      - CREATE
+      - UPDATE
+      apiGroups:
+      - batch
+      apiVersions:
+      - v1
+    - resources:
+      - pods/ephemeralcontainers
+      operations:
       - UPDATE
       apiGroups:
       - ""

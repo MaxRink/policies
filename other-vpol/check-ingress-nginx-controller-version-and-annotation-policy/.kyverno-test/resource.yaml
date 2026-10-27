@@ -81,3 +81,20 @@ spec:
   containers:
   - name: controller
     image: registry.k8s.io/ingress-nginx/controller:v1.11.2-dev
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: bad-controller-rc
+spec:
+  replicas: 1
+  selector:
+    app: bad-controller-rc
+  template:
+    metadata:
+      labels:
+        app: bad-controller-rc
+    spec:
+      containers:
+      - name: controller
+        image: registry.k8s.io/ingress-nginx/controller:v1.11.0

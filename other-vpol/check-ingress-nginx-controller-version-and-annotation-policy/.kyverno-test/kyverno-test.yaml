@@ -43,3 +43,9 @@ results:
   - spoofed-version-pod
   kind: Pod
   result: fail
+- isValidatingPolicy: true
+  policy: check-ingress-nginx-controller-version-and-annotation-policy
+  resources:
+  - bad-controller-rc
+  kind: ReplicationController
+  result: fail

@@ -2,7 +2,7 @@ name: check-ingress-nginx-controller-version-and-annotation-policy
 version: 1.0.0
 displayName: Ensure Valid Ingress NGINX Controller and Annotations in ValidatingPolicy
 description: >-
-  This policy ensures that Ingress resources do not have certain disallowed annotations and that the ingress-nginx controller pod uses a stable image tag at version 1.11.2 or newer. It checks for the presence of the `nginx.ingress.kubernetes.io/server-snippet` annotation and disallows its usage, enforces specific values for `auth-tls-verify-client`, and validates the controller image registry, repository, and semantic version.
+  This policy ensures that Ingress resources do not have certain disallowed annotations and that ingress-nginx controller Pods and workload templates use a stable image tag at version 1.11.2 or newer. It checks for the presence of the `nginx.ingress.kubernetes.io/server-snippet` annotation and disallows its usage, enforces specific values for `auth-tls-verify-client`, and validates the controller image registry, repository, and semantic version.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/check-ingress-nginx-controller-version-and-annotation-policy/check-ingress-nginx-controller-version-and-annotation-policy.yaml
@@ -12,7 +12,8 @@ keywords:
   - Other
   - ValidatingPolicy
 readme: |
-  This policy ensures that Ingress resources do not have certain disallowed annotations and that the ingress-nginx controller pod uses a stable image tag at version 1.11.2 or newer. It checks for the presence of the `nginx.ingress.kubernetes.io/server-snippet` annotation and disallows its usage, enforces specific values for `auth-tls-verify-client`, and validates the controller image registry, repository, and semantic version.
+  This policy ensures that Ingress resources do not have certain disallowed annotations and that ingress-nginx controller Pods and workload templates use a stable image tag at version 1.11.2 or newer. It checks for the presence of the `nginx.ingress.kubernetes.io/server-snippet` annotation and disallows its usage, enforces specific values for `auth-tls-verify-client`, and validates the controller image registry, repository, and semantic version.
+  Background reporting for `pods/ephemeralcontainers` requires granting Kyverno's reports controller `get/list/watch` on that subresource; see the [sample ClusterRole](https://github.com/kyverno/policies/blob/main/other-vpol/check-ingress-nginx-controller-version-and-annotation-policy/.chainsaw-test/ephemeral-rbac.yaml).
   ### Fine-grained PolicyException use
 
   Enable PolicyException support in Kyverno, reference the `ValidatingPolicy` named
@@ -32,6 +33,6 @@ readme: |
 annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.30"
-  kyverno/subject: "Deployment,ReplicaSet,StatefulSet,DaemonSet,Ingress"
-digest: a923d467e39478714b38fe1d10ae0e9414adc03e7855b27ea85e803d54f9b09d
+  kyverno/subject: "Pod,ReplicationController,Deployment,DaemonSet,StatefulSet,ReplicaSet,Job,CronJob,Ingress"
+digest: b89dd216aadf912a383cd79e202f66cba749bc8b879f9b21a3f003fded7fe0d2
 createdAt: "2025-12-12T14:35:08Z"
