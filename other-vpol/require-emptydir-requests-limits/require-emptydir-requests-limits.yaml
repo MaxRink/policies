@@ -15,7 +15,7 @@ metadata:
       the medium backing the emptyDir volume. This sample ensures that any
       initContainers or containers mounting an emptyDir volume have
       ephemeral-storage requests and limits set. Policy will be skipped if
-      the volume has already a sizeLimit set.
+      the volume is memory-backed.
 spec:
   evaluation:
     background:
@@ -51,7 +51,7 @@ spec:
       expression: "variables.podSpec.containers + variables.podSpec.?initContainers.orValue([])"
     - name: emptydirnames
       expression: >-
-        variables.podSpec.?volumes.orValue([]).filter(volume, has(volume.emptyDir) && (!has(volume.emptyDir.sizeLimit) || volume.emptyDir.sizeLimit == null)).map(volume, volume.name)
+        variables.podSpec.?volumes.orValue([]).filter(volume, has(volume.emptyDir) && (!has(volume.emptyDir.medium) || volume.emptyDir.medium == null || volume.emptyDir.medium == '')).map(volume, volume.name)
   validations:
     - expression: >-
         variables.containers.all(container,
