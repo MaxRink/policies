@@ -1,0 +1,151 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bad-exec-create
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bad-exec-get-named
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["get"]
+    resourceNames: ["named-pod"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bad-resource-star
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: bad-resource-attach-suffix
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["*/attach"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: good-pod-reader
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: good-empty
+  namespace: default
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bad-attach-get
+rules:
+  - apiGroups: [""]
+    resources: ["pods/attach"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bad-portforward-create
+rules:
+  - apiGroups: [""]
+    resources: ["pods/portforward"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bad-resource-exec-suffix
+rules:
+  - apiGroups: ["*"]
+    resources: ["*/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bad-resource-portforward-suffix
+rules:
+  - apiGroups: [""]
+    resources: ["*/portforward"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bad-api-group-star
+rules:
+  - apiGroups: ["*"]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bad-verb-star
+rules:
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: bad-aggregated-populated
+aggregationRule:
+  clusterRoleSelectors:
+    - matchLabels:
+        rbac.example.com/aggregate-to-test: "true"
+rules:
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: good-apps-wildcard
+rules:
+  - apiGroups: ["apps"]
+    resources: ["*"]
+    verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: good-aggregated-empty
+aggregationRule:
+  clusterRoleSelectors:
+    - matchLabels:
+        rbac.example.com/aggregate-to-test: "true"
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: good-exec-list-only
+rules:
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["list", "watch"]

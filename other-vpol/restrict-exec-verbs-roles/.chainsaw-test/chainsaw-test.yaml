@@ -1,0 +1,142 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/chainsaw/main/.schemas/json/test-chainsaw-v1alpha1.json
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-exec-verbs-roles
+spec:
+  steps:
+    - name: reports-controller-rbac
+      try:
+        - apply:
+            file: rbac-reporting.yaml
+        - script:
+            content: |
+              set -eu
+              for attempt in $(seq 1 30); do
+                ready=true
+                for resource in roles.rbac.authorization.k8s.io clusterroles.rbac.authorization.k8s.io; do
+                  for verb in get list watch; do
+                    if ! kubectl auth can-i "$verb" "$resource" -n "$NAMESPACE" --as=system:serviceaccount:kyverno:kyverno-reports-controller | grep -qx yes; then
+                      ready=false
+                    fi
+                  done
+                done
+                if [ "$ready" = true ]; then exit 0; fi
+                sleep 1
+              done
+              echo 'exec-subresource reporting RBAC aggregation did not become observable for reports-controller'
+              exit 1
+    - name: shared-exception-namespace
+      skipDelete: true
+      try:
+        - apply:
+            file: policy-exceptions-namespace.yaml
+    - name: install-policy
+      try:
+        - apply:
+            file: ../restrict-exec-verbs-roles.yaml
+        - patch:
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              metadata:
+                name: restrict-exec-verbs-roles
+              spec:
+                validationActions:
+                  - Deny
+        - assert:
+            file: policy-ready.yaml
+    - name: allowed-rules
+      try:
+        - apply:
+            file: role-good.yaml
+    - name: deny-direct-exec
+      try:
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: role-bad-exec-create.yaml
+    - name: deny-all-resources
+      try:
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: role-bad-resource-wildcard.yaml
+    - name: deny-wildcard-exec
+      try:
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: clusterrole-bad-exec-wildcard.yaml
+    - name: deny-wildcard-attach
+      try:
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: role-bad-attach-wildcard.yaml
+    - name: deny-wildcard-portforward
+      try:
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: clusterrole-bad-portforward-wildcard.yaml
+    - name: deny-wildcard-verb
+      try:
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: clusterrole-bad-verb-wildcard.yaml
+    - name: deny-name-scoped-get
+      try:
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: role-bad-exec-get-named.yaml
+    - name: exact-exception
+      try:
+        - apply:
+            file: exception.yaml
+        - apply:
+            file: role-exception.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: role-sibling.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: role-wildcard-resource-exception.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: role-wildcard-group-exception.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: role-wildcard-verb-exception.yaml
+        - delete:
+            file: exception.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: role-exception.yaml
+      finally:
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" delete role restrict-exec-good-role restrict-exec-bad-exec-create restrict-exec-bad-resource-star restrict-exec-bad-attach-wildcard restrict-exec-bad-exec-get restrict-exec-exception-role restrict-exec-sibling-role restrict-exec-wildcard-resource-role restrict-exec-wildcard-group-role restrict-exec-wildcard-verb-role --ignore-not-found --wait=true
+              kubectl delete clusterrole restrict-exec-aggregate restrict-exec-bad-exec-wildcard restrict-exec-bad-portforward-wildcard restrict-exec-bad-verb-wildcard restrict-exec-verbs-roles-reporting --ignore-not-found --wait=true
+              kubectl delete policyexceptions.policies.kyverno.io restrict-exec-exception -n policy-exceptions --ignore-not-found --wait=true
+              kubectl delete vpol restrict-exec-verbs-roles --ignore-not-found --wait=true

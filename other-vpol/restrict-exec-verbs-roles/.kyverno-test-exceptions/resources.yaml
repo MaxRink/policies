@@ -1,0 +1,59 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: exception-role-create
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: exception-role-get
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["pods/attach"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: sibling-role
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: wildcard-resource-role
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: wildcard-api-group-role
+  namespace: default
+rules:
+  - apiGroups: ["*"]
+    resources: ["pods/exec"]
+    verbs: ["create"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: wildcard-verb-role
+  namespace: default
+rules:
+  - apiGroups: [""]
+    resources: ["pods/exec"]
+    verbs: ["*"]

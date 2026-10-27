@@ -1,0 +1,45 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-exec-verbs-roles
+policies:
+  - ../restrict-exec-verbs-roles.yaml
+resources:
+  - resources.yaml
+results:
+  - isValidatingPolicy: true
+    kind: Role
+    policy: restrict-exec-verbs-roles
+    resources:
+      - default/bad-exec-create
+      - default/bad-exec-get-named
+      - default/bad-resource-star
+      - default/bad-resource-attach-suffix
+    result: fail
+  - isValidatingPolicy: true
+    kind: Role
+    policy: restrict-exec-verbs-roles
+    resources:
+      - default/good-pod-reader
+      - default/good-empty
+    result: pass
+  - isValidatingPolicy: true
+    kind: ClusterRole
+    policy: restrict-exec-verbs-roles
+    resources:
+      - bad-attach-get
+      - bad-portforward-create
+      - bad-resource-exec-suffix
+      - bad-resource-portforward-suffix
+      - bad-api-group-star
+      - bad-verb-star
+      - bad-aggregated-populated
+    result: fail
+  - isValidatingPolicy: true
+    kind: ClusterRole
+    policy: restrict-exec-verbs-roles
+    resources:
+      - good-apps-wildcard
+      - good-aggregated-empty
+      - good-exec-list-only
+    result: pass
