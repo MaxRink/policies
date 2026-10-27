@@ -44,18 +44,18 @@ spec:
         object.spec.?template.?spec.orValue(object.spec))
     - name: podHostProcess
       expression: >-
-        variables.podSpec.?securityContext.?windowsOptions.?hostProcess.orValue(false)
+        variables.podSpec.?securityContext.?windowsOptions.?hostProcess.orValue(false) == true
     - name: allContainers
       expression: >-
-        variables.podSpec.containers +
-        variables.podSpec.?initContainers.orValue([]) +
-        variables.podSpec.?ephemeralContainers.orValue([])
+        (variables.podSpec.?containers.orValue([]) == null ? [] : variables.podSpec.?containers.orValue([])) +
+        (variables.podSpec.?initContainers.orValue([]) == null ? [] : variables.podSpec.?initContainers.orValue([])) +
+        (variables.podSpec.?ephemeralContainers.orValue([]) == null ? [] : variables.podSpec.?ephemeralContainers.orValue([]))
   validations:
     - expression: >-
         (!variables.podHostProcess || 'control:podHostProcess' in exceptions.allowedValues) &&
         variables.allContainers.all(container,
           container.image in exceptions.allowedImages ||
-          container.?securityContext.?windowsOptions.?hostProcess.orValue(false) == false)
+          container.?securityContext.?windowsOptions.?hostProcess.orValue(false) != true)
       message: >-
         HostProcess Pods and containers are disallowed. The fields
         spec.securityContext.windowsOptions.hostProcess,

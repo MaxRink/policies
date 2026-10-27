@@ -35,5 +35,5 @@ annotations:
   kyverno/category: "Pod Security Standards (Baseline) in ValidatingPolicy"
   kyverno/kubernetesVersion: "1.30+"
   kyverno/subject: "Pod"
-digest: e4623f0953599c7b41b163ffe9a1014ab90f6de943bcbf7c8b99972a1bbc0912
+digest: 4069c2e12e1cd5e6b25d1ce5e04032ef0d70a5ace7a7a1394c02fb4234a536ac
 createdAt: "2025-03-13T23:26:58Z"

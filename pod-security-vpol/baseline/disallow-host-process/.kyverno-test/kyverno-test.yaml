@@ -6,6 +6,7 @@ policies:
 - ../disallow-host-process.yaml
 resources:
 - resource.yaml
+- null-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -72,4 +73,10 @@ results:
   - goodpod04
   - goodpod05
   - goodpod06
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-host-process
+  resources:
+  - null-hostprocess
   result: pass
