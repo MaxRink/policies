@@ -6,6 +6,7 @@ policies:
 - ../limit-containers-per-pod.yaml
 resources:
 - resource.yaml
+- ephemeral-count.yaml
 - replicationcontroller.yaml
 results:
 - isValidatingPolicy: true
@@ -37,4 +38,10 @@ results:
   policy: limit-containers-per-pod
   resources:
   - too-many-containers-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: limit-containers-per-pod
+  resources:
+  - ephemeral-over-limit
   result: fail
