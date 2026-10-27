@@ -54,10 +54,12 @@ spec:
           - expression: >-
               variables.allContainers.all(container,
               (has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
-              image(container.image).tag() != '' || image(container.image).containsDigest())
+              (isImage(container.image) &&
+              (image(container.image).tag() != '' || image(container.image).containsDigest())))
             message: "An image tag is required."
           - expression: >-
               variables.allContainers.all(container,
               (has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
-              image(container.image).tag() != 'latest' || image(container.image).containsDigest())
+              (isImage(container.image) &&
+              (image(container.image).tag() != 'latest' || image(container.image).containsDigest())))
             message: "Using a mutable image tag e.g. 'latest' is not allowed."
