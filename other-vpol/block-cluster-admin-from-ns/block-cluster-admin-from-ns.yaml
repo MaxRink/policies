@@ -3,16 +3,14 @@ kind: ValidatingPolicy
 metadata:
   name: block-cluster-admin-from-ns
   annotations:
-    policies.kyverno.io/title: Block cluster-admin from modifying any object in a Namespace
+    policies.kyverno.io/title: Block a specified cluster-admin from modifying objects in a Namespace
     policies.kyverno.io/category: Other
     policies.kyverno.io/subject: Namespace, ClusterRole, User 
     policies.kyverno.io/minversion: 1.17.0
     policies.kyverno.io/description: >-
-      In some cases, it may be desirable to block operations of certain privileged users
-      (i.e. cluster-admins) in a specific namespace. In this policy, Kyverno will look for all user operations
-      (CREATE, UPDATE, DELETE), on every object kind, in the testnamespace namespace, and for the
-      ClusterRole cluster-admin. The user testuser is also mentioned so it won't include all the cluster-admins in
-      the cluster, but will be flexible enough to apply only for a sub-group of the cluster-admins in the cluster.
+      Denies CREATE, UPDATE, and DELETE requests from the configured username testuser in
+      testnamespace. The example binds this user to cluster-admin; role membership is not
+      inferred from request.userInfo.groups.
 spec:
   validationActions: ["Deny"]
   variables:
