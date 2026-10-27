@@ -48,6 +48,7 @@ spec:
     - expression: >-
         variables.allContainers.all(container,
         container.?image.hasValue() &&
+        container.image != null &&
         ((has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
         (isImage(container.image) && image(container.image).containsDigest())))
       message: "Images must use checksums rather than tags."

@@ -9,6 +9,7 @@ resources:
 - replicationcontroller-bad.yaml
 - invalid-digest-pod.yaml
 - ephemeral-subresource-pod.yaml
+- null-image-pod.yaml
 variables: values.yaml
 results:
 - isValidatingPolicy: true
@@ -28,6 +29,7 @@ results:
   policy: require-image-checksum
   resources:
   - invalid-digest-pod
+  - null-image-pod
   result: fail
 - isValidatingPolicy: true
   kind: Pod
