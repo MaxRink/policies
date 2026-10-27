@@ -6,6 +6,10 @@ metadata:
   name: add-nodeselector
 spec:
   steps:
+  - name: step-00-before-policy
+    try:
+    - apply:
+        file: update-pod-before.yaml
   - name: step-01
     try:
     - apply:
@@ -14,11 +18,23 @@ spec:
         file: policy-ready.yaml
   - name: step-02
     try:
+    - patch:
+        resource:
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: update-pod
+            annotations:
+              update-tested: "true"
+    - assert:
+        file: update-pod-assert.yaml
+  - name: step-03
+    try:
     - apply:
         file: pod-resources.yaml
     - assert:
         file: pod-resources-patched.yaml
-  - name: step-03
+  - name: step-04
     try:
     - apply:
         file: podcontroller-resources.yaml
