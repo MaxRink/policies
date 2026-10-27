@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: no-replicas
+spec:
+  selector:
+    matchLabels:
+      app: no-replicas
+  template:
+    metadata:
+      labels:
+        app: no-replicas
+    spec:
+      containers:
+      - name: app
+        image: busybox
