@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: missing-priority-rc
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    app: missing-priority
+  template:
+    metadata:
+      labels:
+        app: missing-priority
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.25

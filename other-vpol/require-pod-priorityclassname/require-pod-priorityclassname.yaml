@@ -28,7 +28,20 @@ spec:
     - apiGroups:   [""]
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
-      resources:   ["pods"]
+      resources:   ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
+  variables:
+    - name: podSpec
+      expression: >-
+        object.spec.?jobTemplate.?spec.?template.?spec.orValue(
+        object.spec.?template.?spec.orValue(object.spec))
   validations:
-    - expression: "object.spec.?priorityClassName.orValue('') != '' || object.spec.?priorityClassName.orValue('') in exceptions.allowedValues.orValue([])"
+    - expression: "variables.podSpec.?priorityClassName.orValue('') != '' || variables.podSpec.?priorityClassName.orValue('') in exceptions.allowedValues.orValue([])"
       message: "Pods must define the priorityClassName field."
