@@ -16,6 +16,21 @@ spec:
 apiVersion: batch/v1
 kind: Job
 metadata:
+  name: job05
+spec:
+  ttlSecondsAfterFinished: 900
+  template:
+    spec:
+      containers:
+      - name: busybox
+        image: ghcr.io/kyverno/test-busybox:1.35
+        command: ["sleep", "3600"]
+      restartPolicy: Never
+  backoffLimit: 4
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
   name: job04
 spec:
   ttlSecondsAfterFinished: 900
