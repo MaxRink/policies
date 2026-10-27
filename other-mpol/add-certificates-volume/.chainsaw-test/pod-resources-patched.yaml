@@ -6,6 +6,12 @@ metadata:
   name: pod01
   namespace: other-certvol-ns
 spec:
+  initContainers:
+  - name: init
+    image: nginx:latest
+    volumeMounts:
+    - name: etc-ssl-certs
+      mountPath: /etc/ssl/certs
   containers:
   - name: pod01-01
     image: nginx:latest

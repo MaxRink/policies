@@ -7,6 +7,9 @@ metadata:
   namespace: other-certvol-ns
 spec:
   automountServiceAccountToken: false
+  initContainers:
+    - name: init
+      image: nginx:latest
   containers:
     - name: pod01-01
       image: nginx:latest
