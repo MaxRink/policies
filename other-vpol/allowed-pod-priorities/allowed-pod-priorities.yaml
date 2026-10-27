@@ -26,18 +26,28 @@ spec:
     - apiGroups:   [""]
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
-      resources:   ["pods"]
+      resources:   ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
   variables:
     - name: prior
       expression: >-
         resource.Get("v1", "configmaps", "default", "allowed-pod-priorities")
     - name: namespaceName
       expression: "object.metadata.namespace"
+    - name: podSpec
+      expression: "object.spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec.?template.?spec.orValue(object.spec))"
     - name: priorities
       expression: "variables.prior.?data[?variables.namespaceName].orValue('').split(', ').filter(priority, priority != '')"
   validations:
-    - expression: "variables.priorities == [] || object.spec.priorityClassName in variables.priorities || exceptions.allowedValues.exists(value, value == 'priorityClass:' + object.spec.?priorityClassName.orValue(''))"
+    - expression: "variables.priorities == [] || variables.podSpec.priorityClassName in variables.priorities || exceptions.allowedValues.exists(value, value == 'priorityClass:' + variables.podSpec.?priorityClassName.orValue(''))"
       messageExpression: >-
-        'The Pod PriorityClass ' + object.spec.?priorityClassName.orValue('') +
+        'The Pod PriorityClass ' + variables.podSpec.?priorityClassName.orValue('') +
         ' is not in the list of the following PriorityClasses allowed in this Namespace: ' +
         variables.prior.?data[?variables.namespaceName].orValue('')
