@@ -11,10 +11,9 @@ metadata:
     kyverno.io/kyverno-version: 1.14.0
     kyverno.io/kubernetes-version: "1.30"
     policies.kyverno.io/description: >-
-      It's common where policy lookups need to consider a mapping to many possible values rather than a
-      static mapping. This is a sample which demonstrates how to dynamically look up an allow list of Namespaces from a ConfigMap
-      where the ConfigMap stores an array of strings. This policy validates that any Pods created
-      outside of the list of Namespaces have the label `foo` applied.
+      This policy looks up a comma-separated namespace allowlist from a ConfigMap and requires
+      Pods and supported workload templates outside that list to have the label `foo`. If the
+      ConfigMap or its `exclude` key is absent, no namespace is excluded.
 spec:
   validationActions: 
     - Audit
@@ -45,27 +44,29 @@ spec:
      - name: cm
        expression: >- 
          resource.Get("v1", "configmaps", "default", "namespace-filters")
+     - name: excludedNamespaces
+       expression: "variables.cm.?data[?'exclude'].orValue('')"
      - name: filter
-       expression: "request.namespace in variables.cm.data['exclude'].split(', ')"
+       expression: "request.namespace in variables.excludedNamespaces.split(', ')"
   validations:
   - expression: >
       request.kind.kind == 'Pod' ? 
       ( variables.filter || exceptions.allowedValues.exists(value, value == request.namespace) || (has(object.metadata.labels) && 'foo' in object.metadata.labels)) :
       request.kind.kind in ['Deployment', 'CronJob'] ? true : false
     messageExpression: >-
-      'Pods must have the "foo" label in metadata.labels unless in namespaces: ' + variables.cm.data['exclude'] + 
+      'Pods must have the "foo" label in metadata.labels unless in namespaces: ' + variables.excludedNamespaces + 
       (has(object.metadata.labels) && 'foo' in object.metadata.labels ? ', but the label is present.' : ', but no "foo" label is found.')
   - expression: >
       request.kind.kind == 'Deployment' ? 
       (  variables.filter || exceptions.allowedValues.exists(value, value == request.namespace) || has(object.spec.template.metadata) && has(object.spec.template.metadata.labels) && 'foo' in object.spec.template.metadata.labels) :
       request.kind.kind in ['Pod', 'CronJob'] ? true : false
     messageExpression: >-
-      'Deployments must have the "foo" label in the Pod template metadata.labels unless in namespaces: ' + variables.cm.data['exclude'] + 
+      'Deployments must have the "foo" label in the Pod template metadata.labels unless in namespaces: ' + variables.excludedNamespaces + 
       (has(object.spec.template.metadata) && has(object.spec.template.metadata.labels) && 'foo' in object.spec.template.metadata.labels ? ', but the label is present.' : ', but no "foo" label is found.')
   - expression: >
       request.kind.kind == 'CronJob' ? 
       ( variables.filter || exceptions.allowedValues.exists(value, value == request.namespace) || has(object.spec.jobTemplate.spec.template.metadata) && has(object.spec.jobTemplate.spec.template.metadata.labels) && 'foo' in object.spec.jobTemplate.spec.template.metadata.labels) :
       request.kind.kind in ['Pod', 'Deployment'] ? true : false
     messageExpression: >-
-      'CronJobs must have the "foo" label in the Pod template metadata.labels unless in namespaces: ' + variables.cm.data['exclude'] + 
+      'CronJobs must have the "foo" label in the Pod template metadata.labels unless in namespaces: ' + variables.excludedNamespaces + 
       (has(object.spec.jobTemplate.spec.template.metadata) && has(object.spec.jobTemplate.spec.template.metadata.labels) && 'foo' in object.spec.jobTemplate.spec.template.metadata.labels ? ', but the label is present.' : ', but no "foo" label is found.')
