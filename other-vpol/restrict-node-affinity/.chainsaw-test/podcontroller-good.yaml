@@ -45,3 +45,20 @@ spec:
           - name: busybox
             image: ghcr.io/kyverno/test-busybox:1.35
           restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: goodrc
+spec:
+  replicas: 1
+  selector:
+    app: goodrc
+  template:
+    metadata:
+      labels:
+        app: goodrc
+    spec:
+      containers:
+      - name: nginx
+        image: nginx

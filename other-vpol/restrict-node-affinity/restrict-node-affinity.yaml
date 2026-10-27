@@ -23,11 +23,23 @@ spec:
     - Audit
   matchConstraints:
     resourceRules:
-    - apiGroups:   [""]
+    - apiGroups: [""]
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
-      resources:   ["pods"]
+      resources:   ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
+  variables:
+    - name: podSpec
+      expression: >-
+        object.spec.?jobTemplate.?spec.?template.?spec.orValue(
+        object.spec.?template.?spec.orValue(object.spec))
   validations:
-    - expression: "!object.spec.?affinity.?nodeAffinity.hasValue()"
+    - expression: "!variables.podSpec.?affinity.?nodeAffinity.hasValue()"
       message: "Node affinity cannot be used."
-
