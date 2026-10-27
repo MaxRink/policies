@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - null-fields.yaml
+- init-ephemeral.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -80,3 +81,9 @@ results:
   resources:
   - null-hostprocess
   result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-host-process
+  resources:
+  - init-ephemeral-hostprocess
+  result: fail
