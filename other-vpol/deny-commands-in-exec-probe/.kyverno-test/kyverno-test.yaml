@@ -8,6 +8,12 @@ resources:
 - resource.yaml
 results:
 - isValidatingPolicy: true
+  kind: ReplicationController
+  policy: deny-commands-in-exec-probe
+  resources:
+  - bad-controller
+  result: fail
+- isValidatingPolicy: true
   kind: Pod
   policy: deny-commands-in-exec-probe
   resources:
