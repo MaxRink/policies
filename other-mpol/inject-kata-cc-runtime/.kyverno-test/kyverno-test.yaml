@@ -91,3 +91,10 @@ results:
   - team-a/exception-pod
   result: skip
   rule: ""
+- kind: Pod
+  policy: inject-kata-cc-runtime
+  isMutatingPolicy: true
+  operation: UPDATE
+  resources:
+  - default/coco-enabled-pod
+  result: skip
