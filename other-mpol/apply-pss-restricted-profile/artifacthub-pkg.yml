@@ -20,8 +20,9 @@ readme: |
   `apply-pss-restricted-profile` in `spec.policyRefs`, and narrow the exception with
   `spec.matchConditions` using the exact request identity (kind, namespace and name).
   Kyverno exposes matching exceptions' `spec.images` as `exceptions.allowedImages`.
-  Exact image matches skip the regular container's securityContext mutations
-  (`privileged`, `capabilities`, and `allowPrivilegeEscalation`). Non-exempt
+  Exact image matches skip securityContext mutations on that container, including
+  init containers (`privileged`, `capabilities`, `allowPrivilegeEscalation`, `runAsNonRoot`,
+  `runAsUser`, `runAsGroup`, and `seccompProfile`). Non-exempt
   containers still receive them. Pod-level securityContext defaults remain
   applied, including when every image is exempt; this is not a whole-Pod bypass.
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-mpol/apply-pss-restricted-profile/.kyverno-test/exception.yaml).
@@ -33,4 +34,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.23"
   kyverno/subject: "Pod"
-digest: 3a11298c559744d219228dec959875da9208ff227c90e2c2a959b72431585723
+digest: a342a91f35728524a2e28d801a5dceb9242b180ceafa0b5d4dd5b926bf735b4f

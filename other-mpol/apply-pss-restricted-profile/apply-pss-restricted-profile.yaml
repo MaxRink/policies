@@ -106,7 +106,17 @@ spec:
               path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext",
               value: dyn({})
             } : null
-          ).filter(p, p != null)
+          ).filter(p, p != null) +
+          (has(variables.podSpec.initContainers) ?
+            variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+              !has(c.securityContext) ?
+              JSONPatch{
+                op: "add",
+                path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext",
+                value: dyn({})
+              } : null
+            ).filter(p, p != null) : []
+          )
     
     # Mutation 3: Set privileged=false for all containers
     - patchType: JSONPatch
@@ -118,6 +128,15 @@ spec:
               path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/privileged",
               value: dyn(false)
             }
+          ) +
+          (has(variables.podSpec.initContainers) ?
+            variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+              JSONPatch{
+                op: "add",
+                path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/privileged",
+                value: dyn(false)
+              }
+            ) : []
           )
     
     # Mutation 4: Drop all capabilities for all containers
@@ -130,6 +149,15 @@ spec:
               path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/capabilities",
               value: dyn({"drop": dyn(["ALL"])})
             }
+          ) +
+          (has(variables.podSpec.initContainers) ?
+            variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+              JSONPatch{
+                op: "add",
+                path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/capabilities",
+                value: dyn({"drop": dyn(["ALL"])})
+              }
+            ) : []
           )
     
     # Mutation 5: Set allowPrivilegeEscalation=false for all containers
@@ -142,4 +170,67 @@ spec:
               path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/allowPrivilegeEscalation",
               value: dyn(false)
             }
+          ) +
+          (has(variables.podSpec.initContainers) ?
+            variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+              JSONPatch{
+                op: "add",
+                path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/allowPrivilegeEscalation",
+                value: dyn(false)
+              }
+            ) : []
+          )
+    # Keep container-level overrides from weakening the pod-level defaults.
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          variables.podSpec.containers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+            [
+              JSONPatch{
+                op: "add",
+                path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/runAsNonRoot",
+                value: dyn(true)
+              },
+              JSONPatch{
+                op: "add",
+                path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/runAsUser",
+                value: dyn(1000)
+              },
+              JSONPatch{
+                op: "add",
+                path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/runAsGroup",
+                value: dyn(3000)
+              },
+              JSONPatch{
+                op: "add",
+                path: variables.podSpecPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/securityContext/seccompProfile",
+                value: dyn({"type": "RuntimeDefault"})
+              }
+            ]
+          ).flatten() +
+          (has(variables.podSpec.initContainers) ?
+            variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+              [
+                JSONPatch{
+                  op: "add",
+                  path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/runAsNonRoot",
+                  value: dyn(true)
+                },
+                JSONPatch{
+                  op: "add",
+                  path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/runAsUser",
+                  value: dyn(1000)
+                },
+                JSONPatch{
+                  op: "add",
+                  path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/runAsGroup",
+                  value: dyn(3000)
+                },
+                JSONPatch{
+                  op: "add",
+                  path: variables.podSpecPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/securityContext/seccompProfile",
+                  value: dyn({"type": "RuntimeDefault"})
+                }
+              ]
+            ).flatten() : []
           )
