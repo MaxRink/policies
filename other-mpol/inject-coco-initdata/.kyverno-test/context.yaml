@@ -1,0 +1,19 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Context
+metadata:
+  name: inject-coco-initdata
+spec:
+  resources:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: initdata
+      namespace: default
+    data:
+      data: H4sIAAAAAAAA/ytLLSrOzM9TsFVQMtAz1DNQ4krMSc8vyizJyAWJFWckGpmaKXFFpySWJMZyKRXk52QmV+oVpabnK4HkCxKTsxPTUxWAOK8kHiKrxAUAS9AYxFUAAAA=
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: empty-initdata
+      namespace: default
+    data: {}

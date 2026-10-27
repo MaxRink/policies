@@ -20,7 +20,7 @@ spec:
         resource:
           apiVersion: v1
           data:
-            data: confidential-data-payload
+            data: H4sIAAAAAAAA/ytLLSrOzM9TsFVQMtAz1DNQ4krMSc8vyizJyAWJFWckGpmaKXFFpySWJMZyKRXk52QmV+oVpabnK4HkCxKTsxPTUxWAOK8kHiKrxAUAS9AYxFUAAAA=
           kind: ConfigMap
           metadata:
             name: coco-initdata
@@ -46,7 +46,7 @@ spec:
           kind: Pod
           metadata:
             annotations:
-              io.katacontainers.config.runtime.cc_init_data: confidential-data-payload
+              io.katacontainers.config.hypervisor.cc_init_data: H4sIAAAAAAAA/ytLLSrOzM9TsFVQMtAz1DNQ4krMSc8vyizJyAWJFWckGpmaKXFFpySWJMZyKRXk52QmV+oVpabnK4HkCxKTsxPTUxWAOK8kHiKrxAUAS9AYxFUAAAA=
             name: good-pod-coco-enabled
             namespace: default
         timeout: 60s
@@ -72,7 +72,7 @@ spec:
           kind: Pod
           metadata:
             annotations:
-              io.katacontainers.config.runtime.cc_init_data: confidential-data-payload
+              io.katacontainers.config.hypervisor.cc_init_data: H4sIAAAAAAAA/ytLLSrOzM9TsFVQMtAz1DNQ4krMSc8vyizJyAWJFWckGpmaKXFFpySWJMZyKRXk52QmV+oVpabnK4HkCxKTsxPTUxWAOK8kHiKrxAUAS9AYxFUAAAA=
             name: pod-no-coco-label
             namespace: default
         timeout: 10s
@@ -97,7 +97,7 @@ spec:
           kind: Pod
           metadata:
             annotations:
-              io.katacontainers.config.runtime.cc_init_data: confidential-data-payload
+              io.katacontainers.config.hypervisor.cc_init_data: H4sIAAAAAAAA/ytLLSrOzM9TsFVQMtAz1DNQ4krMSc8vyizJyAWJFWckGpmaKXFFpySWJMZyKRXk52QmV+oVpabnK4HkCxKTsxPTUxWAOK8kHiKrxAUAS9AYxFUAAAA=
             name: sibling-pod-coco
             namespace: default
   - name: step-04
@@ -121,7 +121,7 @@ spec:
           kind: Pod
           metadata:
             annotations:
-              io.katacontainers.config.runtime.cc_init_data: confidential-data-payload
+              io.katacontainers.config.hypervisor.cc_init_data: H4sIAAAAAAAA/ytLLSrOzM9TsFVQMtAz1DNQ4krMSc8vyizJyAWJFWckGpmaKXFFpySWJMZyKRXk52QmV+oVpabnK4HkCxKTsxPTUxWAOK8kHiKrxAUAS9AYxFUAAAA=
             name: pod-no-configmap-annotation
             namespace: default
         timeout: 10s
@@ -156,7 +156,7 @@ spec:
           kind: Pod
           metadata:
             annotations:
-              io.katacontainers.config.runtime.cc_init_data: confidential-data-payload
+              io.katacontainers.config.hypervisor.cc_init_data: H4sIAAAAAAAA/ytLLSrOzM9TsFVQMtAz1DNQ4krMSc8vyizJyAWJFWckGpmaKXFFpySWJMZyKRXk52QmV+oVpabnK4HkCxKTsxPTUxWAOK8kHiKrxAUAS9AYxFUAAAA=
             name: pod-empty-configmap
             namespace: default
         timeout: 10s

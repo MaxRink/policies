@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Inject CoCo InitData Annotation
 createdAt: "2026-04-08T00:00:00Z"
 description: >-
-  Injects the CoCo initdata annotation into pods with the label coco=enabled and reference to an initdata ConfigMap. Retrieves initdata from the specified ConfigMap and injects it as the io.katacontainers.config.runtime.cc_init_data annotation.
+  Injects the CoCo initdata annotation into pods with the label coco=enabled and reference to an initdata ConfigMap. Retrieves gzip-compressed, base64-encoded Init-Data from the specified ConfigMap and injects it as the io.katacontainers.config.hypervisor.cc_init_data annotation.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-mpol/inject-coco-initdata/inject-coco-initdata.yaml
@@ -13,7 +13,12 @@ keywords:
   - Confidential Computing
   - MutatingPolicy
 readme: |
-  Injects the CoCo initdata annotation into pods with the label coco=enabled and reference to an initdata ConfigMap. Retrieves initdata from the specified ConfigMap and injects it as the io.katacontainers.config.runtime.cc_init_data annotation.
+  Injects gzip-compressed, base64-encoded CoCo Init-Data from a ConfigMap into the
+  `io.katacontainers.config.hypervisor.cc_init_data` Pod annotation. The Pod must have
+  `coco=enabled` and the sample-specific `coco.io/initdata-configmap` annotation naming
+  the ConfigMap in the same namespace. The policy also applies to Deployment, StatefulSet,
+  DaemonSet, Job, and CronJob pod templates; other controller kinds, including
+  ReplicationControllers, are not matched.
   
   ### Fine-grained PolicyException use
 
@@ -30,4 +35,4 @@ readme: |
 annotations:
   kyverno/category: "Confidential Computing"
   kyverno/subject: "Pod"
-digest: 4c05f85586d9e907a3abb3baf9ba49a2b138d80a4f526016db1bd590da6571f2
+digest: 31bd9cf04a8c7c57596b4c1f3f7356df5a904ba719dee8849a3aac3e2930d2fd
