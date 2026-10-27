@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: applicationset-name-matches-project-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - name: applicationset-name-matches-project
+      kind: ValidatingPolicy
+  matchConditions:
+    - name: exact-applicationset
+      expression: object.metadata.namespace == 'default' && object.metadata.name == 'exception-appset'
