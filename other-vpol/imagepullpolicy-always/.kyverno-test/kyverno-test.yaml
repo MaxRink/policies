@@ -6,6 +6,7 @@ policies:
 - ../imagepullpolicy-always.yaml
 resources:
 - resource.yaml
+- immutable-or-tagged.yaml
 - replicationcontroller.yaml
 results:
 - isValidatingPolicy: true
@@ -40,3 +41,9 @@ results:
   resources:
   - image-pull-bad-rc
   result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: imagepullpolicy-always
+  resources:
+  - immutable-or-tagged
+  result: pass
