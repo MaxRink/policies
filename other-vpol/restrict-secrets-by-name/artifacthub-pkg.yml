@@ -13,6 +13,8 @@ keywords:
   - ValidatingPolicy
 readme: |
   Secrets often contain sensitive information and their access should be carefully controlled. Although Kubernetes RBAC can be effective at restricting them in several ways, it lacks the ability to use wildcards in resource names. This policy ensures that only Secrets beginning with the name `safe-` can be consumed by Pods and their controllers, including ReplicationControllers, and checks ephemeral-container updates. In order to work effectively, this policy needs to be paired with a separate policy or rule to require `automountServiceAccountToken=false` since this would otherwise result in a Secret being mounted.
+
+  Unlike the legacy sample, this ValidatingPolicy also checks Secret references in projected volumes to prevent that path from bypassing the safe-name rule.
   
   ### Fine-grained PolicyException use
 
@@ -32,7 +34,7 @@ annotations:
   kyverno/category: "Other in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod, Secret"
-digest: 1940f6a003720e01e8265208ca404b819bb8fcb7bbd7cbb7e880f43506fa27d5
+digest: d9289a346288029709e08f1991eb37097fea55ef7b7785e0e7ab1a3ed94890e2
 
 
 createdAt: "2025-05-11T17:46:11Z"
