@@ -51,7 +51,7 @@ spec:
       expression: "variables.podSpec.containers + variables.podSpec.?initContainers.orValue([])"
     - name: emptydirnames
       expression: >-
-        variables.podSpec.?volumes.orValue([]).filter(volume, has(volume.emptyDir) && !has(volume.emptyDir.sizeLimit)).map(volume, volume.name)
+        variables.podSpec.?volumes.orValue([]).filter(volume, has(volume.emptyDir) && (!has(volume.emptyDir.sizeLimit) || volume.emptyDir.sizeLimit == null)).map(volume, volume.name)
   validations:
     - expression: >-
         variables.containers.all(container,
