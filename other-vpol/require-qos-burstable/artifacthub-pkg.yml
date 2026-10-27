@@ -34,7 +34,7 @@ annotations:
   kyverno/category: "Other, Multi-Tenancy in vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: d1db5e2ae77876223fc7c4f2952da319bb7b0fe14f8f726e6cdefe24e96d1815
+digest: b3b724270473d9bbeecf25be4dcf83308fbde3db1118c101997c68bce63edc60
 
 
 createdAt: "2025-05-11T17:46:11Z"
