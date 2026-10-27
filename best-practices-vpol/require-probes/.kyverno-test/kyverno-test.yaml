@@ -26,6 +26,8 @@ results:
   - goodpod02
   - goodpod03
   - goodpod04
+  - init-without-probe
+  - ephemeral-without-probe
   result: pass
 - kind: Pod
   policy: require-pod-probes

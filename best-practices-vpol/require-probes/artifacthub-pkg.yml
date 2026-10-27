@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Require Pod Probes
 createdAt: "2023-04-10T19:47:15.000Z"
 description: >-
-  Liveness and readiness probes need to be configured to correctly manage a Pod's lifecycle during deployments, restarts, and upgrades. For each Pod, a periodic `livenessProbe` is performed by the kubelet to determine if the Pod's containers are running or need to be restarted. A `readinessProbe` is used by Services and Deployments to determine if the Pod is ready to receive network traffic. This policy validates that all containers in Pods and supported Pod controllers have one of livenessProbe, readinessProbe, or startupProbe defined.
+  Liveness and readiness probes need to be configured to correctly manage a Pod's lifecycle during deployments, restarts, and upgrades. For each Pod, a periodic `livenessProbe` is performed by the kubelet to determine if the Pod's containers are running or need to be restarted. A `readinessProbe` is used by Services and Deployments to determine if the Pod is ready to receive network traffic.   This policy audits regular containers in Pods and supported Pod controllers for one of livenessProbe, readinessProbe, or startupProbe; init and ephemeral containers are outside the legacy check's scope.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/best-practices-vpol/require-probes/require-probes.yaml
@@ -13,7 +13,7 @@ keywords:
   - Best Practices
   - EKS Best Practices
 readme: |
-  Liveness and readiness probes need to be configured to correctly manage a Pod's lifecycle during deployments, restarts, and upgrades. For each Pod, a periodic `livenessProbe` is performed by the kubelet to determine if the Pod's containers are running or need to be restarted. A `readinessProbe` is used by Services and Deployments to determine if the Pod is ready to receive network traffic. This policy validates that all containers in Pods and supported Pod controllers have one of livenessProbe, readinessProbe, or startupProbe defined.
+  Liveness and readiness probes need to be configured to correctly manage a Pod's lifecycle during deployments, restarts, and upgrades. For each Pod, a periodic `livenessProbe` is performed by the kubelet to determine if the Pod's containers are running or need to be restarted. A `readinessProbe` is used by Services and Deployments to determine if the Pod is ready to receive network traffic.   This policy audits regular containers in Pods and supported Pod controllers for one of livenessProbe, readinessProbe, or startupProbe; init and ephemeral containers are outside the legacy check's scope.
   
   ### Fine-grained PolicyException use
 
@@ -23,7 +23,7 @@ readme: |
   This policy accepts exact image references in `spec.images`; only matching
   images are exempted and all other images remain enforced.
   CEL reads these references through `exceptions.allowedImages`; `variables.allContainers`
-  includes regular, init, and ephemeral containers.
+  includes regular containers only, matching the legacy policy scope.
   See the [tested example](https://github.com/kyverno/policies/blob/main/best-practices-vpol/require-probes/.kyverno-test/exceptions.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal enforcement behavior.
@@ -32,4 +32,4 @@ readme: |
 annotations:
   kyverno/category: "Best Practices, EKS Best Practices"
   kyverno/subject: "Pod"
-digest: 5d37d16b880c26eb4e45cbe00f02916cc02b8c9604623d933a46afa5cf1b508e
+digest: 4ea7201521dd9780ed876afbf9371d5d7d86c386137f89c941b13cd11e70300c

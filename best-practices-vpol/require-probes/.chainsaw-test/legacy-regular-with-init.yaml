@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: require-probes-legacy-init-scope
+spec:
+  initContainers:
+  - name: setup
+    image: ghcr.io/kyverno/test-busybox:1.35
+  containers:
+  - name: app
+    image: ghcr.io/kyverno/test-busybox:1.35
+    readinessProbe:
+      tcpSocket: {port: 80}
