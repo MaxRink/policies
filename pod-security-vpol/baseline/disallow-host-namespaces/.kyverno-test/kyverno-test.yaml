@@ -6,6 +6,7 @@ policies:
 - ../disallow-host-namespaces.yaml
 resources:
 - resource.yaml
+- null-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -63,4 +64,10 @@ results:
   - goodpod03
   - goodpod04
   - goodpod05
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-host-namespaces
+  resources:
+  - null-host-namespaces
   result: pass

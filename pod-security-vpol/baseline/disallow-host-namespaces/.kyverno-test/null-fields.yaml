@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-host-namespaces
+spec:
+  hostNetwork: null
+  hostIPC: null
+  hostPID: null
+  containers:
+  - name: app
+    image: test:latest
