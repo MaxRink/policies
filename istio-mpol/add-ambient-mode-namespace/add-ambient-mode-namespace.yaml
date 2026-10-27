@@ -14,7 +14,8 @@ metadata:
       In order for Istio to include namespaces in ambient mode, the label `istio.io/dataplane-mode` 
       must be set to `ambient`. As an alternative to rejecting Namespace definitions which don't already 
       contain this label, it can be added automatically. This policy adds the label `istio.io/dataplane-mode`
-      set to `ambient` for new Namespaces without an existing Istio mode selection.
+      set to `ambient` for application Namespaces without another Istio mode selection, excluding
+      `kube-system` and `istio-system`.
 spec:
   matchConstraints:
     resourceRules:
@@ -25,14 +26,16 @@ spec:
   matchConditions:
     - name: namespace-has-no-istio-mode
       expression: |
-        !has(object.metadata.labels) ||
+        object.metadata.name != "kube-system" &&
+        object.metadata.name != "istio-system" &&
+        (!has(object.metadata.labels) ||
         (
           (!("istio.io/dataplane-mode" in object.metadata.labels) ||
            !(object.metadata.labels["istio.io/dataplane-mode"] in ["ambient", "none"])) &&
           (!("istio-injection" in object.metadata.labels) ||
            object.metadata.labels["istio-injection"] != "enabled") &&
           !("istio.io/rev" in object.metadata.labels)
-        )
+        ))
   mutations:
     - patchType: ApplyConfiguration
       applyConfiguration:

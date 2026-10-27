@@ -20,3 +20,15 @@ results:
   - sidecar-ns
   result: skip
   isMutatingPolicy: true
+- kind: Namespace
+  policy: add-ambient-mode-namespace
+  resources:
+  - kube-system
+  result: skip
+  isMutatingPolicy: true
+- kind: Namespace
+  policy: add-ambient-mode-namespace
+  resources:
+  - istio-system
+  result: skip
+  isMutatingPolicy: true
