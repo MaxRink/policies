@@ -31,3 +31,15 @@ results:
   resources:
   - badpod01
   result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-node-affinity
+  resources:
+  - badrc
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-node-affinity
+  resources:
+  - goodrc
+  result: pass

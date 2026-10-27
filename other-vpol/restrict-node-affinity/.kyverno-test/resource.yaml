@@ -89,3 +89,44 @@ spec:
             limits:
               memory: "256Mi"
               cpu: "500m"
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: badrc
+spec:
+  replicas: 1
+  selector:
+    app: bad
+  template:
+    metadata:
+      labels:
+        app: bad
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+      containers:
+      - name: nginx
+        image: nginx
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: goodrc
+spec:
+  replicas: 1
+  selector:
+    app: good
+  template:
+    metadata:
+      labels:
+        app: good
+    spec:
+      containers:
+      - name: nginx
+        image: nginx
