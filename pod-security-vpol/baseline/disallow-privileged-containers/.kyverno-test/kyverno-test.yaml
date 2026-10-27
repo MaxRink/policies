@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - null-fields.yaml
+- init-ephemeral.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -77,3 +78,9 @@ results:
   resources:
   - null-privileged
   result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-privileged-containers
+  resources:
+  - init-ephemeral-privileged
+  result: fail
