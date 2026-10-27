@@ -1,9 +1,9 @@
 name: block-cluster-admin-from-ns 
 version: 1.0.0 
-displayName: Block cluster-admin from modifying any object in a Namespace
+displayName: Block a specified cluster-admin from modifying objects in a Namespace
 createdAt: "2023-05-18T00:00:00.000Z"
 description: >-
-  In some cases, it may be desirable to block operations of certain privileged users (i.e. cluster-admins) in a specific namespace. In this policy, Kyverno will look for all user operations (CREATE, UPDATE, DELETE), on every object kind, in the testnamespace namespace, and for the ClusterRole cluster-admin. The user testuser is also mentioned so it won't include all the cluster-admins in the cluster, but will be flexible enough to apply only for a sub-group of the cluster-admins in the cluster.
+  Denies CREATE, UPDATE, and DELETE requests from the configured username testuser in testnamespace. The example binds this user to cluster-admin; role membership is not inferred from request.userInfo.groups.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/block-cluster-admin-from-ns/block-cluster-admin-from-ns.yaml
@@ -13,8 +13,8 @@ keywords:
   - cluster-admin 
   - ValidatingPolicy
   - kyverno
-readme: | 
-  In some cases, it may be desirable to block operations of certain privileged users (i.e. cluster-admins) in a specific namespace. In this policy, Kyverno will look for all user operations (CREATE, UPDATE, DELETE), on every object kind, in the testnamespace namespace, and for the ClusterRole cluster-admin. The user testuser is also mentioned so it won't include all the cluster-admins in the cluster, but will be flexible enough to apply only for a sub-group of the cluster-admins in the cluster.
+readme: |
+  This policy denies CREATE, UPDATE, and DELETE requests from the configured username `testuser` in `testnamespace`. The example binds this user to the `cluster-admin` ClusterRole; it does not infer role membership from `request.userInfo.groups`. Other usernames and operations are not denied by this policy.
 
   ### Fine-grained PolicyException use
 
@@ -32,4 +32,4 @@ annotations:
   kyverno/category: Other
   kyverno/subject: Namespace, ClusterRole, User
   kyverno/version: "1.15.0"
-digest: 2c2838fd5be0c02b3787f700f8e4604fb4708a5f9476dbcf7c5395235150e26e
+digest: 977cf2cc489908bdc208a0e4079116f4da3fd3d34f8ab077b037befc20397214
