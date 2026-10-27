@@ -42,7 +42,7 @@ spec:
           for attempt in $(seq 1 60); do
             ready=true
             for verb in get list watch update; do
-              result="$(kubectl auth can-i "$verb" pods --subresource=ephemeralcontainers --as=system:serviceaccount:kyverno:kyverno-admission-controller 2>&1)" || {
+              result="$(kubectl auth can-i "$verb" pods --subresource=ephemeralcontainers --namespace=default --as=system:serviceaccount:kyverno:kyverno-admission-controller 2>&1)" || {
                 printf '%s\n' "$result" >&2
                 exit 1
               }
@@ -101,9 +101,9 @@ spec:
     - script:
         content: |
           set -eu
-          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=first --image=registry.example/skip-first:1
-          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=middle --image=registry.example/mutate-middle:1
-          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=last --image=registry.example/skip-last:1
+          kubectl debug pod/ephemeral-update-pod -n default --profile=baseline --attach=false --container=first --image=registry.example/skip-first:1
+          kubectl debug pod/ephemeral-update-pod -n default --profile=baseline --attach=false --container=middle --image=registry.example/mutate-middle:1
+          kubectl debug pod/ephemeral-update-pod -n default --profile=baseline --attach=false --container=last --image=registry.example/skip-last:1
     - assert:
         file: ephemeral-pod-patched.yaml
   - name: step-05-ephemeral-revocation
@@ -117,6 +117,10 @@ spec:
     - script:
         content: |
           set -eu
-          kubectl debug pod/ephemeral-update-pod -n default --attach=false --container=after-revocation --image=registry.example/skip-first:1
+          kubectl debug pod/ephemeral-update-pod -n default --profile=baseline --attach=false --container=after-revocation --image=registry.example/skip-first:1
     - assert:
         file: ephemeral-pod-revoked-patched.yaml
+    - script:
+        content: |
+          set -eu
+          kubectl delete pod ephemeral-update-pod -n default --ignore-not-found=true

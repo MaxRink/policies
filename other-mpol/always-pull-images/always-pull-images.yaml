@@ -61,14 +61,14 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        (variables.isEphemeralUpdate ? [] : variables.podSpec.containers.filter(container, !exceptions.allowedImages.exists(image, image == container.image)).map(container,
+        (variables.isEphemeralUpdate || !has(variables.podSpec.containers) || variables.podSpec.containers == null ? [] : variables.podSpec.containers.filter(container, !exceptions.allowedImages.exists(image, image == container.image)).map(container,
           JSONPatch{
             op: "add",
             path: variables.specPath + "/containers/" + string(variables.podSpec.containers.indexOf(container)) + "/imagePullPolicy",
             value: "Always"
           }
         )) +
-        (!variables.isEphemeralUpdate && has(variables.podSpec.initContainers) ?
+        (!variables.isEphemeralUpdate && has(variables.podSpec.initContainers) && variables.podSpec.initContainers != null ?
           variables.podSpec.initContainers.filter(container, !exceptions.allowedImages.exists(image, image == container.image)).map(container,
             JSONPatch{
               op: "add",
@@ -76,10 +76,10 @@ spec:
               value: "Always"
             }
           ) : []) +
-        (has(variables.podSpec.ephemeralContainers) ?
+        (has(variables.podSpec.ephemeralContainers) && variables.podSpec.ephemeralContainers != null ?
           variables.podSpec.ephemeralContainers.filter(container,
             !exceptions.allowedImages.exists(image, image == container.image) &&
-            !(oldObject != null && has(oldObject.spec.ephemeralContainers) &&
+            !(oldObject != null && has(oldObject.spec) && has(oldObject.spec.ephemeralContainers) && oldObject.spec.ephemeralContainers != null &&
               oldObject.spec.ephemeralContainers.exists(existing, existing.name == container.name))
           ).map(container,
             JSONPatch{
