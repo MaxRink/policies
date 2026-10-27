@@ -43,4 +43,9 @@ spec:
         expect:
         - check:
             ($error != null): true
+        file: ../.kyverno-test/null-resources-pod.yaml
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
         file: ../.kyverno-test/replicationcontroller-bad.yaml
