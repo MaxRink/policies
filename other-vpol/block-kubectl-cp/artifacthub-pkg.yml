@@ -1,8 +1,8 @@
 name: block-kubectl-cp
 version: 1.0.0
-displayName: Block "kubectl cp" by Pod Label in ValidatingPolicy
+displayName: Block "kubectl cp" in Pod exec requests in ValidatingPolicy
 description: >-
-  The `kubectl cp` command allows copying files between a local machine and a Pod's container, which may introduce security risks. This policy blocks the use of the `kubectl cp` command for Pods with the label `block-kubectl-cp=true`, preventing unauthorized data transfers.
+  Blocks tar cf and tar xf commands in pods/exec CONNECT requests for all Pods; it does not select Pods by label.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/block-kubectl-cp/block-kubectl-cp.yaml
@@ -14,8 +14,7 @@ keywords:
   - other
   - ValidatingPolicy
 readme: |
-  The kubectl cp command allows copying files between a local machine and a Pod's container, but it can be misused for unauthorized data transfers. 
-  This policy blocks the kubectl cp command for Pods labeled with block-kubectl-cp=true.
+  The kubectl cp command uses tar over a Pod exec request to copy files. This policy blocks tar cf and tar xf commands in pods/exec CONNECT requests for all Pods; it does not select Pods by label.
 
   ### Fine-grained PolicyException use
 
@@ -32,5 +31,5 @@ annotations:
   kyverno/category: "Sample"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: d91d10c68bef916a70538db37f08082ef0633d84324b3ae196e948153c821c4e
+digest: 9e581ddbd908383024bc1fe729d8d17512dc46f7f7a8818333a62f26d09de7ad
 createdAt: "2025-12-02T13:59:47Z"
