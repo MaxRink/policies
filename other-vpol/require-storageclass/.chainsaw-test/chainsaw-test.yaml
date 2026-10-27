@@ -35,8 +35,16 @@ spec:
     - apply:
         file: pvc-good.yaml
     - apply:
+        file: pvc-null-default.yaml
+    - assert:
+        file: pvc-null-defaulted.yaml
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: ss-null-storageclass.yaml
+    - apply:
         expect:
         - check:
             ($error != null): true
         file: pvc-bad.yaml
-
