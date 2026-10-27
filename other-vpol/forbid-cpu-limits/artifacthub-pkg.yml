@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Other in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 9950b6948a80cf15156fe2a96782eff4b91d4ea660fb4f893c382576515fe4db
+digest: f91820c0d473823f83d4babd13e0cd97e6dc54e84231d539699aefb0214b7a47
 
 
 createdAt: "2025-05-11T17:46:11Z"

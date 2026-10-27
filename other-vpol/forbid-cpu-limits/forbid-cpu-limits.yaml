@@ -25,6 +25,14 @@ spec:
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
       resources:   ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
   variables:
     - name: podSpec
       expression: "object.spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec.?template.?spec.orValue(object.spec))"
