@@ -1,0 +1,7 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: UserInfo
+metadata:
+  name: namespace-editor
+userInfo:
+  username: namespace-editor
+  groups: []

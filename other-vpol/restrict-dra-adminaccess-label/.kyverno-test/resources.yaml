@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unchanged-adminaccess-label
+  labels:
+    resource.kubernetes.io/admin-access: "true"
+    team: after
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: disabled-adminaccess-label
+  labels:
+    resource.kubernetes.io/admin-access: "false"

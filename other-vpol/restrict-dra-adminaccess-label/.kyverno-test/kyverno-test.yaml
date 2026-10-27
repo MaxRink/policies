@@ -1,0 +1,23 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-dra-adminaccess-label
+policies:
+  - ../restrict-dra-adminaccess-label.yaml
+resources:
+  - resources.yaml
+userinfo: userinfo.yaml
+results:
+  - isValidatingPolicy: true
+    policy: restrict-dra-adminaccess-label
+    kind: Namespace
+    resources:
+      - unchanged-adminaccess-label
+    result: pass
+    operation: UPDATE
+  - isValidatingPolicy: true
+    policy: restrict-dra-adminaccess-label
+    kind: Namespace
+    resources:
+      - disabled-adminaccess-label
+    result: pass

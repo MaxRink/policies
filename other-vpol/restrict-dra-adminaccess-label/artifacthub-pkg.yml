@@ -1,0 +1,52 @@
+name: restrict-dra-adminaccess-label-vpol
+version: 1.0.0
+displayName: Restrict the DRA AdminAccess Namespace Label
+description: >-
+  Kubernetes 1.34+ requires resource.kubernetes.io/admin-access=true before a
+  claim can request DRA adminAccess, but does not restrict which principals
+  may set the label. This policy restricts label changes to identities with a
+  dedicated RBAC permission and allows updates that leave the label unchanged.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-dra-adminaccess-label/restrict-dra-adminaccess-label.yaml
+  ```
+keywords:
+  - kyverno
+  - Other
+  - ValidatingPolicy
+  - Dynamic Resource Allocation
+readme: |
+  Kubernetes 1.34+ requires `resource.kubernetes.io/admin-access=true` on a
+  namespace before a claim there can request DRA `adminAccess`. Kubernetes does
+  not restrict who may set this label, so ordinary namespace update permission
+  is sufficient to enable the capability for every claim creator in that
+  namespace.
+
+  This policy adds that missing authorization boundary. A SubjectAccessReview
+  permits only identities with the synthetic
+  `namespaces/adminaccess:create` or `namespaces/adminaccess:update` RBAC
+  permission to add the label. This dedicated permission lets cluster
+  administrators control the label separately from ordinary Namespace update
+  rights.
+
+  The policy compares the new label with `oldObject`, so it does not reject
+  updates that leave an existing `admin-access=true` label unchanged. The
+  included `grant-dra-adminaccess-label-role.yaml` uses a ClusterRole and
+  ClusterRoleBinding because Namespace is cluster-scoped.
+
+  ### Fine-grained PolicyException use
+
+  To permit one exact Namespace label change without its normal SAR, reference
+  this policy in `spec.policyRefs`, match the Namespace name and operation, and
+  set `spec.allowedValues` to
+  `restrict-dra-adminaccess-label:allow-exact-label-change`. Other Namespace
+  label changes remain authorized by the normal SAR. See the
+  [tested exception](https://github.com/kyverno/policies/blob/main/other-vpol/restrict-dra-adminaccess-label/.kyverno-test-exceptions/exceptions.yaml).
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "Other"
+  kyverno/kubernetesVersion: "1.34"
+  kyverno/subject: "Namespace"
+digest: f13daeeda486c2b43fb40a14de0f7f3e4c819c74c424e3e6046d6737955161f0
+createdAt: "2026-10-27T17:49:00Z"
