@@ -33,4 +33,4 @@ readme: |
 annotations:
   kyverno/category: "Confidential Computing"
   kyverno/subject: "ConfigMap"
-digest: 9fe23803c43f7c529cf888baa0ae8aa08216f78ff1b78714039a4c3b0adb7153
+digest: 87916498fbc3b7801b4a0f7e0ab2e82a5ef6cb178a5428b67e143e3103fe0ef7
