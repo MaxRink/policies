@@ -9,6 +9,9 @@ resources:
 - resourceFailed.yaml
 - withoutinitcontainer.yaml
 - already-prefixed.yaml
+- replicationcontroller.yaml
+- deployment.yaml
+- cronjob.yaml
 results:
 - kind: Pod
   patchedResources: patchedResource.yaml
@@ -36,5 +39,23 @@ results:
   policy: prepend-registry
   resources:
   - already-prefixed
+  result: pass
+  isMutatingPolicy: true
+- kind: ReplicationController
+  patchedResources: replicationcontroller-patched.yaml
+  policy: prepend-registry
+  resources: [rc]
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: deployment-patched.yaml
+  policy: prepend-registry
+  resources: [deploy]
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: cronjob-patched.yaml
+  policy: prepend-registry
+  resources: [cronjob]
   result: pass
   isMutatingPolicy: true

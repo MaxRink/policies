@@ -8,8 +8,17 @@ metadata:
     policies.kyverno.io/category: Other
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/description: >-
-      Prepends 'registry.io/' to all container and initContainer images in Pods.
+      Prepends 'registry.io/' to all container and initContainer images in Pods and supported pod-controller templates.
 spec:
+  autogen:
+    podControllers:
+      controllers:
+      - deployments
+      - statefulsets
+      - daemonsets
+      - replicasets
+      - jobs
+      - cronjobs
   evaluation:
     admission:
       enabled: true
@@ -18,27 +27,100 @@ spec:
     - apiGroups: [""]
       apiVersions: ["v1"]
       operations: ["CREATE", "UPDATE"]
-      resources: ["pods"]
+      resources: ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
+  variables:
+  - name: isCronJob
+    expression: has(object.spec.jobTemplate)
+  - name: isController
+    expression: has(object.spec.template)
+  - name: containers
+    expression: >-
+      variables.isCronJob ? object.spec.jobTemplate.spec.template.spec.containers :
+      variables.isController ? object.spec.template.spec.containers : object.spec.containers
+  - name: initContainers
+    expression: >-
+      variables.isCronJob ?
+        (has(object.spec.jobTemplate.spec.template.spec.initContainers) ? object.spec.jobTemplate.spec.template.spec.initContainers : []) :
+        variables.isController ?
+          (has(object.spec.template.spec.initContainers) ? object.spec.template.spec.initContainers : []) :
+          (has(object.spec.initContainers) ? object.spec.initContainers : [])
   mutations:
   - patchType: ApplyConfiguration
     applyConfiguration:
       expression: |
+        variables.isCronJob ?
         Object{
           spec: Object.spec{
-            containers: object.spec.containers.map(container,
+            jobTemplate: Object.spec.jobTemplate{
+              spec: Object.spec.jobTemplate.spec{
+                template: Object.spec.jobTemplate.spec.template{
+                  spec: Object.spec.jobTemplate.spec.template.spec{
+                    containers: variables.containers.map(container,
+                      exceptions.allowedImages.exists(image, image == container.image) ? container :
+                      Object.spec.jobTemplate.spec.template.spec.containers{
+                        name: container.name,
+                        image: container.image.startsWith("registry.io/") ? container.image : "registry.io/" + container.image
+                      }
+                    ),
+                    initContainers: variables.initContainers.map(container,
+                      exceptions.allowedImages.exists(image, image == container.image) ? container :
+                      Object.spec.jobTemplate.spec.template.spec.initContainers{
+                        name: container.name,
+                        image: container.image.startsWith("registry.io/") ? container.image : "registry.io/" + container.image
+                      }
+                    )
+                  }
+                }
+              }
+            }
+          }
+        } :
+        variables.isController ?
+        Object{
+          spec: Object.spec{
+            template: Object.spec.template{
+              spec: Object.spec.template.spec{
+                containers: variables.containers.map(container,
+                  exceptions.allowedImages.exists(image, image == container.image) ? container :
+                  Object.spec.template.spec.containers{
+                    name: container.name,
+                    image: container.image.startsWith("registry.io/") ? container.image : "registry.io/" + container.image
+                  }
+                ),
+                initContainers: variables.initContainers.map(container,
+                  exceptions.allowedImages.exists(image, image == container.image) ? container :
+                  Object.spec.template.spec.initContainers{
+                    name: container.name,
+                    image: container.image.startsWith("registry.io/") ? container.image : "registry.io/" + container.image
+                  }
+                )
+              }
+            }
+          }
+        } :
+        Object{
+          spec: Object.spec{
+            containers: variables.containers.map(container,
               exceptions.allowedImages.exists(image, image == container.image) ? container :
               Object.spec.containers{
                 name: container.name,
                 image: container.image.startsWith("registry.io/") ? container.image : "registry.io/" + container.image
               }
             ),
-            initContainers: has(object.spec.initContainers) ?
-              object.spec.initContainers.map(container,
-                exceptions.allowedImages.exists(image, image == container.image) ? container :
-                Object.spec.initContainers{
-                  name: container.name,
-                  image: container.image.startsWith("registry.io/") ? container.image : "registry.io/" + container.image
-                }
-              ) : []
+            initContainers: variables.initContainers.map(container,
+              exceptions.allowedImages.exists(image, image == container.image) ? container :
+              Object.spec.initContainers{
+                name: container.name,
+                image: container.image.startsWith("registry.io/") ? container.image : "registry.io/" + container.image
+              }
+            )
           }
         }

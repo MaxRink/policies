@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Prepend Image Registry
 createdAt: "2023-04-10T20:30:05.000Z"
 description: >-
-  Pulling images from outside registries may be undesirable due to untrustworthiness or simply because the traffic results in an excess of bandwidth usage. Instead of blocking them, they can be mutated to divert to an internal registry which may already contain them or function as a pull-through proxy. This policy prepends all images in both containers and initContainers to come from `registry.io`.
+  Pulling images from outside registries may be undesirable due to untrustworthiness or simply because the traffic results in an excess of bandwidth usage. Instead of blocking them, they can be mutated to divert to an internal registry which may already contain them or function as a pull-through proxy. This policy prepends all images in both containers and initContainers in Pods and supported pod-controller templates to come from `registry.io`.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-mpol/prepend-image-registry/prepend-image-registry.yaml
@@ -31,4 +31,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.21"
   kyverno/subject: "Pod"
-digest: e42b5ddaa705878c5661214d465c82399b7cda4e2ae083b12882e3174c319104
+digest: a2b08e2a192fa6c3ce92fe94dc824d4e8999020b0c7cafdcdbf92c9f68991299
