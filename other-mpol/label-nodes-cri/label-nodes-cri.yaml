@@ -30,7 +30,7 @@ spec:
     - patchType: ApplyConfiguration
       applyConfiguration:
         expression: |
-          has(object.status.nodeInfo.containerRuntimeVersion) &&
+          has(object.status) && has(object.status.nodeInfo) && has(object.status.nodeInfo.containerRuntimeVersion) &&
           object.status.nodeInfo.containerRuntimeVersion.startsWith("containerd://") ?
           Object{
             metadata: Object.metadata{
@@ -43,7 +43,7 @@ spec:
     - patchType: ApplyConfiguration
       applyConfiguration:
         expression: |
-          has(object.status.nodeInfo.containerRuntimeVersion) && 
+          has(object.status) && has(object.status.nodeInfo) && has(object.status.nodeInfo.containerRuntimeVersion) &&
           object.status.nodeInfo.containerRuntimeVersion.startsWith("docker://") ?
           Object{
             metadata: Object.metadata{
@@ -56,7 +56,7 @@ spec:
     - patchType: ApplyConfiguration
       applyConfiguration:
         expression: |
-          has(object.status.nodeInfo.containerRuntimeVersion) &&
+          has(object.status) && has(object.status.nodeInfo) && has(object.status.nodeInfo.containerRuntimeVersion) &&
           object.status.nodeInfo.containerRuntimeVersion.startsWith("cri-o://") ?
           Object{
             metadata: Object.metadata{
