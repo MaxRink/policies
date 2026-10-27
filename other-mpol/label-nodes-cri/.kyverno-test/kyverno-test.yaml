@@ -7,6 +7,7 @@ policies:
 resources:
 - baseline-resource.yaml
 - exception-resource.yaml
+- crio-resource.yaml
 exceptions:
 - exception.yaml
 results:
@@ -20,4 +21,10 @@ results:
   policy: label-nodes-cri
   resources: [exception-node]
   result: skip
+  isMutatingPolicy: true
+- kind: Node
+  patchedResources: crio-patched.yaml
+  policy: label-nodes-cri
+  resources: [crio-node]
+  result: pass
   isMutatingPolicy: true
