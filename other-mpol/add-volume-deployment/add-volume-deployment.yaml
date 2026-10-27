@@ -27,10 +27,6 @@ spec:
         has(object.spec.template.metadata.annotations) &&
         'vault.k8s.corp.net/inject' in object.spec.template.metadata.annotations &&
         object.spec.template.metadata.annotations['vault.k8s.corp.net/inject'] == 'enabled'
-    - name: does-not-have-vault-volume
-      expression: |
-        !has(object.spec.template.spec.volumes) ||
-        !object.spec.template.spec.volumes.exists(v, v.name == 'vault-secret')
   mutations:
     - patchType: ApplyConfiguration
       applyConfiguration:
@@ -40,13 +36,17 @@ spec:
               template: Object.spec.template{
                 spec: Object.spec.template.spec{
                   volumes: has(object.spec.template.spec.volumes) ?
-                    object.spec.template.spec.volumes + [Object.spec.template.spec.volumes{name: "vault-secret", emptyDir: Object.spec.template.spec.volumes.emptyDir{medium: "Memory"}}] :
+                    (object.spec.template.spec.volumes.exists(v, v.name == "vault-secret") ?
+                      object.spec.template.spec.volumes :
+                      object.spec.template.spec.volumes + [Object.spec.template.spec.volumes{name: "vault-secret", emptyDir: Object.spec.template.spec.volumes.emptyDir{medium: "Memory"}}]) :
                     [Object.spec.template.spec.volumes{name: "vault-secret", emptyDir: Object.spec.template.spec.volumes.emptyDir{medium: "Memory"}}],
                   containers: [
                     Object.spec.template.spec.containers{
                       name: object.spec.template.spec.containers[0].name,
                       volumeMounts: has(object.spec.template.spec.containers[0].volumeMounts) ?
-                        object.spec.template.spec.containers[0].volumeMounts + [Object.spec.template.spec.containers.volumeMounts{mountPath: "/secret", name: "vault-secret"}] :
+                        (object.spec.template.spec.containers[0].volumeMounts.exists(m, m.mountPath == "/secret") ?
+                          object.spec.template.spec.containers[0].volumeMounts :
+                          object.spec.template.spec.containers[0].volumeMounts + [Object.spec.template.spec.containers.volumeMounts{mountPath: "/secret", name: "vault-secret"}]) :
                         [Object.spec.template.spec.containers.volumeMounts{mountPath: "/secret", name: "vault-secret"}]
                     }
                   ]

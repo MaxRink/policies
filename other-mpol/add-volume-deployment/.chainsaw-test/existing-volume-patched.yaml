@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: existing-vault-volume
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: existing-vault-volume
+  template:
+    metadata:
+      labels:
+        app: existing-vault-volume
+      annotations:
+        vault.k8s.corp.net/inject: enabled
+    spec:
+      containers:
+      - name: app
+        image: nginx:latest
+        volumeMounts:
+        - mountPath: /secret
+          name: vault-secret
+      volumes:
+      - name: vault-secret
+        emptyDir:
+          medium: Memory
