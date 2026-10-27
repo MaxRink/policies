@@ -7,6 +7,8 @@ policies:
 resources:
 - resource.yaml
 - exception-resource.yaml
+- replicationcontroller.yaml
+- controller-resource.yaml
 exceptions:
 - exception.yaml
 results:
@@ -21,4 +23,22 @@ results:
   policy: remove-hostpath-volumes
   resources: [exception-pod]
   result: skip
+  isMutatingPolicy: true
+- kind: ReplicationController
+  patchedResources: replicationcontroller-patched.yaml
+  policy: remove-hostpath-volumes
+  resources: [rc]
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: controller-patched.yaml
+  policy: remove-hostpath-volumes
+  resources: [hostpath-deployment]
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: controller-patched.yaml
+  policy: remove-hostpath-volumes
+  resources: [hostpath-cronjob]
+  result: pass
   isMutatingPolicy: true

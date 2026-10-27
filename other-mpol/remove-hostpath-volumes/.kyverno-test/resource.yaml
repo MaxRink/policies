@@ -18,6 +18,19 @@ spec:
     volumeMounts:
       - mountPath: /foo
         name: socket
+  initContainers:
+  - name: init
+    image: busybox:1.35
+    volumeMounts:
+    - mountPath: /foo
+      name: socket
+  ephemeralContainers:
+  - name: debug
+    image: busybox:1.35
+    targetContainerName: busybox
+    volumeMounts:
+    - mountPath: /bar
+      name: bar
   volumes:
   - name: socket
     hostPath:
