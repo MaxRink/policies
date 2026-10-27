@@ -9,6 +9,7 @@ resources:
 - exception-resource.yaml
 - replicationcontroller.yaml
 - controller-resource.yaml
+- large-pod-resource.yaml
 exceptions:
 - exception.yaml
 results:
@@ -40,5 +41,11 @@ results:
   patchedResources: controller-patched.yaml
   policy: remove-hostpath-volumes
   resources: [hostpath-cronjob]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: large-pod-patched.yaml
+  policy: remove-hostpath-volumes
+  resources: [large-pod]
   result: pass
   isMutatingPolicy: true

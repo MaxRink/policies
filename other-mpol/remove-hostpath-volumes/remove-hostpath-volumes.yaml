@@ -45,11 +45,23 @@ spec:
       expression: >-
         variables.isCronJob ? "/spec/jobTemplate/spec/template/spec" :
         variables.isController ? "/spec/template/spec" : "/spec"
+    - name: containers
+      expression: variables.podSpec.containers
+    - name: initContainers
+      expression: >-
+        has(variables.podSpec.initContainers) ? variables.podSpec.initContainers : []
+    - name: ephemeralContainers
+      expression: >-
+        has(variables.podSpec.ephemeralContainers) ? variables.podSpec.ephemeralContainers : []
     - name: hostpathVolumes
       expression: |
         has(variables.podSpec.volumes) ?
           variables.podSpec.volumes.filter(v, has(v.hostPath)).map(v, v.name) :
           []
+    - name: remainingVolumes
+      expression: >-
+        has(variables.podSpec.volumes) ?
+          variables.podSpec.volumes.filter(v, !has(v.hostPath)) : []
     - name: hasHostPath
       expression: |
         variables.hostpathVolumes.size() > 0
@@ -64,50 +76,50 @@ spec:
             JSONPatch{
               op: "replace",
               path: variables.specPath + "/volumes",
-              value: variables.podSpec.volumes.filter(v, !has(v.hostPath))
+              value: variables.remainingVolumes
             }
           ] +
-          variables.podSpec.containers.map(c,
-            has(c.volumeMounts) ?
-              (c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name)).size() > 0 ?
+          lists.range(variables.containers.size()).map(i,
+            has(variables.containers[i].volumeMounts) ?
+              (variables.containers[i].volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name)).size() > 0 ?
                 JSONPatch{
                   op: "replace",
-                  path: variables.specPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/volumeMounts",
-                  value: c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name))
+                  path: variables.specPath + "/containers/" + string(i) + "/volumeMounts",
+                  value: variables.containers[i].volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name))
                 } :
                 JSONPatch{
                   op: "remove",
-                  path: variables.specPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/volumeMounts"
+                  path: variables.specPath + "/containers/" + string(i) + "/volumeMounts"
                 })
             : JSONPatch{op: "test", path: "/", value: null}
           ).filter(p, p.op != "test") +
           (has(variables.podSpec.initContainers) ?
-            variables.podSpec.initContainers.map(c,
-              has(c.volumeMounts) ?
-                (c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name)).size() > 0 ?
+            lists.range(variables.initContainers.size()).map(i,
+              has(variables.initContainers[i].volumeMounts) ?
+                (variables.initContainers[i].volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name)).size() > 0 ?
                   JSONPatch{
                     op: "replace",
-                    path: variables.specPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/volumeMounts",
-                    value: c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name))
+                    path: variables.specPath + "/initContainers/" + string(i) + "/volumeMounts",
+                    value: variables.initContainers[i].volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name))
                   } :
                   JSONPatch{
                     op: "remove",
-                    path: variables.specPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/volumeMounts"
+                    path: variables.specPath + "/initContainers/" + string(i) + "/volumeMounts"
                   })
               : JSONPatch{op: "test", path: "/", value: null}
             ).filter(p, p.op != "test") : []) +
           (has(variables.podSpec.ephemeralContainers) ?
-            variables.podSpec.ephemeralContainers.map(c,
-              has(c.volumeMounts) ?
-                (c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name)).size() > 0 ?
+              lists.range(variables.ephemeralContainers.size()).map(i,
+                has(variables.ephemeralContainers[i].volumeMounts) ?
+                  (variables.ephemeralContainers[i].volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name)).size() > 0 ?
                   JSONPatch{
                     op: "replace",
-                    path: variables.specPath + "/ephemeralContainers/" + string(variables.podSpec.ephemeralContainers.indexOf(c)) + "/volumeMounts",
-                    value: c.volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name))
+                    path: variables.specPath + "/ephemeralContainers/" + string(i) + "/volumeMounts",
+                      value: variables.ephemeralContainers[i].volumeMounts.filter(vm, !variables.hostpathVolumes.exists(hpv, hpv == vm.name))
                   } :
                   JSONPatch{
                     op: "remove",
-                    path: variables.specPath + "/ephemeralContainers/" + string(variables.podSpec.ephemeralContainers.indexOf(c)) + "/volumeMounts"
+                    path: variables.specPath + "/ephemeralContainers/" + string(i) + "/volumeMounts"
                   })
               : JSONPatch{op: "test", path: "/", value: null}
             ).filter(p, p.op != "test") : [])
