@@ -10,12 +10,15 @@ metadata:
     policies.kyverno.io/minversion: 1.17.0
     policies.kyverno.io/description: >- 
       Selecting the correct Node(s) provisioned by Karpenter is a way to specify
-      the appropriate resource landing zone for a workload. This policy injects a
-      nodeSelector map into the Pod based on the Namespace type where it is deployed.
+      the appropriate resource landing zone for a workload. This policy adds
+      missing Karpenter capacity-type and architecture selectors based on Namespace
+      type while preserving selectors already set by the workload.
 spec:
   evaluation:
     admission:
       enabled: true
+    background:
+      enabled: false
   matchConstraints:
     resourceRules:
     - apiGroups: [""]
@@ -29,41 +32,37 @@ spec:
         values: ["medium", "large"]
   variables:
     - name: namespaceLabels
-      expression: "resource.Get('v1', 'namespaces', '', object.metadata.namespace).metadata.labels"
+      expression: "namespaceObject.?metadata.?labels.orValue({})"
     - name: capacityType
       expression: "variables.namespaceLabels.type == 'large' ? 'on-demand' : 'spot'"
+    - name: podSpec
+      expression: "object.spec"
+    - name: nodeSelectorPath
+      expression: '"/spec/nodeSelector"'
   mutations:
-  # Ensure nodeSelector exists
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        !has(object.spec.nodeSelector) ?
-        [
-          JSONPatch{
-            op: "add",
-            path: "/spec/nodeSelector",
-            value: {}
+        !has(variables.podSpec.nodeSelector) ?
+        [JSONPatch{
+          op: "add",
+          path: variables.nodeSelectorPath,
+          value: {
+            "karpenter.sh/capacity-type": variables.capacityType,
+            "kubernetes.io/arch": "amd64"
           }
-        ] : []
-  # Add karpenter.sh/capacity-type (spot for medium, on-demand for large)
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
+        }] :
         [
+          !("karpenter.sh/capacity-type" in variables.podSpec.nodeSelector) ?
           JSONPatch{
             op: "add",
-            path: "/spec/nodeSelector/" + jsonpatch.escapeKey("karpenter.sh/capacity-type"),
+            path: variables.nodeSelectorPath + "/" + jsonpatch.escapeKey("karpenter.sh/capacity-type"),
             value: variables.capacityType
-          }
-        ]
-  # Add kubernetes.io/arch
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        [
+          } : null,
+          !("kubernetes.io/arch" in variables.podSpec.nodeSelector) ?
           JSONPatch{
             op: "add",
-            path: "/spec/nodeSelector/" + jsonpatch.escapeKey("kubernetes.io/arch"),
+            path: variables.nodeSelectorPath + "/" + jsonpatch.escapeKey("kubernetes.io/arch"),
             value: "amd64"
-          }
-        ]
+          } : null
+        ].filter(p, p != null)
