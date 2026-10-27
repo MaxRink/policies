@@ -1,0 +1,48 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: add-emptydir-sizelimit
+policies:
+- ../add-emptydir-sizelimit.yaml
+resources:
+- resource.yaml
+- null-volumes-resource.yaml
+- exception-resource.yaml
+exceptions:
+- exception.yaml
+results:
+- kind: Pod
+  patchedResources: null-volumes.yaml
+  policy: add-emptydir-sizelimit
+  resources: [null-volumes]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: patched.yaml
+  policy: add-emptydir-sizelimit
+  resources: [missing-size]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: preserved.yaml
+  policy: add-emptydir-sizelimit
+  resources: [existing-size]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: no-emptydir.yaml
+  policy: add-emptydir-sizelimit
+  resources: [no-emptydir]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: no-volumes.yaml
+  policy: add-emptydir-sizelimit
+  resources: [no-volumes]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  policy: add-emptydir-sizelimit
+  resources: [default/exception-pod]
+  result: skip
+  isMutatingPolicy: true
