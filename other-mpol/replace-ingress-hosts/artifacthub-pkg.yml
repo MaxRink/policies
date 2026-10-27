@@ -30,4 +30,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.24"
   kyverno/subject: "Ingress"
-digest: 9ccac791beaece09bea202b3b1006cd231e7fcb9b1db966a56ddae346fbaae1e
+digest: 8df4c6ddbcc98694152a2b6b5eafaa765af596a7fbd5ece6c803be58ce889255

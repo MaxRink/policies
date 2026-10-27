@@ -34,7 +34,7 @@ spec:
             JSONPatch{
               op: "replace",
               path: "/spec/rules/" + string(object.spec.rules.indexOf(rule)) + "/host",
-              value: rule.host.replace('.old.com', '.new.com')
+              value: rule.host.substring(0, rule.host.size() - '.old.com'.size()) + '.new.com'
             } : null
           ).filter(patch, patch != null)
     - patchType: JSONPatch
@@ -46,13 +46,19 @@ spec:
             value: object.spec.tls.map(tlsEntry,
               has(tlsEntry.hosts) ?
                 (has(tlsEntry.secretName) ? {
-                  "hosts": dyn(tlsEntry.hosts.map(host, host.endsWith('.old.com') ? host.replace('.old.com', '.new.com') : host)),
-                  "secretName": dyn(tlsEntry.secretName.replace('.old.com', '.new.com'))
+                  "hosts": dyn(tlsEntry.hosts.map(host, host.endsWith('.old.com') ?
+                    host.substring(0, host.size() - '.old.com'.size()) + '.new.com' : host)),
+                  "secretName": dyn(tlsEntry.secretName.endsWith('.old.com') ?
+                    tlsEntry.secretName.substring(0, tlsEntry.secretName.size() - '.old.com'.size()) + '.new.com' :
+                    tlsEntry.secretName)
                 } : {
-                  "hosts": tlsEntry.hosts.map(host, host.endsWith('.old.com') ? host.replace('.old.com', '.new.com') : host)
+                  "hosts": tlsEntry.hosts.map(host, host.endsWith('.old.com') ?
+                    host.substring(0, host.size() - '.old.com'.size()) + '.new.com' : host)
                 }) :
                 (has(tlsEntry.secretName) ? {
-                  "secretName": tlsEntry.secretName.replace('.old.com', '.new.com')
+                  "secretName": tlsEntry.secretName.endsWith('.old.com') ?
+                    tlsEntry.secretName.substring(0, tlsEntry.secretName.size() - '.old.com'.size()) + '.new.com' :
+                    tlsEntry.secretName
                 } : tlsEntry)
             )
           }] : []
