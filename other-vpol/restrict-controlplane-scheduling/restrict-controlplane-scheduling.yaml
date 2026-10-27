@@ -25,11 +25,15 @@ spec:
     - apiGroups:   [""]
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
-      resources:   ["pods"]
+      resources:   ["pods", "replicationcontrollers"]
+  variables:
+    - name: podSpec
+      expression: >-
+        object.spec.?jobTemplate.?spec.?template.?spec.orValue(
+        object.spec.?template.?spec.orValue(object.spec))
   validations:
     - expression: >-
-        !has(object.spec.tolerations) ||
-        !object.spec.tolerations.exists(toleration,
+        !variables.podSpec.?tolerations.orValue([]).exists(toleration,
           (toleration.?key.orValue('') == '' ||
           toleration.key in ['node-role.kubernetes.io/master', 'node-role.kubernetes.io/control-plane']) &&
           !exceptions.allowedValues.exists(value, value == 'toleration:' + toleration.?key.orValue('')))
