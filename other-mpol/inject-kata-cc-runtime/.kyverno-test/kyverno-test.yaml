@@ -15,6 +15,7 @@ results:
   isMutatingPolicy: true
   resources:
   - default/coco-enabled-pod
+  patchedResources: patchedResources.yaml
   result: pass
   rule: ""
 - kind: Pod
@@ -43,6 +44,7 @@ results:
   isMutatingPolicy: true
   resources:
   - default/coco-enabled-existing-runtime
+  patchedResources: patchedResources.yaml
   result: pass
   rule: ""
 - kind: Pod
@@ -50,6 +52,7 @@ results:
   isMutatingPolicy: true
   resources:
   - test-namespace/coco-enabled-multiple-labels
+  patchedResources: patchedResources.yaml
   result: pass
   rule: ""
 - kind: Pod
@@ -71,6 +74,7 @@ results:
   isMutatingPolicy: true
   resources:
   - default/coco-deployment
+  patchedResources: patchedResources.yaml
   result: pass
   rule: ""
 - kind: Deployment
