@@ -15,8 +15,8 @@ results:
   resources:
   - default/badpod01
   - default/badpod02
-  - default/badpod-keyless
-  - default/goodpod-empty-key
+  - default/legacy-keyless-toleration
+  - default/legacy-empty-key-toleration
   result: fail
 - isValidatingPolicy: true
   kind: Pod
