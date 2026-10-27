@@ -26,8 +26,21 @@ spec:
     - apiGroups:   [""]
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
-      resources:   ["pods"]
+      resources:   ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
+  variables:
+    - name: podMetadata
+      expression: >-
+        object.spec.?jobTemplate.?spec.?template.?metadata.orValue(
+        object.spec.?template.?metadata.orValue(object.metadata))
   validations:
     - expression: >-
-        object.metadata.?annotations[?'corp.org/department'].orValue('') != '' || 'missing-annotation:corp.org/department' in exceptions.allowedValues
+        variables.podMetadata.?annotations[?'corp.org/department'].orValue('') != '' || 'missing-annotation:corp.org/department' in exceptions.allowedValues
       message: "The annotation `corp.org/department` is required."
