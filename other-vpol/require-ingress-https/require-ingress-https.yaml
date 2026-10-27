@@ -33,3 +33,9 @@ spec:
       message: "The kubernetes.io/ingress.allow-http annotation must be set to false."
     - expression: "object.spec.?tls.orValue([]).size() > 0"
       message: "TLS must be defined."
+    - expression: >-
+        object.spec.?rules.orValue([]).all(rule,
+          !rule.?host.hasValue() || rule.host == '' ||
+          object.spec.?tls.orValue([]).exists(tls,
+            !tls.?hosts.hasValue() || tls.?hosts.orValue([]).size() == 0 || rule.host in tls.hosts))
+      message: "TLS must cover every host defined in the Ingress rules."

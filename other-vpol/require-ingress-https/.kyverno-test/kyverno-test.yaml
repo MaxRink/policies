@@ -6,6 +6,7 @@ policies:
 - ../require-ingress-https.yaml
 resources:
 - resource.yaml
+- partial-tls-ingress.yaml
 results:
 - isValidatingPolicy: true
   kind: Ingress
@@ -35,4 +36,5 @@ results:
   resources:
   - badingress04
   - badingress-empty-tls
+  - partial-tls-ingress
   result: fail
