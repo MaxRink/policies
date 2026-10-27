@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: log4shell-replicationcontroller
+spec:
+  replicas: 1
+  selector:
+    app: log4shell-replicationcontroller
+  template:
+    metadata:
+      labels:
+        app: log4shell-replicationcontroller
+    spec:
+      containers:
+      - name: app
+        image: nginx
+      initContainers:
+      - name: setup
+        image: busybox
+        env:
+        - name: LOG4J_FORMAT_MSG_NO_LOOKUPS
+          value: "false"
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: log4shell-replicaset
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: log4shell-replicaset
+  template:
+    metadata:
+      labels:
+        app: log4shell-replicaset
+    spec:
+      containers:
+      - name: app
+        image: nginx
