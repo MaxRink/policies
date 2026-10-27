@@ -8,10 +8,74 @@ spec:
   steps:
   - name: step-01
     try:
+    - script:
+        shell: bash
+        shellArgs: ["-c"]
+        content: |
+          set -euo pipefail
+          enforce=$(kubectl get namespaces -l pod-security.kubernetes.io/enforce -o go-template='{{range .items}}{{.metadata.name}}={{index .metadata.labels "pod-security.kubernetes.io/enforce"}};{{end}}')
+          warn=$(kubectl get namespaces -l pod-security.kubernetes.io/warn -o go-template='{{range .items}}{{.metadata.name}}={{index .metadata.labels "pod-security.kubernetes.io/warn"}};{{end}}')
+          kubectl create configmap add-psa-labels-label-backup \
+            --namespace "$NAMESPACE" \
+            --from-literal=enforce="$enforce" \
+            --from-literal=warn="$warn"
     - apply:
         file: ../add-psa-labels.yaml
     - assert:
         file: policy-ready.yaml
+    cleanup:
+    - script:
+        shell: bash
+        shellArgs: ["-c"]
+        content: |
+          set -euo pipefail
+          enforce=$(kubectl get configmap add-psa-labels-label-backup --namespace "$NAMESPACE" -o go-template='{{index .data "enforce"}}')
+          warn=$(kubectl get configmap add-psa-labels-label-backup --namespace "$NAMESPACE" -o go-template='{{index .data "warn"}}')
+          kubectl delete mutatingpolicy add-psa-labels --ignore-not-found --wait=true
+          namespaces=$(kubectl get namespaces -o jsonpath='{.items[*].metadata.name}')
+          errors=0
+          restore_label() {
+            key=$1
+            snapshot=$2
+            found=false
+            previous=
+            for entry in $(printf '%s' "$snapshot" | tr ';' ' '); do
+              if [ "${entry%%=*}" = "$namespace" ]; then
+                found=true
+                previous=${entry#*=}
+                break
+              fi
+            done
+            if [ "$found" = true ]; then
+              kubectl label namespace "$namespace" "$key=$previous" --overwrite || errors=$((errors + 1))
+            else
+              kubectl label namespace "$namespace" "$key-" || errors=$((errors + 1))
+            fi
+          }
+          verify_label() {
+            key=$1
+            snapshot=$2
+            expected=$(printf '%s' "$snapshot" | tr ';' '\n' | sed '/^$/d' | sort)
+            if ! actual=$(kubectl get namespaces -l "$key" -o go-template="{{range .items}}{{.metadata.name}}={{index .metadata.labels \"$key\"}};{{end}}"); then
+              errors=$((errors + 1))
+              return 0
+            fi
+            actual=$(printf '%s' "$actual" | tr ';' '\n' | sed '/^$/d' | sort)
+            if [ "$expected" != "$actual" ]; then
+              errors=$((errors + 1))
+            fi
+          }
+          for namespace in $namespaces; do
+            restore_label pod-security.kubernetes.io/enforce "$enforce"
+            restore_label pod-security.kubernetes.io/warn "$warn"
+          done
+          verify_label pod-security.kubernetes.io/enforce "$enforce"
+          verify_label pod-security.kubernetes.io/warn "$warn"
+          if [ "$errors" -ne 0 ]; then
+            echo "Failed to restore PSA labels on $errors namespace(s)" >&2
+            exit 1
+          fi
+          kubectl delete configmap add-psa-labels-label-backup --namespace "$NAMESPACE" --ignore-not-found
   - name: step-02
     try:
     - apply:
