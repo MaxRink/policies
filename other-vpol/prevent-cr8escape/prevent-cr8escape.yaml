@@ -41,6 +41,6 @@ spec:
         object.spec.?template.?spec.orValue(object.spec))
   validations:
     - expression: >-
-        variables.podSpec.?securityContext.?sysctls.orValue([]).all(sysctl,
+        (variables.podSpec.?securityContext.?sysctls.orValue([]) == null ? [] : variables.podSpec.?securityContext.?sysctls.orValue([])).all(sysctl,
         !has(sysctl.value) || (has(exceptions.allowedValues) && string(sysctl.value) in exceptions.allowedValues) || (!sysctl.value.contains('+') && !sysctl.value.contains('=')))
       message: "characters '+' or '=' are not allowed in sysctls values"      
