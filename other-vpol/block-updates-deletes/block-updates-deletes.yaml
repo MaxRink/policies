@@ -11,8 +11,9 @@ metadata:
       Kubernetes RBAC allows for controls on kinds of resources or those
       with specific names. But it does not have the type of granularity often
       required in more complex environments. This policy restricts updates and deletes to any
-      Service resource that contains the label `protected=true` unless by
-      a cluster-admin.
+      Service resource that contains the label `protected=true` unless the request user belongs
+      to an administrator group in `hasClusterAdminRole`: `system:masters`,
+      `kubeadm:cluster-admins`, or `cluster-admin`. Adjust this exact allowlist for your cluster.
 spec:
   evaluation:
     background:
@@ -22,7 +23,7 @@ spec:
   - name: isProtectedService
     expression: "oldObject.metadata.?labels.?protected.orValue('') == 'true'"
   - name: hasClusterAdminRole
-    expression: "request.userInfo.groups.exists(group, group == 'system:masters') || request.userInfo.groups.exists(group, group.contains('cluster-admin'))"
+    expression: "request.userInfo.groups.exists(group, group in ['system:masters', 'kubeadm:cluster-admins', 'cluster-admin'])"
   matchConstraints:
     resourceRules:
     - resources: ["services"]
