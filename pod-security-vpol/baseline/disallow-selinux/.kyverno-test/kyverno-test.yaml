@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - null-fields.yaml
+- init-ephemeral.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -224,3 +225,9 @@ results:
   resources:
   - null-selinux
   result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-selinux
+  resources:
+  - init-ephemeral-selinux
+  result: fail
