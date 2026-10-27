@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dra-label-exception
+  labels:
+    resource.kubernetes.io/admin-access: "true"
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unchanged-adminaccess-sibling
+  labels:
+    resource.kubernetes.io/admin-access: "true"
+    team: before

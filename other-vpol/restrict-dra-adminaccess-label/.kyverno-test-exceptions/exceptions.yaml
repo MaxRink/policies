@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: dra-label-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: restrict-dra-adminaccess-label
+  matchConditions:
+    - name: exact-namespace
+      expression: request.name == 'dra-label-exception' && request.operation == 'CREATE'
+  allowedValues:
+    - restrict-dra-adminaccess-label:allow-exact-label-change
