@@ -1,0 +1,16 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-dra-adminaccess-controller-created-claim
+policies:
+  - ../restrict-dra-adminaccess-claims.yaml
+resources:
+  - resources.yaml
+userinfo: userinfo.yaml
+results:
+  - isValidatingPolicy: true
+    policy: restrict-dra-adminaccess-claims
+    kind: ResourceClaim
+    resources:
+      - generated-from-template
+    result: pass

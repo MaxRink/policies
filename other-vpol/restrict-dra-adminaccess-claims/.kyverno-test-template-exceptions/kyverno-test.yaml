@@ -1,0 +1,26 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-dra-adminaccess-template-exception
+policies:
+  - ../restrict-dra-adminaccess-claims.yaml
+resources:
+  - resources.yaml
+clusterResources:
+  - ../.kyverno-test-exceptions/cluster-resources.yaml
+userinfo: ../.kyverno-test-exceptions/userinfo.yaml
+exceptions:
+  - exceptions.yaml
+results:
+  - isValidatingPolicy: true
+    policy: restrict-dra-adminaccess-claims
+    kind: ResourceClaimTemplate
+    resources:
+      - exception-admin-template
+    result: pass
+  - isValidatingPolicy: true
+    policy: restrict-dra-adminaccess-claims
+    kind: ResourceClaimTemplate
+    resources:
+      - unauthorized-template-sibling
+    result: fail

@@ -1,0 +1,25 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: exception-admin-claim
+  namespace: team-a
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: gpu.example.com
+          adminAccess: true
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: unauthorized-admin-sibling
+  namespace: team-a
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: gpu.example.com
+          adminAccess: true

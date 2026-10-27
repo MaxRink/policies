@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: dra-adminaccess-template-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: restrict-dra-adminaccess-claims
+  matchConditions:
+    - name: exact-template
+      expression: request.namespace == 'team-a' && request.name == 'exception-admin-template' && request.resource.resource == 'resourceclaimtemplates' && request.operation == 'CREATE'
+  allowedValues:
+    - restrict-dra-adminaccess-claims:allow-exact-request
