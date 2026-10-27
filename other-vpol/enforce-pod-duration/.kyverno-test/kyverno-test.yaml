@@ -7,6 +7,7 @@ policies:
 resources:
 - resources.yaml
 - replicationcontroller.yaml
+- controllers.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -26,4 +27,10 @@ results:
   policy: pod-lifetime
   resources:
   - lifetime-bad-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: pod-lifetime
+  resources:
+  - lifetime-bad-deployment
   result: fail
