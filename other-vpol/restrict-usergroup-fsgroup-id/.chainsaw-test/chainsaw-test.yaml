@@ -39,4 +39,8 @@ spec:
         - check:
             ($error != null): true
         file: podcontroller-bad.yaml
-
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: replicationcontroller-bad.yaml
