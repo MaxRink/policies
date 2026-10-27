@@ -64,6 +64,11 @@ spec:
     - script:
         content: |
           set -eu
+          pod_name="require-run-as-non-root-user-ephemeral-live"
+          exception_name="require-run-as-non-root-user-ephemeral-image"
+          kubectl create namespace policy-exceptions --dry-run=client -o yaml | kubectl apply -f -
+          kubectl delete pod "$pod_name" -n "$NAMESPACE" --grace-period=0 --force --ignore-not-found
+          kubectl delete policyexceptions.policies.kyverno.io "$exception_name" -n policy-exceptions --ignore-not-found
           replace_ephemeral() {
             file=$1
             url=$2
@@ -72,7 +77,7 @@ spec:
             # admission controller, and the API server can return update conflicts.
             for attempt in $(seq 1 30); do
               [ "$attempt" -eq 1 ] || sleep 2
-              rv=$(kubectl get pod "$pod_name" -o jsonpath='{.metadata.resourceVersion}')
+              rv=$(kubectl get pod -n "$NAMESPACE" "$pod_name" -o jsonpath='{.metadata.resourceVersion}')
               jq --arg rv "$rv" '.metadata.resourceVersion=$rv' "$file" >/tmp/ephemeral-rv.json
               set +e
               dry=$(kubectl replace --raw "${url}?dryRun=All" -f /tmp/ephemeral-rv.json 2>&1)
@@ -99,38 +104,32 @@ spec:
             echo "ephemeralcontainers update did not succeed after 30 attempts" >&2
             return 1
           }
-          kubectl apply -f - <<'YAML'
-          apiVersion: v1
-          kind: Namespace
-          metadata:
-            name: policy-exceptions
-          ---
+          kubectl apply -n "$NAMESPACE" -f - <<'YAML'
           apiVersion: v1
           kind: Pod
           metadata:
             name: require-run-as-non-root-user-ephemeral-live
-            namespace: default
           spec:
             containers:
             - name: app
               image: ghcr.io/kyverno/test-busybox:1.35
               command: ["sleep", "3600"]
           YAML
-          kubectl wait --for=jsonpath='{.status.phase}'=Running pod/require-run-as-non-root-user-ephemeral-live --timeout=120s
-          cat >/tmp/denied.json <<'JSON'
-          {"apiVersion":"v1","kind":"Pod","metadata":{"name":"require-run-as-non-root-user-ephemeral-live","namespace":"default"},"spec":{"ephemeralContainers":[{"name":"debug","image":"nginx:1.27","securityContext":{"runAsUser":0}}]}}
+          kubectl wait -n "$NAMESPACE" --for=jsonpath='{.status.phase}'=Running pod/require-run-as-non-root-user-ephemeral-live --timeout=120s
+          cat >/tmp/denied.json <<JSON
+          {"apiVersion":"v1","kind":"Pod","metadata":{"name":"$pod_name","namespace":"$NAMESPACE"},"spec":{"ephemeralContainers":[{"name":"debug","image":"nginx:1.27","securityContext":{"runAsUser":0}}]}}
           JSON
           set +e
-          output=$(kubectl -n default patch pod require-run-as-non-root-user-ephemeral-live --subresource=ephemeralcontainers --type=merge --patch-file=/tmp/denied.json 2>&1)
+          output=$(kubectl -n "$NAMESPACE" patch pod "$pod_name" --subresource=ephemeralcontainers --type=merge --patch-file=/tmp/denied.json 2>&1)
           code=$?
           set -e
           test "$code" -ne 0
           printf '%s' "$output" | grep -F "Running as root is not allowed"
-          kubectl apply -f - <<'YAML'
+          kubectl apply -f - <<YAML
           apiVersion: policies.kyverno.io/v1
           kind: PolicyException
           metadata:
-            name: require-run-as-non-root-user-ephemeral-image
+            name: $exception_name
             namespace: policy-exceptions
           spec:
             policyRefs:
@@ -139,19 +138,23 @@ spec:
             images: ["exempt.example/app:1"]
             matchConditions:
             - name: exact-workload
-              expression: object.metadata.namespace == 'default' && object.metadata.name == 'require-run-as-non-root-user-ephemeral-live'
+              expression: object.metadata.namespace == '$NAMESPACE' && object.metadata.name == '$pod_name'
           YAML
-          cat >/tmp/approved.json <<'JSON'
-          {"apiVersion":"v1","kind":"Pod","metadata":{"name":"require-run-as-non-root-user-ephemeral-live","namespace":"default"},"spec":{"ephemeralContainers":[{"name":"debug","image":"exempt.example/app:1","securityContext":{"runAsUser":0}}]}}
+          cat >/tmp/approved.json <<JSON
+          {"apiVersion":"v1","kind":"Pod","metadata":{"name":"$pod_name","namespace":"$NAMESPACE"},"spec":{"ephemeralContainers":[{"name":"debug","image":"exempt.example/app:1","securityContext":{"runAsUser":0}}]}}
           JSON
-          pod_name='require-run-as-non-root-user-ephemeral-live'
-          replace_ephemeral /tmp/approved.json '/api/v1/namespaces/default/pods/require-run-as-non-root-user-ephemeral-live/ephemeralcontainers' 'Running as root is not allowed'
-          cat >/tmp/sibling.json <<'JSON'
-          {"apiVersion":"v1","kind":"Pod","metadata":{"name":"require-run-as-non-root-user-ephemeral-live","namespace":"default"},"spec":{"ephemeralContainers":[{"name":"debug","image":"exempt.example/app:1","securityContext":{"runAsUser":0}},{"name":"unapproved","image":"nginx:1.27","securityContext":{"runAsUser":0}}]}}
+          replace_ephemeral /tmp/approved.json "/api/v1/namespaces/$NAMESPACE/pods/$pod_name/ephemeralcontainers" 'Running as root is not allowed'
+          cat >/tmp/sibling.json <<JSON
+          {"apiVersion":"v1","kind":"Pod","metadata":{"name":"$pod_name","namespace":"$NAMESPACE"},"spec":{"ephemeralContainers":[{"name":"debug","image":"exempt.example/app:1","securityContext":{"runAsUser":0}},{"name":"unapproved","image":"nginx:1.27","securityContext":{"runAsUser":0}}]}}
           JSON
           set +e
-          output=$(kubectl -n default patch pod require-run-as-non-root-user-ephemeral-live --subresource=ephemeralcontainers --type=merge --patch-file=/tmp/sibling.json 2>&1)
+          output=$(kubectl -n "$NAMESPACE" patch pod "$pod_name" --subresource=ephemeralcontainers --type=merge --patch-file=/tmp/sibling.json 2>&1)
           code=$?
           set -e
           test "$code" -ne 0
           printf '%s' "$output" | grep -F "Running as root is not allowed"
+    finally:
+    - script:
+        content: |
+          kubectl delete pod -n "$NAMESPACE" require-run-as-non-root-user-ephemeral-live --grace-period=0 --force --ignore-not-found
+          kubectl delete policyexceptions.policies.kyverno.io -n policy-exceptions require-run-as-non-root-user-ephemeral-image --ignore-not-found
