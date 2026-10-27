@@ -41,7 +41,7 @@ spec:
   - expression: "('cdh.toml' in variables.configData && variables.configData['cdh.toml'] != '') || 'missing-key:cdh.toml' in exceptions.allowedValues"
     messageExpression: "'ConfigMap must contain a non-empty cdh.toml field'"
   variables:
-  - expression: object.data.orValue({})
+  - expression: object.?data.orValue({})
     name: configData
   - expression: '["sha256", "sha384", "sha512"]'
     name: allowedAlgorithms
