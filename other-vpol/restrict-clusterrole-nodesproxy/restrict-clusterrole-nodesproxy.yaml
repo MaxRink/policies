@@ -31,9 +31,9 @@ spec:
         resources: ["clusterroles"]
   validations:
     - expression: >-
-        object.rules == null ||
-        !object.rules.exists(rule,
-          rule.resources.exists(resource,
+        object.?rules.orValue([]) == null ||
+        !object.?rules.orValue([]).exists(rule,
+          rule.?resources.orValue([]).exists(resource,
             (resource == '*' || (resource == 'nodes/proxy' && !('nodes/proxy' in exceptions.allowedValues))) &&
-            rule.apiGroups.exists(apiGroup, apiGroup == '')))
+            rule.?apiGroups.orValue([]).exists(apiGroup, apiGroup in ['', '*'])))
       message: "A ClusterRole containing the nodes/proxy resource is not allowed."
