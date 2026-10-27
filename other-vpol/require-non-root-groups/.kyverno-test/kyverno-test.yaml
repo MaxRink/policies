@@ -10,6 +10,7 @@ resources:
 - resource.yaml
 - replicationcontroller-bad.yaml
 - ephemeral-subresource-pod.yaml
+- null-security-groups-pod.yaml
 variables: values.yaml
 results:
 - isValidatingPolicy: true
@@ -110,6 +111,7 @@ results:
   - badpod13
   - badpod14
   - badpod15
+  - null-security-groups-pod
   result: fail
 - isValidatingPolicy: true
   kind: Pod

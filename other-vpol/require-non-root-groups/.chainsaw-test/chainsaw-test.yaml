@@ -49,6 +49,11 @@ spec:
             (contains($error, 'Policy require-non-root-groups failed')): true
         file: ../.kyverno-test/replicationcontroller-bad.yaml
     - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy require-non-root-groups failed')): true
+        file: ../.kyverno-test/null-security-groups-pod.yaml
+    - apply:
         file: ephemeral-pod.yaml
     - script:
         content: |
