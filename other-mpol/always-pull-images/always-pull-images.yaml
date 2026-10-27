@@ -57,34 +57,53 @@ spec:
       variables.isPod ? "/spec" :
       variables.isCronJob ? "/spec/jobTemplate/spec/template/spec" :
       "/spec/template/spec"
+  - name: containerIndices
+    expression: |
+      has(variables.podSpec.containers) && variables.podSpec.containers != null ?
+        lists.range(size(variables.podSpec.containers)).filter(i,
+          !exceptions.allowedImages.exists(image, image == variables.podSpec.containers[i].image)
+        ) : []
+  - name: initContainerIndices
+    expression: |
+      has(variables.podSpec.initContainers) && variables.podSpec.initContainers != null ?
+        lists.range(size(variables.podSpec.initContainers)).filter(i,
+          !exceptions.allowedImages.exists(image, image == variables.podSpec.initContainers[i].image)
+        ) : []
+  - name: ephemeralContainerIndices
+    expression: |
+      has(variables.podSpec.ephemeralContainers) && variables.podSpec.ephemeralContainers != null ?
+        lists.range(size(variables.podSpec.ephemeralContainers)).filter(i,
+          !exceptions.allowedImages.exists(image, image == variables.podSpec.ephemeralContainers[i].image) &&
+          !(oldObject != null && has(oldObject.spec) && has(oldObject.spec.ephemeralContainers) &&
+            oldObject.spec.ephemeralContainers != null &&
+            oldObject.spec.ephemeralContainers.exists(existing, existing.name == variables.podSpec.ephemeralContainers[i].name))
+        ) : []
   mutations:
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        (variables.isEphemeralUpdate || !has(variables.podSpec.containers) || variables.podSpec.containers == null ? [] : variables.podSpec.containers.filter(container, !exceptions.allowedImages.exists(image, image == container.image)).map(container,
-          JSONPatch{
-            op: "add",
-            path: variables.specPath + "/containers/" + string(variables.podSpec.containers.indexOf(container)) + "/imagePullPolicy",
-            value: "Always"
-          }
-        )) +
-        (!variables.isEphemeralUpdate && has(variables.podSpec.initContainers) && variables.podSpec.initContainers != null ?
-          variables.podSpec.initContainers.filter(container, !exceptions.allowedImages.exists(image, image == container.image)).map(container,
+    - patchType: JSONPatch
+      jsonPatch:
+        expression: |
+          (variables.isEphemeralUpdate ? [] :
+            variables.containerIndices.map(i,
+              JSONPatch{
+                op: "add",
+                path: variables.specPath + "/containers/" + string(i) + "/imagePullPolicy",
+                value: "Always"
+              }
+            )
+          ) +
+          (!variables.isEphemeralUpdate ?
+            variables.initContainerIndices.map(i,
+              JSONPatch{
+                op: "add",
+                path: variables.specPath + "/initContainers/" + string(i) + "/imagePullPolicy",
+                value: "Always"
+              }
+            ) : []
+          ) +
+          variables.ephemeralContainerIndices.map(i,
             JSONPatch{
               op: "add",
-              path: variables.specPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(container)) + "/imagePullPolicy",
+              path: variables.specPath + "/ephemeralContainers/" + string(i) + "/imagePullPolicy",
               value: "Always"
             }
-          ) : []) +
-        (has(variables.podSpec.ephemeralContainers) && variables.podSpec.ephemeralContainers != null ?
-          variables.podSpec.ephemeralContainers.filter(container,
-            !exceptions.allowedImages.exists(image, image == container.image) &&
-            !(oldObject != null && has(oldObject.spec) && has(oldObject.spec.ephemeralContainers) && oldObject.spec.ephemeralContainers != null &&
-              oldObject.spec.ephemeralContainers.exists(existing, existing.name == container.name))
-          ).map(container,
-            JSONPatch{
-              op: "add",
-              path: variables.specPath + "/ephemeralContainers/" + string(variables.podSpec.ephemeralContainers.indexOf(container)) + "/imagePullPolicy",
-              value: "Always"
-            }
-          ) : [])
+          )
