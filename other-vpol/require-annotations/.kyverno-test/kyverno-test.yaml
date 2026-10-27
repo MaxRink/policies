@@ -9,6 +9,7 @@ resources:
 - ../.chainsaw-test/pod-good.yaml
 - ../.chainsaw-test/podcontroller-bad.yaml
 - ../.chainsaw-test/podcontroller-good.yaml
+- replicationcontroller-bad.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -16,6 +17,12 @@ results:
   resources:
   - badpod01
   - badpod02
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: require-annotations
+  resources:
+  - missing-annotation-rc
   result: fail
 - isValidatingPolicy: true
   kind: Pod
