@@ -6,6 +6,7 @@ policies:
 - ../forbid-cpu-limits.yaml
 resources:
 - resource.yaml
+- replicationcontroller.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -22,3 +23,9 @@ results:
   - good01
   - good02
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: forbid-cpu-limits
+  resources:
+  - cpu-limit-bad-rc
+  result: fail
