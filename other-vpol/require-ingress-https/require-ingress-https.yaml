@@ -31,11 +31,17 @@ spec:
     - expression: >-
         object.metadata.?annotations[?'kubernetes.io/ingress.allow-http'].orValue('default') == 'false'
       message: "The kubernetes.io/ingress.allow-http annotation must be set to false."
-    - expression: "object.spec.?tls.orValue([]).size() > 0"
+    - expression: "(object.spec.?tls.orValue([]) == null ? [] : object.spec.?tls.orValue([])).size() > 0"
       message: "TLS must be defined."
     - expression: >-
-        object.spec.?rules.orValue([]).all(rule,
+        (object.spec.?rules.orValue([]) == null ? [] : object.spec.?rules.orValue([])).all(rule,
           !rule.?host.hasValue() || rule.host == '' ||
-          object.spec.?tls.orValue([]).exists(tls,
-            !tls.?hosts.hasValue() || tls.?hosts.orValue([]).size() == 0 || rule.host in tls.hosts))
+          (object.spec.?tls.orValue([]) == null ? [] : object.spec.?tls.orValue([])).exists(tls,
+            (tls.?hosts.orValue([]) == null ? [] : tls.?hosts.orValue([])).size() == 0 ||
+            (tls.?hosts.orValue([]) == null ? [] : tls.?hosts.orValue([])).exists(tlsHost,
+              tlsHost != null && (rule.host == tlsHost ||
+                (tlsHost.startsWith('*.') &&
+                rule.host.size() > tlsHost.substring(1).size() &&
+                rule.host.endsWith(tlsHost.substring(1)) &&
+                !rule.host.substring(0, rule.host.size() - tlsHost.substring(1).size()).contains('.'))))))
       message: "TLS must cover every host defined in the Ingress rules."

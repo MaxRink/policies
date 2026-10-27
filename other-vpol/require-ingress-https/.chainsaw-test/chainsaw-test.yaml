@@ -47,3 +47,24 @@ spec:
         - check:
             ($error != null): true
         file: ../.kyverno-test/null-ingress-fields.yaml
+    - apply:
+        file: ../.kyverno-test/null-rules-ingress.yaml
+    - apply:
+        file: ../.kyverno-test/wildcard-tls-pass.yaml
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: ../.kyverno-test/wildcard-tls-multilabel.yaml
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: ../.kyverno-test/wildcard-tls-apex.yaml
+    - apply:
+        file: ../.kyverno-test/null-tls-hosts-ingress.yaml
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: ../.kyverno-test/null-tls-ingress-annotated.yaml
