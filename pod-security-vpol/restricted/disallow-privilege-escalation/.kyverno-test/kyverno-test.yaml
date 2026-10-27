@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - null-fields.yaml
+- init-ephemeral.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -82,4 +83,10 @@ results:
   policy: disallow-privilege-escalation
   resources:
   - null-privilege-escalation
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-privilege-escalation
+  resources:
+  - init-ephemeral-privilege-escalation
   result: fail
