@@ -11,6 +11,13 @@ spec:
         name: vault-secret
   - name: nginx
     image: busybox:1.35
+  initContainers:
+  - name: init
+    image: busybox:1.35
+  ephemeralContainers:
+  - name: debug
+    image: busybox:1.35
+    targetContainerName: busybox
   volumes:
   - name: vault-secret
     emptyDir:
