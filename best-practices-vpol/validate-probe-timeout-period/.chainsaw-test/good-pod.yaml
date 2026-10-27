@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: good-probes
+spec:
+  containers:
+  - name: app
+    image: nginx:1.29
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+    readinessProbe:
+      httpGet:
+        path: /ready
+        port: 8080
+      timeoutSeconds: 5
+      periodSeconds: 10
+  initContainers:
+  - name: sidecar
+    image: nginx:1.29
+    restartPolicy: Always
+    startupProbe:
+      httpGet:
+        path: /startup
+        port: 8080
+      timeoutSeconds: 2
+      periodSeconds: 10

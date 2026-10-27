@@ -1,0 +1,34 @@
+name: validate-probe-timeout-period
+version: 1.0.0
+displayName: Validate Probe Timeout Period
+createdAt: "2026-10-27T00:00:00.000Z"
+description: >-
+  Validates that liveness, readiness, and startup probe timeoutSeconds are less than periodSeconds for Pods and their Deployments, StatefulSets, and DaemonSets. Checks regular and restartable init containers, using Kubernetes defaults of 1 and 10 seconds when fields are omitted.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/best-practices-vpol/validate-probe-timeout-period/validate-probe-timeout-period.yaml
+  ```
+keywords:
+  - kyverno
+  - Best Practices
+  - VPOL
+readme: |
+  Validates that liveness, readiness, and startup probe `timeoutSeconds` are less than `periodSeconds` for Pods and their Deployments, StatefulSets, and DaemonSets. Checks regular containers and restartable init containers (`restartPolicy: Always`). Omitted values use the Kubernetes defaults: `timeoutSeconds: 1` and `periodSeconds: 10`. Probes without either field are therefore allowed, and a timeout equal to or greater than the period is reported.
+
+  ### Fine-grained PolicyException use
+
+  Enable PolicyException support in Kyverno and reference the `ValidatingPolicy`
+  named `validate-probe-timeout-period` in `spec.policyRefs`. Use a
+  `spec.matchConditions` expression to restrict the exception to the exact Pod,
+  namespace, and request being approved. Add the token
+  `probe-timeout-period:<container-name>:<probe-name>` to `spec.allowedValues`
+  to exempt only that container's livenessProbe, readinessProbe, or startupProbe.
+  Other containers and probes continue to be validated. See the [tested exception
+  example](https://github.com/kyverno/policies/blob/main/best-practices-vpol/validate-probe-timeout-period/.kyverno-test/exceptions.yaml).
+  Without a matching exception and token, normal validation applies.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/
+annotations:
+  kyverno/category: "Best Practices"
+  kyverno/subject: "Pod"
+digest: 1d31e94b4657aca3b85c99beb09978c81d163d073334f4c0a846e046a2d7ebb9
