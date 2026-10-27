@@ -35,6 +35,15 @@ spec:
     - delete:
         file: legacy-regular-with-init.yaml
     - apply:
+        file: good-pod-sidecar-with-probe.yaml
+    - delete:
+        file: good-pod-sidecar-with-probe.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy require-pod-probes failed')): true
+        file: bad-pod-sidecar-without-probe.yaml
+    - apply:
         file: good-podcontrollers.yaml
     - apply:
         file: good-cronjob.yaml

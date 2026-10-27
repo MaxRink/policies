@@ -22,12 +22,18 @@ results:
 - kind: Pod
   policy: require-pod-probes
   resources:
+  - sidecar-without-probe
+  result: fail
+- kind: Pod
+  policy: require-pod-probes
+  resources:
   - goodpod01
   - goodpod02
   - goodpod03
   - goodpod04
   - init-without-probe
   - ephemeral-without-probe
+  - sidecar-with-probe
   result: pass
 - kind: Pod
   policy: require-pod-probes
