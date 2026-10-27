@@ -1,0 +1,32 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: add-karpenter-nodeselector
+policies:
+- ../add-karpenter-nodeselector.yaml
+resources:
+- ../.chainsaw-test/resource.yaml
+variables: values.yaml
+results:
+- kind: Pod
+  patchedResources: patched-pods.yaml
+  policy: add-karpenter-nodeselector
+  resources:
+  - kp-med-ns/pod-med01
+  - kp-lg-ns/pod-lg01
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: patched-existing-pods.yaml
+  policy: add-karpenter-nodeselector
+  resources:
+  - kp-med-ns/pod-med02
+  - kp-lg-ns/pod-lg02
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  policy: add-karpenter-nodeselector
+  resources:
+  - kp-small-ns/pod-sm01
+  result: skip
+  isMutatingPolicy: true
