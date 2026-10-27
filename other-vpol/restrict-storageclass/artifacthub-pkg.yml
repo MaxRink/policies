@@ -32,7 +32,7 @@ annotations:
   kyverno/category: "Other, Multi-Tenancy in vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "StorageClass"
-digest: f45de3bb9f4a63de9569ba32cf0466f67c29658ece8c0f869589059a13cc4e8c
+digest: 233018073902c582e20d04296108d9bcdb61f15c6df2b7e27f98a749f078180b
 
 
 createdAt: "2025-05-11T17:46:12Z"

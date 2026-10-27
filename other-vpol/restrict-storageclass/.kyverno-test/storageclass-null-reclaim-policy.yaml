@@ -1,0 +1,6 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: null-reclaim-policy
+provisioner: kubernetes.io/no-provisioner
+reclaimPolicy: null
