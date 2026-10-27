@@ -1,0 +1,41 @@
+name: restrict-exec-verbs-roles
+version: 1.0.0
+displayName: Restrict Exec Subresource Verbs in Roles
+createdAt: "2026-10-27T00:00:00.000Z"
+description: >-
+  Detects Roles and ClusterRoles that grant create, get, or wildcard access to
+  pods/exec, pods/attach, or pods/portforward, including resource and API group
+  wildcards.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-exec-verbs-roles/restrict-exec-verbs-roles.yaml
+  ```
+keywords:
+  - kyverno
+  - Security
+  - ValidatingPolicy
+readme: |
+  This policy detects Roles and ClusterRoles granting interactive access to
+  workloads through `pods/exec`, `pods/attach`, or `pods/portforward`. It checks
+  the core API group and wildcard API groups, and recognizes resource patterns
+  `*`, `*/exec`, `*/attach`, and `*/portforward`. It checks rules present on the
+  submitted resource, including rules populated on aggregated ClusterRoles;
+  an aggregate with no matching rules is allowed. The Chainsaw test supplies a
+  reports-controller aggregated ClusterRole granting get/list/watch on Roles
+  and ClusterRoles so background policy reporting can become ready.
+
+  ### Fine-grained PolicyException use
+
+  A PolicyException can waive one exact core-group grant using an `allowedValues`
+  token such as `pods/exec:create` or `pods/attach:get`. Scope its
+  `matchConditions` to the exact Role or ClusterRole name. Wildcard resources,
+  wildcard API groups, and wildcard verbs cannot be excepted by these tokens.
+  See the tested examples in the `.kyverno-test-exceptions` and `.chainsaw-test`
+  directories.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "Security"
+  kyverno/kubernetesVersion: "1.19"
+  kyverno/subject: "Role, ClusterRole, RBAC"
+digest: 0c19ae4870e83944ca9fe7dcb0b22947c2bfae122fef3bd5c540e2888d758f49

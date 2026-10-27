@@ -1,0 +1,8 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: restrict-exec-bad-exec-wildcard
+rules:
+  - apiGroups: ["*"]
+    resources: ["*/exec"]
+    verbs: ["create"]

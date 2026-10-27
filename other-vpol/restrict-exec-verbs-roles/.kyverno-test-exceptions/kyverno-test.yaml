@@ -1,0 +1,27 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-exec-verbs-roles-exceptions
+policies:
+  - ../restrict-exec-verbs-roles.yaml
+resources:
+  - resources.yaml
+exceptions:
+  - exceptions.yaml
+results:
+  - isValidatingPolicy: true
+    kind: Role
+    policy: restrict-exec-verbs-roles
+    resources:
+      - default/exception-role-create
+      - default/exception-role-get
+    result: pass
+  - isValidatingPolicy: true
+    kind: Role
+    policy: restrict-exec-verbs-roles
+    resources:
+      - default/sibling-role
+      - default/wildcard-resource-role
+      - default/wildcard-api-group-role
+      - default/wildcard-verb-role
+    result: fail

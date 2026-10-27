@@ -1,0 +1,23 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: restrict-exec-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - name: restrict-exec-verbs-roles
+      kind: ValidatingPolicy
+  allowedValues:
+    - pods/exec:create
+    - pods/attach:get
+  matchConditions:
+    - name: exact-rbac-resources
+      expression: >-
+        object.metadata.namespace == 'default' &&
+        object.metadata.name in [
+          'exception-role-create',
+          'exception-role-get',
+          'wildcard-resource-role',
+          'wildcard-api-group-role',
+          'wildcard-verb-role'
+        ]
