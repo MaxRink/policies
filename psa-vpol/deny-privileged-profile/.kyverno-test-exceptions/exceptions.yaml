@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: allow-kube-system
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - name: deny-privileged-profile
+      kind: ValidatingPolicy
+  matchConditions:
+    - name: kube-system
+      expression: object.metadata.name == 'kube-system'

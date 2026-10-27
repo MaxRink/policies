@@ -1,0 +1,24 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: deny-privileged-profile-exceptions
+policies:
+  - ../deny-privileged-profile.yaml
+resources:
+  - exception-resources.yaml
+exceptions:
+  - exceptions.yaml
+userinfo: ../.kyverno-test/userinfo.yaml
+results:
+  - isValidatingPolicy: true
+    kind: Namespace
+    policy: deny-privileged-profile
+    resources:
+      - kube-system
+    result: skip
+  - isValidatingPolicy: true
+    kind: Namespace
+    policy: deny-privileged-profile
+    resources:
+      - kube-system-copy
+    result: fail

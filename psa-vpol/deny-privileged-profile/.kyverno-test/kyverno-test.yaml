@@ -1,0 +1,25 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: deny-privileged-profile
+policies:
+  - ../deny-privileged-profile.yaml
+resources:
+  - namespace-resources.yaml
+userinfo: userinfo.yaml
+results:
+  - isValidatingPolicy: true
+    kind: Namespace
+    policy: deny-privileged-profile
+    resources:
+      - privileged-enforce
+    result: fail
+  - isValidatingPolicy: true
+    kind: Namespace
+    policy: deny-privileged-profile
+    resources:
+      - enforce-baseline
+      - enforce-empty
+      - audit-privileged
+      - no-labels
+    result: skip

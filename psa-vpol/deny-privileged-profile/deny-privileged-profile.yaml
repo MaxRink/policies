@@ -1,0 +1,43 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: deny-privileged-profile
+  annotations:
+    policies.kyverno.io/title: Deny Privileged Profile in ValidatingPolicy
+    policies.kyverno.io/category: Pod Security Admission
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/minversion: 1.17.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: Namespace
+    policies.kyverno.io/description: >-
+      Denies non-system-masters requests that create or update a Namespace
+      with pod-security.kubernetes.io/enforce=privileged. Use a narrowly
+      scoped PolicyException for approved platform namespaces.
+spec:
+  validationActions:
+    - Audit
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["namespaces"]
+  matchConditions:
+    - name: privileged-enforce-profile
+      expression: >-
+        object.metadata.?labels.orValue({}).exists(
+          key,
+          key == 'pod-security.kubernetes.io/enforce' &&
+          object.metadata.labels[key] == 'privileged'
+        )
+    - name: requester-is-not-system-masters
+      expression: >-
+        !request.userInfo.groups.exists(group, group == 'system:masters')
+  validations:
+    - expression: "false"
+      message: >-
+        Only members of system:masters may set
+        pod-security.kubernetes.io/enforce=privileged on a Namespace.
