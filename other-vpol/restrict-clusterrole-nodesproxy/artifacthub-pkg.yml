@@ -2,7 +2,7 @@ name: restrict-clusterrole-nodesproxy-vpol
 version: 1.0.0
 displayName: Restrict ClusterRole with Nodes Proxy in ValidatingPolicy
 description: >-
-  A ClusterRole with nodes/proxy resource access allows a user to perform anything the kubelet API allows. It also allows users to bypass the API server and talk directly to the kubelet potentially circumventing audits and admission controllers. See https://blog.aquasec.com/privilege-escalation-kubernetes-rbac for more info. This policy prevents the creation of a ClusterRole if it contains the nodes/proxy resource. 
+  A ClusterRole with nodes/proxy resource access allows a user to perform anything the kubelet API allows. It also allows users to bypass the API server and talk directly to the kubelet potentially circumventing audits and admission controllers. See https://www.aquasec.com/blog/privilege-escalation-kubernetes-rbac/ for more info. This policy prevents the creation of a ClusterRole if it contains the nodes/proxy resource.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-clusterrole-nodesproxy/restrict-clusterrole-nodesproxy.yaml
@@ -12,8 +12,8 @@ keywords:
   - Sample
   - ValidatingPolicy
 readme: |
-  A ClusterRole with nodes/proxy resource access allows a user to perform anything the kubelet API allows. It also allows users to bypass the API server and talk directly to the kubelet potentially circumventing audits and admission controllers. See https://blog.aquasec.com/privilege-escalation-kubernetes-rbac for more info. This policy prevents the creation of a ClusterRole if it contains the nodes/proxy resource. 
-  
+  A ClusterRole with nodes/proxy resource access allows a user to perform anything the kubelet API allows. It also allows users to bypass the API server and talk directly to the kubelet potentially circumventing audits and admission controllers. See https://www.aquasec.com/blog/privilege-escalation-kubernetes-rbac/ for more info. This policy prevents the creation of a ClusterRole if it contains the nodes/proxy resource.
+
   ### Fine-grained PolicyException use
 
   Enable PolicyException support in Kyverno, reference the `ValidatingPolicy` named
@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "ClusterRole, RBAC"
-digest: b2d5ad699621a943bf47b911b2ad8fe50dc722904c90ca11b4ca6e8e8594cd4b
+digest: e890b383930c7e7c3b22b9a57dff71b7d70f93754d8a843f96491faad63f5a19
 
 
 createdAt: "2025-05-11T17:46:11Z"
