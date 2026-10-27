@@ -40,7 +40,7 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "PersistentVolumeClaims"
-digest: 3e80fa4db7979277406105672ac37d79e8adf8df1dbc1e644707d04cf5ee8f83
+digest: 23bad69a36548e650e3b9fa2f911c271cefb95d0ffce055f7888f815cddc4938
 
 
 createdAt: "2025-05-11T17:46:12Z"

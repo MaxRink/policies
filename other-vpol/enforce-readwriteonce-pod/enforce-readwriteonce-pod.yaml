@@ -28,7 +28,9 @@ spec:
         apiVersions: ["v1"]
         resources: ["persistentvolumeclaims"]
         operations: ["CREATE", "UPDATE"]
+  variables:
+    - name: accessModes
+      expression: "object.spec.?accessModes.orValue([])"
   validations:
-    - expression: "'ReadWriteOncePod' in object.spec.accessModes"
+    - expression: "variables.accessModes != null && 'ReadWriteOncePod' in variables.accessModes"
       message: "The accessMode must be set to ReadWriteOncePod."
-
