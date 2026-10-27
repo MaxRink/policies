@@ -7,7 +7,14 @@ policies:
 resources:
 - resource.yaml
 - null-resource.yaml
+- large-resource.yaml
 results:
+- kind: Pod
+  patchedResources: large-patched.yaml
+  policy: add-image-as-env-var
+  resources: [large-image-env]
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: null-patched.yaml
   policy: add-image-as-env-var
