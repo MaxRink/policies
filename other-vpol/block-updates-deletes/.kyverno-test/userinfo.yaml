@@ -1,0 +1,8 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: UserInfo
+metadata:
+  name: non-admin-with-similar-group
+userInfo:
+  username: non-admin
+  groups:
+  - not-a-cluster-admin

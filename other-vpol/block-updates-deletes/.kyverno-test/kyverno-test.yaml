@@ -1,0 +1,24 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: block-updates-deletes
+policies:
+- ../block-updates-deletes.yaml
+resources:
+- resource.yaml
+userinfo: userinfo.yaml
+results:
+- isValidatingPolicy: true
+  kind: Service
+  operation: UPDATE
+  policy: block-updates-deletes
+  resources:
+  - protected-service
+  result: fail
+- isValidatingPolicy: true
+  kind: Service
+  operation: DELETE
+  policy: block-updates-deletes
+  resources:
+  - protected-service
+  result: fail
