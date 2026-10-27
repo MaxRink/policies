@@ -6,6 +6,7 @@ policies:
 - ../add-nodeSelector.yaml
 resources:
 - resource.yaml
+- update-resource.yaml
 - existing-selector.yaml
 - null-selector-resource.yaml
 - controller-resource.yaml
@@ -14,6 +15,13 @@ resources:
 exceptions:
 - exception.yaml
 results:
+- kind: Pod
+  operation: UPDATE
+  patchedResources: update-unchanged.yaml
+  policy: add-nodeselector
+  resources: [update-pod]
+  result: skip
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: null-selector-patched.yaml
   policy: add-nodeselector
