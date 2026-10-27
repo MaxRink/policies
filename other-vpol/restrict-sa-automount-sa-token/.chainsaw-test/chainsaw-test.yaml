@@ -21,8 +21,6 @@ spec:
              - Deny
     - assert:
         file: policy-ready.yaml
-    - sleep: 
-       duration: 10s
   - name: step-02
     try:
     - apply:
@@ -32,4 +30,3 @@ spec:
         - check:
             ($error != null): true
         file: bad-sa.yaml
-
