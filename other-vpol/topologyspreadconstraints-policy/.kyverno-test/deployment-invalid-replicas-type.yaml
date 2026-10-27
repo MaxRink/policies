@@ -1,0 +1,17 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: invalid-replicas-type
+spec:
+  replicas: "3"
+  selector:
+    matchLabels:
+      app: invalid-replicas-type
+  template:
+    metadata:
+      labels:
+        app: invalid-replicas-type
+    spec:
+      containers:
+      - name: app
+        image: busybox
