@@ -39,6 +39,7 @@ results:
   - implicit-docker-hub
   - evil-registry-prefix
   - registry-port
+  - invalid-image
   result: fail
 - isValidatingPolicy: true
   kind: Pod
