@@ -34,6 +34,10 @@ spec:
       apiVersions: ["v1"]
       operations: ["CREATE", "UPDATE"]
       resources: ["jobs", "cronjobs"]
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["UPDATE"]
+      resources: ["pods/ephemeralcontainers"]
   variables:
     - name: podSpec
       expression: >-
