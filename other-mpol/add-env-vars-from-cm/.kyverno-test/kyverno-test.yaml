@@ -6,15 +6,59 @@ policies:
 - ../add-env-vars-from-cm.yaml
 resources:
 - resource.yaml
+- envfrom-resource.yaml
+- already-injected.yaml
+- null-resource.yaml
+- deployment-resource.yaml
+- job-resource.yaml
+- cronjob-resource.yaml
 - exception-resource.yaml
 exceptions:
 - exception.yaml
 results:
 - kind: Pod
+  patchedResources: null-patched.yaml
+  policy: add-env-vars-from-cm
+  resources: [null-envfrom]
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: deployment-patched.yaml
+  policy: add-env-vars-from-cm
+  resources: [deployment-envfrom]
+  result: pass
+  isMutatingPolicy: true
+- kind: Job
+  patchedResources: job-patched.yaml
+  policy: add-env-vars-from-cm
+  resources: [job-envfrom]
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: cronjob-patched.yaml
+  policy: add-env-vars-from-cm
+  resources: [cronjob-envfrom]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: already-injected.yaml
+  policy: add-env-vars-from-cm
+  resources:
+  - already-injected
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
   patchedResources: patchedResource01.yaml
   policy: add-env-vars-from-cm
   resources:
   - mypod
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: envfrom-patched.yaml
+  policy: add-env-vars-from-cm
+  resources:
+  - envfrom-pod
   result: pass
   isMutatingPolicy: true
 - kind: Pod
