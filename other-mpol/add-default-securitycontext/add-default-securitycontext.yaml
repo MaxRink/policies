@@ -18,26 +18,67 @@ spec:
     - apiGroups: [""]
       apiVersions: ["v1"]
       operations: ["CREATE", "UPDATE"]
-      resources: ["pods"]
+      resources: ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
+  variables:
+  - name: podSpec
+    expression: object.spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec.?template.?spec.orValue(object.spec))
+  - name: securityContext
+    expression: variables.podSpec.?securityContext.orValue({})
+  - name: runAsNonRoot
+    expression: variables.securityContext.?runAsNonRoot.orValue(true)
+  - name: runAsUser
+    expression: variables.securityContext.?runAsUser.orValue(1000)
+  - name: runAsGroup
+    expression: variables.securityContext.?runAsGroup.orValue(3000)
+  - name: fsGroup
+    expression: variables.securityContext.?fsGroup.orValue(2000)
   mutations:
   - patchType: ApplyConfiguration
     applyConfiguration:
       expression: >-
-        Object{
-          spec: Object.spec{
-            securityContext: Object.spec.securityContext{
-              runAsNonRoot: has(object.spec.securityContext) && has(object.spec.securityContext.runAsNonRoot)
-                           ? object.spec.securityContext.runAsNonRoot
-                           : true,
-              runAsUser: has(object.spec.securityContext) && has(object.spec.securityContext.runAsUser)
-                         ? object.spec.securityContext.runAsUser
-                         : 1000,
-              runAsGroup: has(object.spec.securityContext) && has(object.spec.securityContext.runAsGroup)
-                          ? object.spec.securityContext.runAsGroup
-                          : 3000,
-              fsGroup: has(object.spec.securityContext) && has(object.spec.securityContext.fsGroup)
-                       ? object.spec.securityContext.fsGroup
-                       : 2000            
+        object.kind == "Pod" ?
+        Object{spec: Object.spec{
+          securityContext: Object.spec.securityContext{
+            runAsNonRoot: variables.runAsNonRoot,
+            runAsUser: variables.runAsUser,
+            runAsGroup: variables.runAsGroup,
+            fsGroup: variables.fsGroup
+          }
+        }} :
+        object.kind == "CronJob" ?
+        Object{spec: Object.spec{
+          jobTemplate: Object.spec.jobTemplate{
+            spec: Object.spec.jobTemplate.spec{
+              template: Object.spec.jobTemplate.spec.template{
+                spec: Object.spec.jobTemplate.spec.template.spec{
+                  securityContext: Object.spec.jobTemplate.spec.template.spec.securityContext{
+                    runAsNonRoot: variables.runAsNonRoot,
+                    runAsUser: variables.runAsUser,
+                    runAsGroup: variables.runAsGroup,
+                    fsGroup: variables.fsGroup
+                  }
+                }
+              }
             }
           }
-        }
+        }} :
+        Object{spec: Object.spec{
+          template: Object.spec.template{
+            spec: Object.spec.template.spec{
+              securityContext: Object.spec.template.spec.securityContext{
+                runAsNonRoot: variables.runAsNonRoot,
+                runAsUser: variables.runAsUser,
+                runAsGroup: variables.runAsGroup,
+                fsGroup: variables.fsGroup
+              }
+            }
+          }
+        }}

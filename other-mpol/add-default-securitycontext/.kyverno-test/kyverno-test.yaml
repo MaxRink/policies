@@ -6,10 +6,33 @@ policies:
 - ../add-default-securitycontext.yaml
 resources:
 - resource.yaml
+- null-resource.yaml
+- rc-resource.yaml
+- controller-resource.yaml
 - exception-resource.yaml
 exceptions:
 - exception.yaml
 results:
+- kind: Pod
+  patchedResources: null-patched.yaml
+  policy: add-default-securitycontext
+  resources: [null-securitycontext]
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: controller-patched.yaml
+  policy: add-default-securitycontext
+  resources:
+  - controller-securitycontext
+  result: pass
+  isMutatingPolicy: true
+- kind: ReplicationController
+  patchedResources: rc-patched.yaml
+  policy: add-default-securitycontext
+  resources:
+  - rc-default-securitycontext
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: patchedResource.yaml
   policy: add-default-securitycontext
