@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - null-fields.yaml
+- init-ephemeral.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -88,3 +89,9 @@ results:
   resources:
   - null-proc-mount
   result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-proc-mount
+  resources:
+  - init-ephemeral-proc-mount
+  result: fail
