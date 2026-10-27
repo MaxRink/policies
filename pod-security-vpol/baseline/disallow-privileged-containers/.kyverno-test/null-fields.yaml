@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-privileged
+spec:
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      privileged: null

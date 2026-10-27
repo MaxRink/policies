@@ -6,6 +6,7 @@ policies:
 - ../disallow-privileged-containers.yaml
 resources:
 - resource.yaml
+- null-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -69,4 +70,10 @@ results:
   - goodpod04
   - goodpod05
   - goodpod06
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-privileged-containers
+  resources:
+  - null-privileged
   result: pass
