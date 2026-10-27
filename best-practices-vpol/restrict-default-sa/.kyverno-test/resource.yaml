@@ -1,0 +1,182 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-custom
+  namespace: default-serviceaccount-test
+spec:
+  serviceAccountName: app
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-legacy-custom
+  namespace: default-serviceaccount-test
+spec:
+  serviceAccount: app
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-empty-name-legacy-custom
+  namespace: default-serviceaccount-test
+spec:
+  serviceAccountName: ""
+  serviceAccount: app
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-missing
+  namespace: default-serviceaccount-test
+spec:
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-empty
+  namespace: default-serviceaccount-test
+spec:
+  serviceAccountName: ""
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-default
+  namespace: default-serviceaccount-test
+spec:
+  serviceAccountName: default
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-legacy-default
+  namespace: default-serviceaccount-test
+spec:
+  serviceAccount: default
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-legacy-empty
+  namespace: default-serviceaccount-test
+spec:
+  serviceAccount: ""
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exception-pod
+  namespace: default-serviceaccount-test
+spec:
+  serviceAccountName: default
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-unexcepted
+  namespace: default-serviceaccount-test
+spec:
+  serviceAccountName: default
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-custom
+  namespace: default-serviceaccount-test
+spec:
+  template:
+    spec:
+      serviceAccountName: app
+      containers:
+      - name: app
+        image: nginx:1.27
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-missing
+  namespace: default-serviceaccount-test
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.27
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-legacy-custom
+  namespace: default-serviceaccount-test
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccount: app
+          containers:
+          - name: app
+            image: nginx:1.27
+          restartPolicy: Never
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-legacy-default
+  namespace: default-serviceaccount-test
+spec:
+  template:
+    spec:
+      serviceAccount: default
+      containers:
+      - name: app
+        image: nginx:1.27
+      restartPolicy: Never
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc-default
+  namespace: default-serviceaccount-test
+spec:
+  selector:
+    app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: app
+        image: nginx:1.27
