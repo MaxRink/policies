@@ -44,8 +44,6 @@ spec:
             validationActions: [Deny]
     - assert:
         file: policy-ready.yaml
-    - sleep:
-        duration: 7s
   - name: step-02
     try:
     - apply:
