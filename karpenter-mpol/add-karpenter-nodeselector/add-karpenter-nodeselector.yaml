@@ -25,6 +25,18 @@ spec:
       apiVersions: ["v1"]
       operations: ["CREATE", "UPDATE"]
       resources: ["pods"]
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
     namespaceSelector:
       matchExpressions:
       - key: type
@@ -36,9 +48,15 @@ spec:
     - name: capacityType
       expression: "variables.namespaceLabels.type == 'large' ? 'on-demand' : 'spot'"
     - name: podSpec
-      expression: "object.spec"
+      expression: >-
+        object.kind == "Pod" ? object.spec :
+        object.kind == "CronJob" ? object.spec.jobTemplate.spec.template.spec :
+        object.spec.template.spec
     - name: nodeSelectorPath
-      expression: '"/spec/nodeSelector"'
+      expression: >-
+        object.kind == "Pod" ? "/spec/nodeSelector" :
+        object.kind == "CronJob" ? "/spec/jobTemplate/spec/template/spec/nodeSelector" :
+        "/spec/template/spec/nodeSelector"
   mutations:
   - patchType: JSONPatch
     jsonPatch:
