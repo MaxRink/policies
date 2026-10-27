@@ -44,6 +44,15 @@ spec:
   - name: partial-exception
     try:
     - apply:
+        file: clusterrole-ciliumendpoints-good.yaml
+    - apply:
+        file: clusterrole-omitted-rules.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'CVE-2021-25740')): true
+        file: clusterrole-subresource-only.yaml
+    - apply:
         file: exception.yaml
     - apply:
         file: clusterrole-update-only.yaml
@@ -64,3 +73,9 @@ spec:
           apiVersion: policies.kyverno.io/v1
           kind: ValidatingPolicy
           name: restrict-edit-for-endpoints
+    - delete:
+        ref:
+          apiVersion: policies.kyverno.io/v1beta1
+          kind: PolicyException
+          name: allow-endpoint-update-only
+          namespace: policy-exceptions
