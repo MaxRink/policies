@@ -2,7 +2,7 @@ name: require-labels-VPOL
 version: 1.0.0
 displayName: Require Labels in VPOL
 description: >-
-  Define and use labels that identify semantic attributes of your application or Deployment. A common set of labels allows tools to work collaboratively, describing objects in a common manner that all tools can understand. The recommended labels describe applications in a way that can be queried. This policy validates that the label `app.kubernetes.io/name` is specified with some value.
+  Define and use labels that identify semantic attributes of your application or Deployment. A common set of labels allows tools to work collaboratively, describing objects in a common manner that all tools can understand. The recommended labels describe applications in a way that can be queried. This policy validates that the label `app.kubernetes.io/name` is specified with a non-empty value on Pods and supported Pod controller templates.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/best-practices-vpol/require-labels/require-labels.yaml
@@ -12,7 +12,7 @@ keywords:
   - Best Practices
   - VPOL
 readme: |
-  Define and use labels that identify semantic attributes of your application or Deployment. A common set of labels allows tools to work collaboratively, describing objects in a common manner that all tools can understand. The recommended labels describe applications in a way that can be queried. This policy validates that the label `app.kubernetes.io/name` is specified with some value.
+  Define and use labels that identify semantic attributes of your application or Deployment. A common set of labels allows tools to work collaboratively, describing objects in a common manner that all tools can understand. The recommended labels describe applications in a way that can be queried. This policy validates that the label `app.kubernetes.io/name` is specified with a non-empty value on Pods and supported Pod controller templates.
   
   ### Fine-grained PolicyException use
 
@@ -31,6 +31,6 @@ readme: |
 annotations:
   kyverno/category: "Best Practices in VPOL"
   kyverno/kubernetesVersion: "1.30"
-  kyverno/subject: "Pod, Label"
-digest: ea13616d0a9250f1f297b3d669f6b6ddf8cf81fabc7dcaf954ce090b22e54a2d
+  kyverno/subject: "Pod, Pod controller, Label"
+digest: f3abbf135523c9e95fd79996a9d6bfe5bcb103edee416a5c294315e7ebbc27ca
 createdAt: "2025-05-05T13:19:12Z"
