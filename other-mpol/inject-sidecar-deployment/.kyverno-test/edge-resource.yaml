@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exception-sibling
+  namespace: team-a
+spec:
+  selector:
+    matchLabels:
+      app: exception-sibling
+  template:
+    metadata:
+      labels:
+        app: exception-sibling
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+    spec:
+      initContainers: null
+      volumes: null
+      containers:
+      - name: app
+        image: nginx:1.27
+        imagePullPolicy: Always

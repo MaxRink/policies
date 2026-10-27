@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exception-sibling
+  namespace: team-a
+spec:
+  selector:
+    matchLabels:
+      app: exception-sibling
+  template:
+    metadata:
+      labels:
+        app: exception-sibling
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+    spec:
+      initContainers:
+      - name: vault-agent-init
+        image: vault:1.5.4
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /vault/secrets
+          name: vault-secret
+      volumes:
+      - name: vault-secret
+        emptyDir:
+          medium: Memory
+      containers:
+      - name: app
+        image: nginx:1.27
+        imagePullPolicy: Always
+      - name: vault-agent
+        image: vault:1.5.4
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /vault/secrets
+          name: vault-secret

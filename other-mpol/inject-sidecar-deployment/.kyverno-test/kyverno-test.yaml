@@ -6,6 +6,7 @@ policies:
 - ../inject-sidecar-deployment.yaml
 resources:
 - resource.yaml
+- edge-resource.yaml
 - exception-resource.yaml
 exceptions:
 - exception.yaml
@@ -28,4 +29,10 @@ results:
   resources:
   - mydeploy-2
   result: skip
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: edge-patchedResource.yaml
+  policy: inject-sidecar
+  resources: [exception-sibling]
+  result: pass
   isMutatingPolicy: true
