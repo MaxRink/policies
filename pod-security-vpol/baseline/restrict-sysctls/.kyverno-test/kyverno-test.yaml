@@ -6,6 +6,7 @@ policies:
 - ../restrict-sysctls.yaml
 resources:
 - resource.yaml
+- null-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -66,4 +67,10 @@ results:
   - goodpod06
   - goodpod07
   - goodpod08
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-sysctls
+  resources:
+  - null-sysctls
   result: pass

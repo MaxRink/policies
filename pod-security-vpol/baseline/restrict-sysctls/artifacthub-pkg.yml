@@ -30,7 +30,7 @@ readme: |
   Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
 annotations:
   kyverno/category: "Pod Security Standards (Baseline) in ValidatingPolicy"
-  kyverno/kubernetesVersion: "1.30+"
+  kyverno/kubernetesVersion: "1.37+"
   kyverno/subject: "Pod"
-digest: 5a0746856436a283099b9f0a0d40aade8b861632e5a77114c70fc87759a822bb
+digest: ed160de05fc1141da5f8dea9b5890fa2162f65158b76d6e506c848feee907275
 createdAt: "2025-03-13T23:26:58Z"

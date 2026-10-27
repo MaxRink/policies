@@ -9,7 +9,7 @@ metadata:
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/minversion: 1.19.1
     kyverno.io/kyverno-version: 1.14.0
-    kyverno.io/kubernetes-version: "1.30+"
+    kyverno.io/kubernetes-version: "1.37+"
     policies.kyverno.io/description: >-
       Sysctls can disable security mechanisms or affect all containers on a
       host, and should be disallowed except for an allowed "safe" subset. A
@@ -57,7 +57,7 @@ spec:
          'net.ipv4.tcp_syncookies', 'net.ipv4.tcp_wmem']
   validations:
     - expression: >-
-        variables.podSpec.?securityContext.?sysctls.orValue([]).all(sysctl,
+        (variables.podSpec.?securityContext.?sysctls.orValue([]) == null ? [] : variables.podSpec.?securityContext.?sysctls.orValue([])).all(sysctl,
           sysctl.?name.orValue('') in variables.allowedSysctls ||
           sysctl.?name.orValue('') in exceptions.allowedValues)
       message: >-
