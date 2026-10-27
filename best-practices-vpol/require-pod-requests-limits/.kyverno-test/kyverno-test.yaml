@@ -40,3 +40,9 @@ results:
   - exception-requests-limits
   result: pass
   isValidatingPolicy: true
+- kind: ReplicationController
+  policy: require-requests-limits
+  resources:
+  - badrc-requests-limits
+  result: fail
+  isValidatingPolicy: true

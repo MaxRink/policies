@@ -5,9 +5,10 @@ metadata:
     policies.kyverno.io/minversion: 1.19.1
     policies.kyverno.io/category: Best Practices
     policies.kyverno.io/description: >-
-      This policy validates that all containers have CPU and memory resource
-      requests and memory limits defined. Ephemeral containers are excluded because
-      Kubernetes does not support resource requests or limits for them.
+      This policy validates that regular and init containers in Pods and supported
+      Pod controller templates have CPU and memory resource requests and memory
+      limits defined. Ephemeral containers are excluded because Kubernetes does not
+      support resource requests or limits for them.
     policies.kyverno.io/severity: medium
     policies.kyverno.io/title: Require Requests and Limits
   name: require-requests-limits
@@ -26,6 +27,15 @@ spec:
           - UPDATE
         resources:
           - pods
+          - replicationcontrollers
+      - apiGroups: [apps]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [deployments, daemonsets, statefulsets, replicasets]
+      - apiGroups: [batch]
+        apiVersions: [v1]
+        operations: [CREATE, UPDATE]
+        resources: [jobs, cronjobs]
   validationActions:
     - Audit
   validations:
@@ -41,5 +51,9 @@ spec:
         containers.
   variables:
     - expression: >-
-        object.spec.containers + object.spec.?initContainers.orValue([])
+        object.spec.?jobTemplate.?spec.?template.?spec.orValue(
+        object.spec.?template.?spec.orValue(object.spec))
+      name: podSpec
+    - expression: >-
+        variables.podSpec.containers + variables.podSpec.?initContainers.orValue([])
       name: allContainers
