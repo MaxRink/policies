@@ -46,3 +46,8 @@ spec:
         - check:
             (contains($error, 'The label `corp.org/version` is required')): true
         file: ../.kyverno-test/replicationcontroller-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'The label `corp.org/version` is required')): true
+        file: ../.kyverno-test/null-labels-pod.yaml

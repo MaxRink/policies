@@ -10,6 +10,7 @@ resources:
 - ../.chainsaw-test/podcontroller-bad.yaml
 - ../.chainsaw-test/podcontroller-good.yaml
 - replicationcontroller-bad.yaml
+- null-labels-pod.yaml
 results:
 - policy: metadata-match-regex
   isValidatingPolicy: true
@@ -20,6 +21,8 @@ results:
   - badpod02
   - badpod03
   - badpod04
+  - null-labels-pod
+  - null-version-label-pod
   result: fail
 - policy: metadata-match-regex
   isValidatingPolicy: true
