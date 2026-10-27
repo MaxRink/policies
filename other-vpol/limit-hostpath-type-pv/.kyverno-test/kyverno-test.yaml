@@ -6,6 +6,7 @@ policies:
 - ../limit-hostpath-type-pv.yaml
 resources:
 - resource.yaml
+- traversal.yaml
 results:
 - isValidatingPolicy: true
   kind: PersistentVolume
@@ -18,6 +19,12 @@ results:
   policy: limit-hostpath-type-pv
   resources:
   - bad-pv-data-other
+  result: fail
+- isValidatingPolicy: true
+  kind: PersistentVolume
+  policy: limit-hostpath-type-pv
+  resources:
+  - traversal-pv
   result: fail
 - isValidatingPolicy: true
   kind: PersistentVolume

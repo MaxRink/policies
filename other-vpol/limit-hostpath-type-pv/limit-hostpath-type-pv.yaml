@@ -27,5 +27,10 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["persistentvolumes"]
   validations:
-    - expression: "!has(object.spec.hostPath) || (has(exceptions.allowedValues) && object.spec.hostPath.path in exceptions.allowedValues) || object.spec.hostPath.path == '/data' || object.spec.hostPath.path.startsWith('/data/')"
+    - expression: >-
+        !has(object.spec.hostPath) ||
+        (has(exceptions.allowedValues) && object.spec.hostPath.path in exceptions.allowedValues) ||
+        object.spec.hostPath.path == '/data' ||
+        (object.spec.hostPath.path.startsWith('/data/') &&
+        !object.spec.hostPath.path.split('/').exists(segment, segment == '..'))
       message: hostPath type persistent volumes are confined to /data.
