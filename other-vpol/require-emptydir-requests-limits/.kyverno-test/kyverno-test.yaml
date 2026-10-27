@@ -8,6 +8,7 @@ resources:
 - resource-fail.yaml
 - resource-pass.yaml
 - resource-skip.yaml
+- replicationcontroller-bad.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -19,6 +20,12 @@ results:
   - exception-emptydir-wrong-token
   - exception-emptydir-sibling-name
   - exception-emptydir-sibling-volume
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: require-emptydir-requests-and-limits
+  resources:
+  - missing-emptydir-resources-rc
   result: fail
 - isValidatingPolicy: true
   kind: Pod
