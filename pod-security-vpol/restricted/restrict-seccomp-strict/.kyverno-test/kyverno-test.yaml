@@ -6,6 +6,7 @@ policies:
 - ../restrict-seccomp-strict.yaml
 resources:
 - resource.yaml
+- null-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -103,4 +104,16 @@ results:
   - goodpod11
   - goodpod12
   - goodpod13
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-seccomp-strict
+  resources:
+  - null-seccomp
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-seccomp-strict
+  resources:
+  - null-container-seccomp-inherited
   result: pass
