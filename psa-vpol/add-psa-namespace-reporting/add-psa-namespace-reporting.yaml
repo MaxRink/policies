@@ -1,0 +1,49 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: add-psa-namespace-reporting
+  annotations:
+    policies.kyverno.io/title: Add PSA Namespace Reporting in ValidatingPolicy
+    policies.kyverno.io/category: Pod Security Admission, EKS Best Practices
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/minversion: 1.17.0
+    kyverno.io/kubernetes-version: "1.24"
+    policies.kyverno.io/subject: Namespace
+    policies.kyverno.io/description: >-
+      Audits Namespaces that have no non-empty Pod Security Admission label.
+      A non-empty enforce, audit, or warn label, or its corresponding version
+      label, satisfies this check.
+spec:
+  validationActions:
+    - Audit
+  evaluation:
+    background:
+      enabled: true
+  matchConstraints:
+    resourceRules:
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["namespaces"]
+  variables:
+    - name: psaLabelKeys
+      expression: >-
+        [
+          'pod-security.kubernetes.io/enforce',
+          'pod-security.kubernetes.io/audit',
+          'pod-security.kubernetes.io/warn',
+          'pod-security.kubernetes.io/enforce-version',
+          'pod-security.kubernetes.io/audit-version',
+          'pod-security.kubernetes.io/warn-version'
+        ]
+    - name: namespaceLabels
+      expression: object.metadata.?labels.orValue({})
+  validations:
+    - expression: >-
+        variables.namespaceLabels.exists(
+          key,
+          key in variables.psaLabelKeys && variables.namespaceLabels[key] != ''
+        )
+      message: >-
+        Namespace must have at least one non-empty Pod Security Admission label:
+        enforce, audit, warn, or a corresponding version label.

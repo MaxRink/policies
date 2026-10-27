@@ -1,0 +1,32 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: add-psa-namespace-reporting
+policies:
+  - ../add-psa-namespace-reporting.yaml
+resources:
+  - namespace-resources.yaml
+results:
+  - isValidatingPolicy: true
+    kind: Namespace
+    policy: add-psa-namespace-reporting
+    resources:
+      - enforce-label
+      - audit-label
+      - warn-label
+      - enforce-version-label
+      - audit-version-label
+      - warn-version-label
+      - non-empty-among-empty
+    result: pass
+  - isValidatingPolicy: true
+    kind: Namespace
+    policy: add-psa-namespace-reporting
+    resources:
+      - labels-absent
+      - labels-null
+      - labels-empty
+      - enforce-empty
+      - unknown-psa-key
+      - ordinary-label-only
+    result: fail

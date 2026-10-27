@@ -1,0 +1,87 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: enforce-label
+  labels:
+    pod-security.kubernetes.io/enforce: baseline
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: audit-label
+  labels:
+    pod-security.kubernetes.io/audit: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: warn-label
+  labels:
+    pod-security.kubernetes.io/warn: restricted
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: enforce-version-label
+  labels:
+    pod-security.kubernetes.io/enforce-version: latest
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: audit-version-label
+  labels:
+    pod-security.kubernetes.io/audit-version: v1.30
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: warn-version-label
+  labels:
+    pod-security.kubernetes.io/warn-version: v1.30
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: non-empty-among-empty
+  labels:
+    pod-security.kubernetes.io/enforce: ""
+    pod-security.kubernetes.io/audit-version: latest
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: labels-absent
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: labels-null
+  labels: null
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: labels-empty
+  labels: {}
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: enforce-empty
+  labels:
+    pod-security.kubernetes.io/enforce: ""
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unknown-psa-key
+  labels:
+    pod-security.kubernetes.io/custom: baseline
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ordinary-label-only
+  labels:
+    tenant: example
