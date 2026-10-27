@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-owner-references-pod
+  namespace: default
+  ownerReferences: null
+spec:
+  containers:
+    - name: app
+      image: nginx:1.25
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-controller-owner-pod
+  namespace: default
+  ownerReferences:
+    - apiVersion: v1
+      kind: ConfigMap
+      name: unrelated
+      uid: deadbeef
+      controller: null
+spec:
+  containers:
+    - name: app
+      image: nginx:1.25
