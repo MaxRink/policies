@@ -6,12 +6,29 @@ metadata:
   name: apply-pss-restricted-profile
 spec:
   steps:
+  - name: step-00
+    try:
+    - apply:
+        file: upgrade-pod.yaml
   - name: step-01
     try:
     - apply:
         file: ../apply-pss-restricted-profile.yaml
     - assert:
         file: policy-ready.yaml
+  - name: step-01-upgrade-existing-pod
+    try:
+    - patch:
+        resource:
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: upgrade-pod
+            namespace: default
+            labels:
+              upgrade-test: updated
+    - assert:
+        file: upgrade-pod-patched.yaml
   - name: step-02
     try:
     - apply:

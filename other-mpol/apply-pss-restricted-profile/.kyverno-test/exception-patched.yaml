@@ -10,10 +10,6 @@ spec:
       allowPrivilegeEscalation: false
       capabilities: {drop: [ALL]}
       privileged: false
-      runAsGroup: 3000
-      runAsNonRoot: true
-      runAsUser: 1000
-      seccompProfile: {type: RuntimeDefault}
   - {name: last, image: registry.example/skip-last:1}
   securityContext:
     fsGroup: 2000

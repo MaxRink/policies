@@ -59,9 +59,9 @@ spec:
     seccompProfile:
       type: RuntimeDefault
     runAsNonRoot: true
-    runAsUser: 1000
-    runAsGroup: 3000
-    fsGroup: 2000
+    runAsUser: 2000
+    runAsGroup: 1000
+    fsGroup: 3000
   containers:
     - image: ghcr.io/kyverno/test-busybox:1.35
       name: busybox
