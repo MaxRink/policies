@@ -45,5 +45,9 @@ spec:
       operations: ["CREATE", "UPDATE"]
       resources: ["jobs", "cronjobs"]
   validations:
-    - expression: "variables.allContainers.all(container, container.image.contains('@') || (has(exceptions.allowedImages) && exceptions.allowedImages.exists(image, image == container.image)))"
+    - expression: >-
+        variables.allContainers.all(container,
+        container.?image.hasValue() &&
+        ((has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
+        (isImage(container.image) && image(container.image).containsDigest())))
       message: "Images must use checksums rather than tags."

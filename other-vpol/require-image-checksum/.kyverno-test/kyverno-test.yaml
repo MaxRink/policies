@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - replicationcontroller-bad.yaml
+- invalid-digest-pod.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -19,6 +20,12 @@ results:
   policy: require-image-checksum
   resources:
   - myapp-pod-2
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: require-image-checksum
+  resources:
+  - invalid-digest-pod
   result: fail
 - isValidatingPolicy: true
   kind: ReplicationController
