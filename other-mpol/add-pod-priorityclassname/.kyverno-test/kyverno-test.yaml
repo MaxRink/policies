@@ -6,10 +6,18 @@ policies:
 - ../add-pod-priorityclassname.yaml
 resources:
 - resource.yaml
+- priority-resource.yaml
 - exception-resource.yaml
 exceptions:
 - exceptions.yaml
 results:
+- kind: Deployment
+  patchedResources: priority-patched.yaml
+  policy: add-pod-priorityclassname
+  resources:
+  - team-c/priority-user-set
+  result: pass
+  isMutatingPolicy: true
 - kind: Deployment
   patchedResources: patchedResource.yaml
   policy: add-pod-priorityclassname
