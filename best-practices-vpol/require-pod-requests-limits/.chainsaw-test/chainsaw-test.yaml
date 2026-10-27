@@ -26,6 +26,10 @@ spec:
     - apply:
         file: good-pods.yaml
     - apply:
+        file: legacy-regular-container-scope.yaml
+    - delete:
+        file: legacy-regular-container-scope.yaml
+    - apply:
         file: good-podcontrollers.yaml
     - apply:
         expect:

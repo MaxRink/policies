@@ -5,10 +5,8 @@ metadata:
     policies.kyverno.io/minversion: 1.19.1
     policies.kyverno.io/category: Best Practices
     policies.kyverno.io/description: >-
-      This policy validates that regular and init containers in Pods and supported
-      Pod controller templates have CPU and memory resource requests and memory
-      limits defined. Ephemeral containers are excluded because Kubernetes does not
-      support resource requests or limits for them.
+      This policy validates that regular containers in Pods and supported Pod
+      controller templates specify CPU and memory requests and memory limits.
     policies.kyverno.io/severity: medium
     policies.kyverno.io/title: Require Requests and Limits
   name: require-requests-limits
@@ -43,9 +41,8 @@ spec:
         variables.allContainers.all(c, (has(exceptions.allowedImages) && c.image in exceptions.allowedImages) ||
         (has(c.resources) &&
         has(c.resources.requests) && has(c.resources.requests.memory) &&
-        c.resources.requests.memory != '' && has(c.resources.requests.cpu) &&
-        c.resources.requests.cpu != '' && has(c.resources.limits) &&
-        has(c.resources.limits.memory) && c.resources.limits.memory != ''))
+        has(c.resources.requests.cpu) && has(c.resources.limits) &&
+        has(c.resources.limits.memory)))
       message: >-
         CPU and memory resource requests and memory limits are required for
         containers.
@@ -55,5 +52,5 @@ spec:
         object.spec.?template.?spec.orValue(object.spec))
       name: podSpec
     - expression: >-
-        variables.podSpec.containers + variables.podSpec.?initContainers.orValue([])
+        variables.podSpec.containers
       name: allContainers

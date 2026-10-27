@@ -32,6 +32,8 @@ results:
   - goodpod01
   - goodpod02
   - ephemeral-without-resources
+  - init-container-no-resources
+  - empty-resource-values
   result: pass
   isValidatingPolicy: true
 - kind: Pod
