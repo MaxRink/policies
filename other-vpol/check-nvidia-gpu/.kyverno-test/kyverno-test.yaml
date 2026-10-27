@@ -9,12 +9,21 @@ resources:
 - good02.yaml
 - good03.yaml
 - bad.yaml
+- rc-bad.yaml
 results:
 - kind: Pod
   policy: check-nvidia-gpus
   isValidatingPolicy: true
   resources:
   - badpod01
+  - badpod-init
+  result: fail
+  rule: check-nvidia-gpus
+- kind: ReplicationController
+  policy: check-nvidia-gpus
+  isValidatingPolicy: true
+  resources:
+  - rc-bad-gpu
   result: fail
   rule: check-nvidia-gpus
 - kind: Pod

@@ -39,6 +39,11 @@ spec:
         - check:
             (contains($error, 'Images which reserve NVIDIA GPUs must be built to use them')): true
         file: podcontrollers-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Images which reserve NVIDIA GPUs must be built to use them')): true
+        file: replicationcontroller-bad.yaml
   - name: step-99
     try:
     - script:
