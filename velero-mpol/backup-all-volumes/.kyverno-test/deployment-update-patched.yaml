@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+    app: busybox
+  name: update-new-pvc
+  namespace: foo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+      annotations:
+        backup.velero.io/backup-volumes: task-pv-storage,custom-volume,later-volume
+    spec:
+      volumes:
+      - name: task-pv-storage
+        persistentVolumeClaim:
+          claimName: existing-pvc
+      - name: later-volume
+        persistentVolumeClaim:
+          claimName: later-pvc
+      containers:
+      - name: app
+        image: busybox
+        volumeMounts:
+        - name: task-pv-storage
+          mountPath: /data
+        - name: later-volume
+          mountPath: /later
