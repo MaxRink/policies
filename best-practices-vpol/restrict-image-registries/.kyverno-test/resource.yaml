@@ -231,3 +231,105 @@ spec:
   containers:
   - name: app
     image: null
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: badpod-init-unapproved
+spec:
+  initContainers:
+  - name: setup
+    image: registry.k8s.io/busybox:1.36
+  containers:
+  - name: app
+    image: eu.foo.io/app:1.0
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: badpod-ephemeral-unapproved
+spec:
+  containers:
+  - name: app
+    image: eu.foo.io/app:1.0
+  ephemeralContainers:
+  - name: debugger
+    image: registry.k8s.io/busybox:1.36
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: badcontroller-init
+spec:
+  selector:
+    matchLabels: {app: badcontroller-init}
+  template:
+    metadata:
+      labels: {app: badcontroller-init}
+    spec:
+      initContainers:
+      - name: setup
+        image: registry.k8s.io/busybox:1.36
+      containers:
+      - name: app
+        image: eu.foo.io/app:1.0
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: goodpod-sha384-digest
+spec:
+  containers:
+  - name: app
+    image: bar.io/app@sha384:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: goodpod-sha512-digest
+spec:
+  containers:
+  - name: app
+    image: eu.foo.io/app@sha512:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: badpod-sha384-unapproved
+spec:
+  containers:
+  - name: app
+    image: registry.k8s.io/app@sha384:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: badpod-sha512-unapproved
+spec:
+  containers:
+  - name: app
+    image: registry.k8s.io/app@sha512:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: badpod-invalid-sha512
+spec:
+  containers:
+  - name: app
+    image: eu.foo.io/app@sha512:deadbeef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: badpod-extra-at-digest
+spec:
+  containers:
+  - name: app
+    image: eu.foo.io/app@invalid@sha512:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef

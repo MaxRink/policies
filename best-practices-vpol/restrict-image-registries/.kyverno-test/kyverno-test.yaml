@@ -16,6 +16,12 @@ results:
   - badpod01
   - badpod03
   - badpod04
+  - badpod-init-unapproved
+  - badpod-ephemeral-unapproved
+  - badpod-sha384-unapproved
+  - badpod-sha512-unapproved
+  - badpod-invalid-sha512
+  - badpod-extra-at-digest
   result: fail
 - isValidatingPolicy: true
   kind: Pod
@@ -31,6 +37,8 @@ results:
   - goodpod02
   - goodpod03
   - goodpod-digest
+  - goodpod-sha384-digest
+  - goodpod-sha512-digest
   result: pass
 - isValidatingPolicy: true
   kind: Pod
@@ -59,6 +67,11 @@ results:
   kind: Deployment
   policy: restrict-image-registries
   resources: [badcontroller-deployment]
+  result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: restrict-image-registries
+  resources: [badcontroller-init]
   result: fail
 - isValidatingPolicy: true
   kind: StatefulSet
