@@ -8,6 +8,7 @@ resources:
 - resource.yaml
 - ../.chainsaw-test/podcontroller-bad.yaml
 - ../.chainsaw-test/podcontroller-good.yaml
+- null-security-context.yaml
 - pod-container-override.yaml
 - ephemeralcontainer-override.yaml
 - windows-pod.yaml
@@ -27,6 +28,7 @@ results:
   - badpod02
   - badpod03
   - badpod04
+  - null-security-context
   - container-security-context-override
   - ephemeral-container-override
   result: fail
