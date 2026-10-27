@@ -34,7 +34,8 @@ spec:
                 Object.spec.containers{
                   name: c.name,
                   image: 'myregistry.corp.com/' + 
-                    (c.image.contains('/') && c.image.split('/')[0].contains('.') ? 
+                    (c.image.contains('/') && (c.image.split('/')[0].contains('.') ||
+                      c.image.split('/')[0].contains(':')) ?
                       c.image.substring(c.image.indexOf('/') + 1) : 
                       c.image.replace('localhost/', ''))
                 }
@@ -45,7 +46,8 @@ spec:
                   Object.spec.initContainers{
                     name: c.name,
                     image: 'myregistry.corp.com/' + 
-                      (c.image.contains('/') && c.image.split('/')[0].contains('.') ? 
+                      (c.image.contains('/') && (c.image.split('/')[0].contains('.') ||
+                        c.image.split('/')[0].contains(':')) ?
                         c.image.substring(c.image.indexOf('/') + 1) : 
                         c.image.replace('localhost/', ''))
                   }

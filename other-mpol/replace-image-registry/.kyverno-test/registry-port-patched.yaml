@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: registry-port
+  namespace: default
+spec:
+  containers:
+  - name: app
+    image: myregistry.corp.com/example/thing:1
+  initContainers:
+  - name: init
+    image: myregistry.corp.com/example/init:1
