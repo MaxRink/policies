@@ -8,6 +8,8 @@ resources:
 - goodpod.yaml
 - badpod.yaml
 - traversal.yaml
+- replicationcontroller.yaml
+- controllers.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -26,5 +28,17 @@ results:
   policy: limit-hostpath-vols
   resources:
   - traversal
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: limit-hostpath-vols
+  resources:
+  - hostpath-bad-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: limit-hostpath-vols
+  resources:
+  - hostpath-bad-deployment
   result: fail
 variables: values.yaml
