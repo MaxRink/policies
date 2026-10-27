@@ -32,7 +32,7 @@ annotations:
   kyverno/category: "Other, Multi-Tenancy in vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "NetworkPolicy"
-digest: c91a63d46fd7f5403711e1871751d065b9268988be722259ba91a85558b054a6
+digest: bc40f7a3a539cdbd114b20fb0c3dee0175f1be5d7936192dee3398a471436b62
 
 
 createdAt: "2025-05-11T17:46:11Z"
