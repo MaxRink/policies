@@ -14,8 +14,8 @@ metadata:
       rejected based upon what has already been defined. It is also possible to mutate
       incoming Pods to achieve the desired PSS level rather than reject. This policy
       sets all the fields necessary to pass the PSS Restricted profile. Note that it does
-      not attempt to remove non-compliant volumes and volumeMounts. Additional policies
-      may be employed for this purpose.
+      not mutate Windows Pods or attempt to remove non-compliant volumes and volumeMounts.
+      Additional policies may be employed for those purposes.
 spec:
   matchConstraints:
     resourceRules:
@@ -55,6 +55,10 @@ spec:
         object.kind == "CronJob" ? object.spec.jobTemplate.spec.template.spec :
         object.kind in ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet", "ReplicationController", "Job"] ? object.spec.template.spec :
         {}
+
+  matchConditions:
+    - name: skip-windows-pods
+      expression: '!has(variables.podSpec.os) || variables.podSpec.os.name != "windows"'
   
   mutations:
     # Mutation 1: Set pod-level security context
