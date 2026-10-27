@@ -81,13 +81,21 @@ spec:
   - name: podNamespace
     expression: "(object.metadata.namespace != '') ? object.metadata.namespace : 'default'"
   - name: configMapName
-    expression: "object.metadata.annotations['coco.io/sidecar-config']"
+    expression: |
+      request.object.kind == "Pod" ?
+      request.object.metadata.annotations['coco.io/sidecar-config'] :
+      request.object.spec.template.metadata.annotations['coco.io/sidecar-config']
   - name: configMap
     expression: "resource.Get('v1', 'configmaps', variables.podNamespace, variables.configMapName)"
   - name: sidecarImage
     expression: "has(variables.configMap.data) && 'sidecar_image' in variables.configMap.data ? variables.configMap.data['sidecar_image'] : 'ghcr.io/confidential-containers/secure-sidecar:latest'"
   - name: httpsPort
-    expression: "has(variables.configMap.data) && 'https_port' in variables.configMap.data ? int(variables.configMap.data['https_port']) : 8443"
+    expression: |
+      has(variables.configMap.data) && 'https_port' in variables.configMap.data &&
+      variables.configMap.data['https_port'].matches('^[0-9]+$') &&
+      int(variables.configMap.data['https_port']) > 0 &&
+      int(variables.configMap.data['https_port']) <= 65535 ?
+      int(variables.configMap.data['https_port']) : 8443
   - name: tlsCertUri
     expression: "has(variables.configMap.data) && 'tls_cert_uri' in variables.configMap.data ? variables.configMap.data['tls_cert_uri'] : ''"
   - name: forwardPort

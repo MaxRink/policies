@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coco-deployment
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: coco
+  template:
+    metadata:
+      labels:
+        app: coco
+        coco: enabled
+      annotations:
+        coco.io/sidecar-config: sidecar
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.20

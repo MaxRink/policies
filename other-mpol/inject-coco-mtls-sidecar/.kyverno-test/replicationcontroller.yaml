@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: coco-replicationcontroller
+  namespace: default
+spec:
+  selector:
+    app: coco
+  template:
+    metadata:
+      labels:
+        app: coco
+        coco: enabled
+      annotations:
+        coco.io/sidecar-config: sidecar
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.20
