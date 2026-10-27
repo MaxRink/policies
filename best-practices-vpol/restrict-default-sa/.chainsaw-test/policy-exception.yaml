@@ -1,0 +1,16 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: restrict-default-sa-example
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - kind: ValidatingPolicy
+    name: restrict-default-sa
+  matchConditions:
+  - name: target-namespace
+    expression: request.namespace == 'default-serviceaccount-test'
+  - name: target-name
+    expression: request.name == 'exception-pod'
+  allowedValues:
+  - serviceAccountName:default

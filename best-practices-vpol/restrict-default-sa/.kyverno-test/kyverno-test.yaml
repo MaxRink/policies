@@ -1,0 +1,61 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-default-sa
+policies:
+- ../restrict-default-sa.yaml
+resources:
+- resource.yaml
+exceptions:
+- exceptions.yaml
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-default-sa
+  resources:
+  - pod-custom
+  - pod-legacy-custom
+  - pod-empty-name-legacy-custom
+  - exception-pod
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-default-sa
+  resources:
+  - pod-missing
+  - pod-empty
+  - pod-default
+  - pod-legacy-default
+  - pod-legacy-empty
+  - pod-unexcepted
+  result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: restrict-default-sa
+  resources:
+  - deployment-custom
+  result: pass
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: restrict-default-sa
+  resources:
+  - deployment-missing
+  result: fail
+- isValidatingPolicy: true
+  kind: CronJob
+  policy: restrict-default-sa
+  resources:
+  - cronjob-legacy-custom
+  result: pass
+- isValidatingPolicy: true
+  kind: Job
+  policy: restrict-default-sa
+  resources:
+  - job-legacy-default
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-default-sa
+  resources:
+  - rc-default
+  result: fail
