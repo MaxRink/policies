@@ -32,5 +32,5 @@ annotations:
   kyverno/category: "Sample"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod,ServiceAccount"
-digest: 29c19bcf57806c592670d1d5407f7a0f4f9bf1755fc5c5c63e70b5c1efe5bdf4
+digest: e2295e7432b5d22e99ac8b07d21f45cc3be77a0aa3baa9168b39d6994a75397e
 createdAt: "2025-12-15T12:37:33Z"
