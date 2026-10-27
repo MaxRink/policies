@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: invalid-port-pod
+  namespace: default
+  labels:
+    coco: enabled
+  annotations:
+    coco.io/sidecar-config: invalid-port
+spec:
+  containers:
+  - name: app
+    image: nginx:1.20
+  - name: coco-sidecar
+    image: ghcr.io/confidential-containers/secure-sidecar:latest
+    ports:
+    - name: https
+      containerPort: 8443
+      protocol: TCP
+    env:
+    - name: TLS_CERT_URI
+      value: ""
+    - name: HTTPS_PORT
+      value: "8443"
+    - name: FORWARD_PORT
+      value: "8080"
+    resources:
+      requests:
+        memory: 64Mi
+        cpu: 50m
+      limits:
+        memory: 128Mi
+        cpu: 100m

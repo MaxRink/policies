@@ -13,7 +13,14 @@ keywords:
   - Confidential Computing
   - MutatingPolicy
 readme: |
-  Injects a secure mTLS sidecar container into pods with CoCo configuration based on ConfigMap settings.
+  Adds a `coco-sidecar` container to Pods labeled `coco=enabled` that have the
+  `coco.io/sidecar-config` annotation. The annotation names a ConfigMap in the Pod's namespace.
+  The policy also applies to Deployment, StatefulSet, DaemonSet, and Job pod templates;
+  other controller kinds, including ReplicationControllers and CronJobs, are not matched.
+  Optional ConfigMap keys are `sidecar_image`, `https_port`, `forward_port`, and `tls_cert_uri`;
+  absent keys use the defaults in the policy. `https_port` must be a decimal port in 1–65535;
+  other values fall back to 8443. These annotation and ConfigMap keys are this
+  sample's configuration interface, not native CoCo runtime annotations.
   
   ### Fine-grained PolicyException use
 
@@ -30,4 +37,4 @@ readme: |
 annotations:
   kyverno/category: "Confidential Computing"
   kyverno/subject: "Pod"
-digest: c2c1425d359128515d0ca27b70c86643d96c9887bb6d16f92d6d2b20a0e6fea6
+digest: a7bf820e3d175b3d113ec05948369d29aa8723783bec12a27cc876db49468e85

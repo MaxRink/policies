@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: coco-pod
+  namespace: default
+  labels:
+    coco: enabled
+  annotations:
+    coco.io/sidecar-config: sidecar
+spec:
+  containers:
+  - name: app
+    image: nginx:1.20
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: non-numeric-port-pod
+  namespace: default
+  labels:
+    coco: enabled
+  annotations:
+    coco.io/sidecar-config: non-numeric-port
+spec:
+  containers:
+  - name: app
+    image: nginx:1.20
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sibling-pod
+  namespace: default
+  labels:
+    coco: enabled
+  annotations:
+    coco.io/sidecar-config: sidecar
+spec:
+  containers:
+  - name: app
+    image: nginx:1.20
+  - name: user-sidecar
+    image: busybox:1.36
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exception-pod
+  namespace: default
+  labels:
+    coco: enabled
+  annotations:
+    coco.io/sidecar-config: sidecar
+spec:
+  containers:
+  - name: app
+    image: nginx:1.20
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: no-label-pod
+  namespace: default
+  annotations:
+    coco.io/sidecar-config: sidecar
+spec:
+  containers:
+  - name: app
+    image: nginx:1.20
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: invalid-port-pod
+  namespace: default
+  labels:
+    coco: enabled
+  annotations:
+    coco.io/sidecar-config: invalid-port
+spec:
+  containers:
+  - name: app
+    image: nginx:1.20
