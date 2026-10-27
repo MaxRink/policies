@@ -1,0 +1,24 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: allowed-image-repos-ephemeral
+policies:
+- ../allowed-image-repos.yaml
+resources:
+- resource.yaml
+variables: values.yaml
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: allowed-image-repos
+  resources:
+  - default/disallowed-ephemeral-repo
+  result: fail
+  operation: UPDATE
+- isValidatingPolicy: true
+  kind: Pod
+  policy: allowed-image-repos
+  resources:
+  - default/allowed-ephemeral-repo
+  result: pass
+  operation: UPDATE
