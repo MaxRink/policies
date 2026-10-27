@@ -6,6 +6,7 @@ policies:
 - ../require-qos-guaranteed.yaml
 resources:
 - resource.yaml
+- null-resources-pod.yaml
 - replicationcontroller-bad.yaml
 exceptions:
 - exceptions.yaml
@@ -19,6 +20,7 @@ results:
   - badpod03
   - badpod04-zero
   - badpod05-init
+  - null-resources-pod
   result: fail
 - isValidatingPolicy: true
   kind: ReplicationController
