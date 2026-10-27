@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-init
+  namespace: multi-key-signing
+spec:
+  initContainers:
+  - name: unsigned-init
+    image: ghcr.io/kyverno/test-verify-image@sha256:74a98f0e4d750c9052f092a7f7a72de7b20f94f176a490088f7a744c76c53ea5
+    imagePullPolicy: Always
+  containers:
+  - name: main
+    image: nginx:1.27

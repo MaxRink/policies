@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-namespace-key
+  namespace: multi-key-signing
+spec:
+  containers:
+  - name: test-container
+    image: ghcr.io/kyverno/test-verify-image@sha256:b31bfb4d0213f254d361e0079deaaebefa4f82ba7aa76ef82e90b4935ad5b105
+    imagePullPolicy: Always

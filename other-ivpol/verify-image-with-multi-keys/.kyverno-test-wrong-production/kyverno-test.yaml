@@ -1,0 +1,15 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: verify-image-with-multi-keys-requires-production-key
+policies:
+- ../.kyverno-test/policy-deny.yaml
+context: context.yaml
+resources:
+- resources.yaml
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: verify-image-with-multi-keys
+  resources: [signed-digest-wrong-production-key]
+  result: fail
