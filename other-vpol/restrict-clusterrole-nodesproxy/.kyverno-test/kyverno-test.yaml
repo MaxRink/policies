@@ -13,6 +13,7 @@ results:
   resources:
   - badcr02
   - badcr01
+  - badcr03
   result: fail
 - policy: restrict-clusterrole-nodesproxy
   isValidatingPolicy: true
