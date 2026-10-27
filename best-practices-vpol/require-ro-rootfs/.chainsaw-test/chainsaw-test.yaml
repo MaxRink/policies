@@ -47,3 +47,8 @@ spec:
         - check:
             (contains($error, 'Policy require-ro-rootfs failed')): true
         file: bad-podcontrollers.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy require-ro-rootfs failed')): true
+        file: bad-replicationcontroller.yaml
