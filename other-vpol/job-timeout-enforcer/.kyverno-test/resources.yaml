@@ -1,0 +1,174 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-min-timeout
+  namespace: default
+spec:
+  activeDeadlineSeconds: 3600
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: busybox:1.36
+        command: ["sleep", "1"]
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-max-timeout
+  namespace: default
+spec:
+  activeDeadlineSeconds: 86400
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: busybox:1.36
+        command: ["sleep", "1"]
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-too-short
+  namespace: default
+spec:
+  activeDeadlineSeconds: 3599
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: busybox:1.36
+        command: ["sleep", "1"]
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-too-long
+  namespace: default
+spec:
+  activeDeadlineSeconds: 86401
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: busybox:1.36
+        command: ["sleep", "1"]
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-no-timeout
+  namespace: default
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: busybox:1.36
+        command: ["sleep", "1"]
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-null-timeout
+  namespace: default
+spec:
+  activeDeadlineSeconds: null
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: busybox:1.36
+        command: ["sleep", "1"]
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-zero-timeout
+  namespace: default
+spec:
+  activeDeadlineSeconds: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: app
+        image: busybox:1.36
+        command: ["sleep", "1"]
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-valid-timeout
+  namespace: default
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 7200
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: app
+            image: busybox:1.36
+            command: ["sleep", "1"]
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-no-timeout
+  namespace: default
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: app
+            image: busybox:1.36
+            command: ["sleep", "1"]
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-too-long
+  namespace: default
+spec:
+  schedule: "0 * * * *"
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 90000
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: app
+            image: busybox:1.36
+            command: ["sleep", "1"]
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-timeout-outside-template
+  namespace: default
+spec:
+  schedule: "0 * * * *"
+  activeDeadlineSeconds: 7200
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+          - name: app
+            image: busybox:1.36
+            command: ["sleep", "1"]

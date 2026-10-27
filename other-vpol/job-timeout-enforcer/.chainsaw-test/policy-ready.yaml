@@ -1,0 +1,15 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: job-timeout-enforcer
+status:
+  conditionStatus:
+    (conditions[?type == 'RBACPermissionsGranted']):
+    - reason: Succeeded
+      status: "True"
+      type: RBACPermissionsGranted
+    (conditions[?type == 'WebhookConfigured']):
+    - reason: Succeeded
+      status: "True"
+      type: WebhookConfigured
+    ready: true
