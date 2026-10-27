@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: already-rewritten
+  namespace: default
+data:
+  endpoint: https://s3.ap-south-2.amazonaws.com
