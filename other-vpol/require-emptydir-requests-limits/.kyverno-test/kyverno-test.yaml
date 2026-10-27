@@ -18,6 +18,7 @@ resources:
 - memory-emptydir-pod.yaml
 - no-volumes-pod.yaml
 - update-emptydir-pod.yaml
+- size-limit-not-exempt-pod.yaml
 variables: values.yaml
 exceptions:
 - exceptions.yaml
@@ -33,8 +34,8 @@ results:
   - null-ephemeral-storage-pod
   - empty-ephemeral-storage-pod
   - init-emptydir-fail-pod
-  - memory-emptydir-pod
   - update-emptydir-pod
+  - size-limit-not-exempt-pod
   - exception-emptydir-wrong-token
   - exception-emptydir-sibling-name
   - exception-emptydir-sibling-volume
@@ -53,6 +54,7 @@ results:
   - pass-pod-02
   - exception-emptydir
   - null-volume-mounts-pod
+  - memory-emptydir-pod
   result: pass
 - isValidatingPolicy: true
   kind: Pod

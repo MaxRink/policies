@@ -62,9 +62,11 @@ spec:
             ($error != null): true
         file: ../.kyverno-test/init-emptydir-fail-pod.yaml
     - apply:
+        file: ../.kyverno-test/memory-emptydir-pod.yaml
+    - apply:
         expect:
         - check:
             ($error != null): true
-        file: ../.kyverno-test/memory-emptydir-pod.yaml
+        file: ../.kyverno-test/size-limit-not-exempt-pod.yaml
     - apply:
         file: ../.kyverno-test/no-volumes-pod.yaml
