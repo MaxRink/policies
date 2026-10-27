@@ -8,6 +8,7 @@ resources:
 - resource.yaml
 - exception-resources.yaml
 - null-fields.yaml
+- init-ephemeral.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -105,3 +106,9 @@ results:
   resources:
   - null-capabilities
   result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-capabilities
+  resources:
+  - init-ephemeral-capabilities
+  result: fail
