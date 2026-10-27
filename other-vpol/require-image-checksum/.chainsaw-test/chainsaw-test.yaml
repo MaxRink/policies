@@ -57,6 +57,18 @@ spec:
             ($error != null): true
         file: ../.kyverno-test/null-image-pod.yaml
     - apply:
+        file: ../.kyverno-test/init-image-good-pod.yaml
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: ../.kyverno-test/init-image-bad-pod.yaml
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: ../.kyverno-test/init-image-bad-deployment.yaml
+    - apply:
         file: ephemeral-pod.yaml
     - script:
         content: |

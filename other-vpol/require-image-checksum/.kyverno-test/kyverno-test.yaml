@@ -10,6 +10,9 @@ resources:
 - invalid-digest-pod.yaml
 - ephemeral-subresource-pod.yaml
 - null-image-pod.yaml
+- init-image-bad-pod.yaml
+- init-image-good-pod.yaml
+- init-image-bad-deployment.yaml
 variables: values.yaml
 results:
 - isValidatingPolicy: true
@@ -30,6 +33,7 @@ results:
   resources:
   - invalid-digest-pod
   - null-image-pod
+  - init-image-bad-pod
   result: fail
 - isValidatingPolicy: true
   kind: Pod
@@ -50,8 +54,15 @@ results:
   - mydeploy
   result: pass
 - isValidatingPolicy: true
+  kind: Deployment
+  policy: require-image-checksum
+  resources:
+  - init-image-bad-deployment
+  result: fail
+- isValidatingPolicy: true
   kind: Pod
   policy: require-image-checksum
   resources:
   - myapp-pod-1
+  - init-image-good-pod
   result: pass
