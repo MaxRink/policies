@@ -18,6 +18,9 @@ kind: Pod
 metadata:
   name: pod02
 spec:
+  initContainers:
+  - name: init
+    image: nginx:latest
   containers:
   - name: pod02-01
     image: nginx:latest

@@ -24,6 +24,17 @@ spec:
       apiVersions: ["v1"]
       operations: ["CREATE", "UPDATE"]
       resources: ["pods"]
+  variables:
+  - name: initContainers
+    expression: >-
+      object.kind == "Pod" ? object.spec.?initContainers.orValue([]) :
+      object.kind == "CronJob" ? object.spec.?jobTemplate.?spec.?template.?spec.?initContainers.orValue([]) :
+      object.spec.?template.?spec.?initContainers.orValue([])
+  - name: initContainersPath
+    expression: >-
+      object.kind == "Pod" ? "/spec/initContainers" :
+      object.kind == "CronJob" ? "/spec/jobTemplate/spec/template/spec/initContainers" :
+      "/spec/template/spec/initContainers"
   mutations:
   - patchType: ApplyConfiguration
     applyConfiguration:
@@ -48,3 +59,51 @@ spec:
             )
           }
         }
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        variables.initContainers.filter(c,
+          !exceptions.allowedImages.exists(image, image == c.image) &&
+          (!has(c.resources) || c.resources == null)
+        ).map(c,
+          JSONPatch{
+            op: "add",
+            path: variables.initContainersPath + "/" + string(variables.initContainers.indexOf(c)) + "/resources",
+            value: dyn({"requests": {"cpu": "100m", "memory": "100Mi"}})
+          }
+        ) +
+        variables.initContainers.filter(c,
+          !exceptions.allowedImages.exists(image, image == c.image) &&
+          has(c.resources) && c.resources != null &&
+          (!has(c.resources.requests) || c.resources.requests == null)
+        ).map(c,
+          JSONPatch{
+            op: "add",
+            path: variables.initContainersPath + "/" + string(variables.initContainers.indexOf(c)) + "/resources/requests",
+            value: dyn({"cpu": "100m", "memory": "100Mi"})
+          }
+        ) +
+        variables.initContainers.filter(c,
+          !exceptions.allowedImages.exists(image, image == c.image) &&
+          has(c.resources) && c.resources != null &&
+          has(c.resources.requests) && c.resources.requests != null &&
+          (!has(c.resources.requests.cpu) || c.resources.requests.cpu == null)
+        ).map(c,
+          JSONPatch{
+            op: "add",
+            path: variables.initContainersPath + "/" + string(variables.initContainers.indexOf(c)) + "/resources/requests/cpu",
+            value: "100m"
+          }
+        ) +
+        variables.initContainers.filter(c,
+          !exceptions.allowedImages.exists(image, image == c.image) &&
+          has(c.resources) && c.resources != null &&
+          has(c.resources.requests) && c.resources.requests != null &&
+          (!has(c.resources.requests.memory) || c.resources.requests.memory == null)
+        ).map(c,
+          JSONPatch{
+            op: "add",
+            path: variables.initContainersPath + "/" + string(variables.initContainers.indexOf(c)) + "/resources/requests/memory",
+            value: "100Mi"
+          }
+        )

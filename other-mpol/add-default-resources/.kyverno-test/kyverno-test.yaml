@@ -6,7 +6,36 @@ policies:
 - ../add-default-resources.yaml
 resources:
 - resource.yaml
+- init-resource.yaml
+- deployment-init-resource.yaml
+- cronjob-init-resource.yaml
+- null-resource.yaml
 results:
+- kind: Deployment
+  patchedResources: deployment-init-patched.yaml
+  policy: add-default-resources
+  resources: [deployment-init-resources]
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: cronjob-init-patched.yaml
+  policy: add-default-resources
+  resources: [cronjob-init-resources]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: null-patched.yaml
+  policy: add-default-resources
+  resources: [null-resources]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: init-patched.yaml
+  policy: add-default-resources
+  resources:
+  - init-resources
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: patchedResource1.yaml
   policy: add-default-resources

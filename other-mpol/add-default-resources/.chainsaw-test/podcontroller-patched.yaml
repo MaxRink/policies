@@ -46,6 +46,19 @@ spec:
       labels:
         app: busybox
     spec:
+      initContainers:
+        - name: init02
+          image: nginx:latest
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "500m"
+        - name: init-null-resources
+          image: nginx:latest
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
       containers:
         - name: bb-01
           image: nginx:latest
@@ -70,6 +83,13 @@ spec:
     spec:
       template:
         spec:
+          initContainers:
+          - name: init-null-resources
+            image: nginx:latest
+            resources:
+              requests:
+                memory: "100Mi"
+                cpu: "100m"
           containers:
             - name: bb-01
               image: nginx:latest

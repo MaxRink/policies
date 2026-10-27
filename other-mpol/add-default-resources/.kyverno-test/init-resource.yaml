@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-resources
+spec:
+  initContainers:
+  - name: init
+    image: init:v1
+    resources:
+      limits:
+        cpu: "1"
+  - name: init-null-resources
+    image: init:v1
+    resources: null
+  containers:
+  - name: app
+    image: app:v1
+    resources:
+      requests:
+        cpu: 200m
