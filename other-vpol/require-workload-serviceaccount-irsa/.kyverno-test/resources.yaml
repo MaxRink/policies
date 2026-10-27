@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aws-irsa-role
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/my-app-role
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aws-cn-irsa-role
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws-cn:iam::123456789012:role/team/workload-role
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aws-gov-irsa-role
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws-us-gov:iam::123456789012:role/workload-role
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: no-aws-access
+  namespace: default
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: aws-access-false
+  namespace: default
+  labels:
+    aws-access: "false"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: no-role-annotation
+  namespace: default
+  labels:
+    aws-access: "true"
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: empty-role-annotation
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: ""
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: short-arn
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::x
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: short-account
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::1234:role/my-app-role
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: wrong-service
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:sts::123456789012:role/my-app-role
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: empty-role-name
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: trailing-role-slash
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/team/
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: double-slash-role
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/team//workload-role
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: unsupported-partition
+  namespace: default
+  labels:
+    aws-access: "true"
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws-iso:iam::123456789012:role/workload-role

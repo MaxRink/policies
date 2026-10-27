@@ -1,0 +1,31 @@
+name: require-workload-serviceaccount-irsa
+version: 1.0.0
+displayName: Require Workload ServiceAccount IRSA
+createdAt: "2026-10-27T00:00:00.000Z"
+description: >-
+  Requires ServiceAccounts labeled aws-access: "true" to use a syntactically valid
+  AWS IAM role ARN for IRSA. The label selects the workload scope; this policy does
+  not restrict access to the EC2 instance metadata service.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/require-workload-serviceaccount-irsa/require-workload-serviceaccount-irsa.yaml
+  ```
+keywords:
+  - kyverno
+  - AWS, EKS Best Practices
+  - ValidatingPolicy
+readme: |
+  Requires ServiceAccounts labeled `aws-access: "true"` to include an
+  `eks.amazonaws.com/role-arn` annotation with an IAM role ARN in the `aws`, `aws-cn`,
+  or `aws-us-gov` partition, a 12-digit account ID, and a non-empty role name. The label
+  opts a workload into this policy; unlabeled ServiceAccounts are not checked.
+
+  This policy checks the role ARN's format and does not verify that the role exists or
+  trusts the cluster's OIDC provider. It does not isolate or restrict access to IMDS.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "AWS, EKS Best Practices"
+  kyverno/kubernetesVersion: "1.26-1.37"
+  kyverno/subject: "ServiceAccount"
+digest: ccb0a648f4ffcd80300c0d337a9f701257d90b05714fbfc6b58f8ee970489948
