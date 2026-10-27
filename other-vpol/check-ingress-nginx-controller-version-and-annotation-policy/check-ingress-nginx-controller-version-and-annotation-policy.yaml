@@ -9,15 +9,15 @@ metadata:
     policies.kyverno.io/minversion: 1.19.1
     kyverno.io/kyverno-version: 1.15.0
     kyverno.io/kubernetes-version: "1.30"
-    policies.kyverno.io/subject: Ingress, Pod, ReplicationController, Deployment, DaemonSet, StatefulSet, ReplicaSet, Job, CronJob
+    policies.kyverno.io/subject: ConfigMap, Ingress, Pod, ReplicationController, Deployment, DaemonSet, StatefulSet, ReplicaSet, Job, CronJob
     policies.kyverno.io/description: >-
-      This policy ensures that Ingress resources do not have certain disallowed annotations and that ingress-nginx
-      controller Pods and templates use version 1.11.2 or higher. It checks for the presence of the
-      `nginx.ingress.kubernetes.io/server-snippet` annotation and disallows its usage, enforces specific values 
-      for `auth-tls-verify-client`, and ensures that the ingress-nginx controller image is of the required version.
+      This policy prevents ingress-nginx custom snippets by requiring ConfigMaps to set
+      `allow-snippet-annotations` to `false` and blocking Ingress annotation keys ending in
+      `-snippet` (including empty-valued keys). It also enforces auth-tls-verify-client values
+      and requires ingress-nginx controller Pods and templates to use version 1.11.2 or higher.
 spec:
   validationActions:
-  - Audit
+  - Deny
   variables:
   - name: isIngress
     expression: "object.kind == 'Ingress'"
@@ -46,6 +46,15 @@ spec:
       - UPDATE
       apiGroups:
       - networking.k8s.io
+      apiVersions:
+      - v1
+    - resources:
+      - configmaps
+      operations:
+      - CREATE
+      - UPDATE
+      apiGroups:
+      - ""
       apiVersions:
       - v1
     - resources:
@@ -98,8 +107,18 @@ spec:
       - v1
   validations:
   - reason: Invalid
+    message: "ingress-nginx allow-snippet-annotations must be set to false"
+    expression: "object.kind != 'ConfigMap' || object.?data[?'allow-snippet-annotations'].orValue('false') == 'false'"
+  - reason: Invalid
     messageExpression: "'server-snippet annotation is not allowed in Ingress resources'"
     expression: "!variables.isIngress || !has(object.metadata.annotations) || !object.metadata.annotations.exists(a, a == 'nginx.ingress.kubernetes.io/server-snippet') || 'annotation:nginx.ingress.kubernetes.io/server-snippet' in exceptions.allowedValues"
+  - reason: Invalid
+    message: "ingress-nginx custom snippets are not allowed"
+    expression: >-
+      !variables.isIngress ||
+      !object.metadata.?annotations.orValue({}).exists(annotation,
+        annotation.endsWith('-snippet') &&
+        !(('annotation:' + annotation) in exceptions.allowedValues))
   - reason: Invalid
     messageExpression: "'auth-tls-verify-client annotation must be one of: ' + variables.validAuthTlsValues.join(', ') + ', received: ' + variables.authTlsAnnotation"
     expression: "!variables.isIngress || variables.authTlsAnnotation == '' || variables.authTlsAnnotation in variables.validAuthTlsValues || ('annotation:nginx.ingress.kubernetes.io/auth-tls-verify-client:' + variables.authTlsAnnotation) in exceptions.allowedValues"

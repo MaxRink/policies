@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: exact-snippet-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - kind: ValidatingPolicy
+    name: check-ingress-nginx-controller-version-and-annotation-policy
+  matchConditions:
+  - name: exact-resource
+    expression: object.kind == 'Ingress' && object.metadata.name == 'excepted-snippet'
+  allowedValues:
+  - annotation:nginx.org/location-snippet

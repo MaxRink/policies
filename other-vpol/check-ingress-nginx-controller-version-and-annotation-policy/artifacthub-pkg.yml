@@ -2,7 +2,7 @@ name: check-ingress-nginx-controller-version-and-annotation-policy
 version: 1.0.0
 displayName: Ensure Valid Ingress NGINX Controller and Annotations in ValidatingPolicy
 description: >-
-  This policy ensures that Ingress resources do not have certain disallowed annotations and that ingress-nginx controller Pods and workload templates use a stable image tag at version 1.11.2 or newer. It checks for the presence of the `nginx.ingress.kubernetes.io/server-snippet` annotation and disallows its usage, enforces specific values for `auth-tls-verify-client`, and validates the controller image registry, repository, and semantic version.
+  This policy requires allow-snippet-annotations=false on ConfigMaps, blocks every Ingress annotation key ending in -snippet (even when empty), validates auth-tls-verify-client, and requires stable ingress-nginx controller tags at version 1.11.2 or newer.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/check-ingress-nginx-controller-version-and-annotation-policy/check-ingress-nginx-controller-version-and-annotation-policy.yaml
@@ -12,7 +12,7 @@ keywords:
   - Other
   - ValidatingPolicy
 readme: |
-  This policy ensures that Ingress resources do not have certain disallowed annotations and that ingress-nginx controller Pods and workload templates use a stable image tag at version 1.11.2 or newer. It checks for the presence of the `nginx.ingress.kubernetes.io/server-snippet` annotation and disallows its usage, enforces specific values for `auth-tls-verify-client`, and validates the controller image registry, repository, and semantic version.
+  This policy requires `allow-snippet-annotations: "false"` on ConfigMaps and blocks every Ingress annotation key ending in `-snippet`, even when its value is empty. The exact ConfigMap and Ingress scope is retained from the legacy sample. It also validates `auth-tls-verify-client` and requires stable ingress-nginx controller tags at version 1.11.2 or newer.
   Background reporting for `pods/ephemeralcontainers` requires granting Kyverno's reports controller `get/list/watch` on that subresource; see the [sample ClusterRole](https://github.com/kyverno/policies/blob/main/other-vpol/check-ingress-nginx-controller-version-and-annotation-policy/.chainsaw-test/ephemeral-rbac.yaml).
   ### Fine-grained PolicyException use
 
@@ -20,8 +20,8 @@ readme: |
   `check-ingress-nginx-controller-version-and-annotation-policy` in `spec.policyRefs`, and narrow the exception with
   `spec.matchConditions` using the exact request identity.
   Use `spec.images` (`exceptions.allowedImages` in CEL) for exact controller image
-  references. In `spec.allowedValues`, use
-  `annotation:nginx.ingress.kubernetes.io/server-snippet` for that annotation, or
+  references. In `spec.allowedValues`, use `annotation:<exact-key>` to allow an individual
+  `*-snippet` annotation (for example `annotation:nginx.ingress.kubernetes.io/server-snippet`), or
   `annotation:nginx.ingress.kubernetes.io/auth-tls-verify-client:<value>` for an exact TLS
   annotation value. Each allowance affects only its corresponding validation. CEL consumes
   `spec.allowedValues` as `exceptions.allowedValues`; unlisted values remain checked.
@@ -33,6 +33,6 @@ readme: |
 annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.30"
-  kyverno/subject: "Pod,ReplicationController,Deployment,DaemonSet,StatefulSet,ReplicaSet,Job,CronJob,Ingress"
-digest: b89dd216aadf912a383cd79e202f66cba749bc8b879f9b21a3f003fded7fe0d2
+  kyverno/subject: "ConfigMap,Ingress,Pod,ReplicationController,Deployment,DaemonSet,StatefulSet,ReplicaSet,Job,CronJob"
+digest: 8bc91f86e7d1842f3430d7aa328cde3f16af5891920ab956f1d9cfe7fde25f26
 createdAt: "2025-12-12T14:35:08Z"

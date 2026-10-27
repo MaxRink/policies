@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: excepted-snippet
+  namespace: policy-exceptions
+  annotations:
+    nginx.org/location-snippet: ""
+spec:
+  rules:
+  - host: snippets.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: snippet-service
+            port:
+              number: 80
