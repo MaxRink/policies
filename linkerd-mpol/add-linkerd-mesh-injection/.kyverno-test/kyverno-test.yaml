@@ -1,0 +1,16 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: add-linkerd-mesh-injection
+policies:
+- ../add-linkerd-mesh-injection.yaml
+resources:
+- resource.yaml
+results:
+- kind: Namespace
+  patchedResources: patched.yaml
+  policy: add-linkerd-mesh-injection
+  resources:
+  - test
+  result: pass
+  isMutatingPolicy: true
