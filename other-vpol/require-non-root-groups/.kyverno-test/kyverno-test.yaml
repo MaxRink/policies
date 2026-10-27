@@ -9,6 +9,8 @@ policies:
 resources:
 - resource.yaml
 - replicationcontroller-bad.yaml
+- ephemeral-subresource-pod.yaml
+variables: values.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -108,6 +110,12 @@ results:
   - badpod13
   - badpod14
   - badpod15
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: require-non-root-groups
+  resources:
+  - ephemeral-group-pod
   result: fail
 - isValidatingPolicy: true
   kind: ReplicationController

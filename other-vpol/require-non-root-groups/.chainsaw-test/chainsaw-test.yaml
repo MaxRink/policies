@@ -48,3 +48,9 @@ spec:
         - check:
             (contains($error, 'Policy require-non-root-groups failed')): true
         file: ../.kyverno-test/replicationcontroller-bad.yaml
+    - apply:
+        file: ephemeral-pod.yaml
+    - script:
+        content: |
+          output="$(kubectl patch pod ephemeral-groups -n default --subresource=ephemeralcontainers --type=strategic --patch='{"spec":{"ephemeralContainers":[{"name":"debug","image":"nginx:1.25","targetContainerName":"app","securityContext":{"runAsGroup":0}}]}}' 2>&1)" && { echo "$output"; exit 1; }
+          echo "$output" | grep -q 'Running with root group IDs is disallowed.'

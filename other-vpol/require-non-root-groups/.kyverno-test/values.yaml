@@ -1,0 +1,9 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Values
+policies:
+- name: require-non-root-groups
+  resources:
+  - name: ephemeral-group-pod
+    values:
+      request.operation: UPDATE
+      request.subResource: ephemeralcontainers
