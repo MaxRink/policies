@@ -33,7 +33,7 @@ annotations:
   kyverno/category: "Other, Multi-Tenancy in vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "PersistentVolumeClaim, StatefulSet"
-digest: 3e3e06e2759122c373b7f732f99be535fa350579d3d1b3df6ad84dbd6c148e2b
+digest: 9b42dee58a7bd4a864b31e7c1d50421f692c72b32c21650533f7990bd2016a65
 
 
 createdAt: "2025-05-11T17:46:11Z"
