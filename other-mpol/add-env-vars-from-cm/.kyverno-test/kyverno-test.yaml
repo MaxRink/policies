@@ -6,6 +6,7 @@ policies:
 - ../add-env-vars-from-cm.yaml
 resources:
 - resource.yaml
+- large-resource.yaml
 - envfrom-resource.yaml
 - already-injected.yaml
 - null-resource.yaml
@@ -16,6 +17,12 @@ resources:
 exceptions:
 - exception.yaml
 results:
+- kind: Pod
+  patchedResources: large-patched.yaml
+  policy: add-env-vars-from-cm
+  resources: [large-envfrom]
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: null-patched.yaml
   policy: add-env-vars-from-cm
