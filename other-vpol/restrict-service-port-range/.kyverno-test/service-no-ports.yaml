@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-service-no-ports
+spec:
+  type: ExternalName
+  externalName: example.com
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-service-null-ports
+spec:
+  type: ExternalName
+  externalName: example.com
+  ports: null
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-service-empty-ports
+spec:
+  type: ExternalName
+  externalName: example.com
+  ports: []
