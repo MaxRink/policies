@@ -32,6 +32,16 @@ spec:
         object.spec.containers.map(c,
           exceptions.allowedImages.exists(image, image == c.image) ? {} : image.GetMetadata(c.image)
         )
+    # Most Pods are small; avoid a range allocation until the container list grows past three.
+    - name: containerIndices
+      expression: |
+        size(object.spec.containers) <= 3 ?
+          object.spec.containers.map(container, object.spec.containers.indexOf(container)).filter(idx,
+            !exceptions.allowedImages.exists(image, image == object.spec.containers[idx].image)
+          ) :
+          lists.range(size(object.spec.containers)).filter(idx,
+            !exceptions.allowedImages.exists(image, image == object.spec.containers[idx].image)
+          )
   mutations:
   # First, ensure annotations exist
   - patchType: JSONPatch
@@ -49,9 +59,7 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        object.spec.containers.map(container, object.spec.containers.indexOf(container)).filter(idx,
-          !exceptions.allowedImages.exists(image, image == object.spec.containers[idx].image)
-        ).map(idx,
+        variables.containerIndices.map(idx,
           has(variables.imageMetadata[idx].manifest) && 
           has(variables.imageMetadata[idx].manifest.annotations) &&
           "org.opencontainers.image.base.name" in variables.imageMetadata[idx].manifest.annotations ?

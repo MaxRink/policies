@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: many-containers
+  namespace: default
+  annotations:
+    kyverno.io/baseimages0: base.example/image:1
+    kyverno.io/baseimages1: base.example/image:1
+    kyverno.io/baseimages2: base.example/image:1
+    kyverno.io/baseimages3: base.example/image:1
+    kyverno.io/baseimages4: base.example/image:1
+    kyverno.io/baseimages5: base.example/image:1
+    kyverno.io/baseimages6: base.example/image:1
+    kyverno.io/baseimages7: base.example/image:1
+    kyverno.io/baseimages8: base.example/image:1
+    kyverno.io/baseimages9: base.example/image:1
+spec:
+  containers:
+  - {name: app-01, image: registry.example/mutate:1}
+  - {name: app-02, image: registry.example/mutate:1}
+  - {name: app-03, image: registry.example/mutate:1}
+  - {name: app-04, image: registry.example/mutate:1}
+  - {name: app-05, image: registry.example/mutate:1}
+  - {name: app-06, image: registry.example/mutate:1}
+  - {name: app-07, image: registry.example/mutate:1}
+  - {name: app-08, image: registry.example/mutate:1}
+  - {name: app-09, image: registry.example/mutate:1}
+  - {name: app-10, image: registry.example/mutate:1}
