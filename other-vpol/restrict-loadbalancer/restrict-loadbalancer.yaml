@@ -28,5 +28,5 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["services"]
   validations:
-    - expression: "object.spec.type != 'LoadBalancer'"
+    - expression: "object.spec.?type.orValue('') != 'LoadBalancer'"
       message: "Service of type LoadBalancer is not allowed."
