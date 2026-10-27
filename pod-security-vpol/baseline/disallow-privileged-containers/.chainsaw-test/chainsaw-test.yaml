@@ -15,10 +15,16 @@ spec:
     - script:
         content: |
           set -eu
+          NAMESPACE=default
           for attempt in $(seq 1 120); do
             ready=true
             for verb in get list watch update; do
-            if ! kubectl auth can-i "$verb" pods --subresource=ephemeralcontainers --as=system:serviceaccount:kyverno:kyverno-admission-controller | grep -qx yes; then
+            set +e
+            can_i=$(kubectl auth can-i "$verb" pods --subresource=ephemeralcontainers -n "$NAMESPACE" --as=system:serviceaccount:kyverno:kyverno-admission-controller 2>&1)
+            can_i_code=$?
+            set -e
+            printf '%s\n' "$can_i" >&2
+            if [ "$can_i_code" -ne 0 ] || [ "$can_i" != yes ]; then
                 ready=false
               fi
             done
@@ -64,36 +70,47 @@ spec:
     - script:
         content: |
           set -eu
+          NAMESPACE=default
+          POD_NAME=privileged-ephemeral-live
+          EXCEPTION_NAME=privileged-ephemeral-image
+          cleanup() {
+            kubectl -n "$NAMESPACE" delete pod "$POD_NAME" --wait=true --ignore-not-found --timeout=120s >/dev/null 2>&1 || true
+            kubectl -n policy-exceptions delete policyexceptions.policies.kyverno.io "$EXCEPTION_NAME" --wait=true --ignore-not-found >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
           replace_ephemeral() {
-            file=$1
+            json=$1
             url=$2
             transient_message=$3
             # Retry for up to about 60s: a new PolicyException takes a few seconds to reach the
             # admission controller, and the API server can return update conflicts.
             for attempt in $(seq 1 30); do
               [ "$attempt" -eq 1 ] || sleep 2
-              rv=$(kubectl get pod "$pod_name" -o jsonpath='{.metadata.resourceVersion}')
-              jq --arg rv "$rv" '.metadata.resourceVersion=$rv' "$file" >/tmp/ephemeral-rv.json
+              rv=$(kubectl -n "$NAMESPACE" get pod "$POD_NAME" -o jsonpath='{.metadata.resourceVersion}')
+              resource=$(printf '%s' "$json" | jq --arg rv "$rv" '.metadata.resourceVersion=$rv')
               set +e
-              dry=$(kubectl replace --raw "${url}?dryRun=All" -f /tmp/ephemeral-rv.json 2>&1)
+              dry=$(printf '%s' "$resource" | kubectl replace --raw "${url}?dryRun=All" -f - 2>&1)
               dry_code=$?
               set -e
               if [ "$dry_code" -ne 0 ]; then
-                printf '%s' "$dry" | grep -Fq "$transient_message" && continue
-                printf '%s' "$dry" | grep -Eq 'the object has been modified|Conflict' && continue
                 printf '%s\n' "$dry" >&2
+                case "$dry" in
+                  *"$transient_message"*|*'the object has been modified'*|*Conflict*) continue ;;
+                esac
                 return "$dry_code"
               fi
               set +e
-              actual=$(kubectl replace --raw "$url" -f /tmp/ephemeral-rv.json 2>&1)
+              actual=$(printf '%s' "$resource" | kubectl replace --raw "$url" -f - 2>&1)
               actual_code=$?
               set -e
               if [ "$actual_code" -eq 0 ]; then
                 printf '%s' "$actual"
                 return 0
               fi
-              printf '%s' "$actual" | grep -Eq 'the object has been modified|Conflict' && continue
               printf '%s\n' "$actual" >&2
+              case "$actual" in
+                *'the object has been modified'*|*Conflict*) continue ;;
+              esac
               return "$actual_code"
             done
             echo "ephemeralcontainers update did not succeed after 30 attempts" >&2
@@ -104,33 +121,35 @@ spec:
           kind: Namespace
           metadata:
             name: policy-exceptions
-          ---
+          YAML
+          kubectl -n policy-exceptions delete policyexceptions.policies.kyverno.io "$EXCEPTION_NAME" --wait=true --ignore-not-found
+          kubectl -n "$NAMESPACE" delete pod "$POD_NAME" --wait=true --ignore-not-found --timeout=120s
+          kubectl -n "$NAMESPACE" apply -f - <<YAML
           apiVersion: v1
           kind: Pod
           metadata:
-            name: privileged-ephemeral-live
-            namespace: default
+            name: $POD_NAME
+            namespace: $NAMESPACE
           spec:
             containers:
             - name: app
               image: ghcr.io/kyverno/test-busybox:1.35
               command: ["sleep", "3600"]
           YAML
-          kubectl wait --for=jsonpath='{.status.phase}'=Running pod/privileged-ephemeral-live --timeout=120s
-          cat > /tmp/ephemeral-denied.json <<'JSON'
-          {"apiVersion":"v1","kind":"Pod","metadata":{"name":"privileged-ephemeral-live","namespace":"default"},"spec":{"ephemeralContainers":[{"name":"debug","image":"nginx:1.27","securityContext":{"privileged":true}}]}}
-          JSON
+          kubectl wait -n "$NAMESPACE" --for=jsonpath='{.status.phase}'=Running "pod/$POD_NAME" --timeout=120s
+          denied_patch='[{"op":"add","path":"/spec/ephemeralContainers","value":[{"name":"debug","image":"nginx:1.27","securityContext":{"privileged":true}}]}]'
           set +e
-          denied=$(kubectl -n default patch pod privileged-ephemeral-live --subresource=ephemeralcontainers --type=merge --patch-file=/tmp/ephemeral-denied.json 2>&1)
+          denied=$(kubectl -n "$NAMESPACE" patch pod "$POD_NAME" --subresource=ephemeralcontainers --type=json --patch "$denied_patch" 2>&1)
           code=$?
           set -e
+          printf '%s\n' "$denied" >&2
           test "$code" -ne 0
           printf '%s' "$denied" | grep -F "Privileged mode is disallowed"
-          kubectl apply -f - <<'YAML'
+          kubectl -n policy-exceptions apply -f - <<YAML
           apiVersion: policies.kyverno.io/v1
           kind: PolicyException
           metadata:
-            name: privileged-ephemeral-image
+            name: $EXCEPTION_NAME
             namespace: policy-exceptions
           spec:
             policyRefs:
@@ -139,19 +158,20 @@ spec:
             images: ["exempt.example/app:1"]
             matchConditions:
             - name: exact-workload
-              expression: object.metadata.namespace == 'default' && object.metadata.name == 'privileged-ephemeral-live'
+              expression: object.metadata.namespace == '$NAMESPACE' && object.metadata.name == '$POD_NAME'
           YAML
-          cat > /tmp/ephemeral-approved.json <<'JSON'
-          {"apiVersion":"v1","kind":"Pod","metadata":{"name":"privileged-ephemeral-live","namespace":"default"},"spec":{"ephemeralContainers":[{"name":"debug","image":"exempt.example/app:1","securityContext":{"privileged":true}}]}}
-          JSON
-          pod_name='privileged-ephemeral-live'
-          replace_ephemeral /tmp/ephemeral-approved.json '/api/v1/namespaces/default/pods/privileged-ephemeral-live/ephemeralcontainers' 'Privileged mode is disallowed'
-          cat > /tmp/ephemeral-sibling.json <<'JSON'
-          {"apiVersion":"v1","kind":"Pod","metadata":{"name":"privileged-ephemeral-live","namespace":"default"},"spec":{"ephemeralContainers":[{"name":"debug","image":"exempt.example/app:1","securityContext":{"privileged":true}},{"name":"unapproved","image":"nginx:1.27","securityContext":{"privileged":true}}]}}
-          JSON
+          approved_json=$(printf '{"apiVersion":"v1","kind":"Pod","metadata":{"name":"%s","namespace":"%s"},"spec":{"ephemeralContainers":[{"name":"debug","image":"exempt.example/app:1","securityContext":{"privileged":true}}]}}' "$POD_NAME" "$NAMESPACE")
+          replace_ephemeral "$approved_json" "/api/v1/namespaces/$NAMESPACE/pods/$POD_NAME/ephemeralcontainers" 'Privileged mode is disallowed'
+          sibling_patch='[{"op":"add","path":"/spec/ephemeralContainers/-","value":{"name":"unapproved","image":"nginx:1.27","securityContext":{"privileged":true}}}]'
           set +e
-          sibling=$(kubectl -n default patch pod privileged-ephemeral-live --subresource=ephemeralcontainers --type=merge --patch-file=/tmp/ephemeral-sibling.json 2>&1)
+          sibling=$(kubectl -n "$NAMESPACE" patch pod "$POD_NAME" --subresource=ephemeralcontainers --type=json --patch "$sibling_patch" 2>&1)
           code=$?
           set -e
+          printf '%s\n' "$sibling" >&2
+          if [ "$code" -eq 0 ]; then
+            stored=$(kubectl -n "$NAMESPACE" get pod "$POD_NAME" -o jsonpath='{range .spec.ephemeralContainers[*]}{.name}:{.image}{" "}{end}')
+            echo "Non-exempt sibling was admitted; stored ephemeral containers: $stored" >&2
+            exit 1
+          fi
           test "$code" -ne 0
           printf '%s' "$sibling" | grep -F "Privileged mode is disallowed"
