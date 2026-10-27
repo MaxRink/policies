@@ -45,10 +45,12 @@ spec:
           (has(exceptions.allowedValues) && string(container.image) in exceptions.allowedValues) ||
           (
             variables.cmRegistries.exists(cmRegistry,
-              container.image.startsWith(cmRegistry.trim()))
+              container.image == cmRegistry.trim() ||
+              container.image.startsWith(cmRegistry.trim() + "/"))
           ) || (
             variables.nsRegistries.exists(nsRegistry,
-              container.image.startsWith(nsRegistry.trim()))
+              container.image == nsRegistry.trim() ||
+              container.image.startsWith(nsRegistry.trim() + "/"))
           )
         )
       messageExpression: >-
