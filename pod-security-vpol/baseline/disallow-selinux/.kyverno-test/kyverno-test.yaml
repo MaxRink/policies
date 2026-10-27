@@ -6,6 +6,7 @@ policies:
 - ../disallow-selinux.yaml
 resources:
 - resource.yaml
+- null-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -216,4 +217,10 @@ results:
   - selur-goodpod09
   - selur-goodpod10
   - selur-goodpod11
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-selinux
+  resources:
+  - null-selinux
   result: pass

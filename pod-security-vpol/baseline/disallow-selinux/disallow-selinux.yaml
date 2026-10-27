@@ -9,7 +9,7 @@ metadata:
     policies.kyverno.io/subject: Pod
     policies.kyverno.io/minversion: 1.19.1
     kyverno.io/kyverno-version: 1.14.0
-    kyverno.io/kubernetes-version: "1.30+"
+    kyverno.io/kubernetes-version: "1.31+"
     policies.kyverno.io/description: >-
       SELinux options can be used to escalate privileges and should not be allowed. This policy
       ensures that the `seLinuxOptions` field is undefined.
@@ -44,24 +44,28 @@ spec:
         object.spec.?template.?spec.orValue(object.spec))
     - name: allContainerTypes
       expression: >-
-        variables.podSpec.containers +
-        variables.podSpec.?initContainers.orValue([]) +
-        variables.podSpec.?ephemeralContainers.orValue([])
+        (variables.podSpec.?containers.orValue([]) == null ? [] : variables.podSpec.?containers.orValue([])) +
+        (variables.podSpec.?initContainers.orValue([]) == null ? [] : variables.podSpec.?initContainers.orValue([])) +
+        (variables.podSpec.?ephemeralContainers.orValue([]) == null ? [] : variables.podSpec.?ephemeralContainers.orValue([]))
     - name: seLinuxTypes
       expression: "['container_t', 'container_init_t', 'container_kvm_t', 'container_engine_t']"
     - name: hasValidSELinuxType
       expression: >-
+        variables.podSpec.?securityContext.?seLinuxOptions.?type.orValue('') == null ||
         variables.podSpec.?securityContext.?seLinuxOptions.?type.orValue('') == '' ||
         variables.seLinuxTypes.exists(type, type == variables.podSpec.securityContext.seLinuxOptions.type)
     - name: hasValidSELinuxUserRole
       expression: >-
-        variables.podSpec.?securityContext.?seLinuxOptions.?user.orValue('') == '' &&
-        variables.podSpec.?securityContext.?seLinuxOptions.?role.orValue('') == ''
+        (variables.podSpec.?securityContext.?seLinuxOptions.?user.orValue('') == null ||
+        variables.podSpec.?securityContext.?seLinuxOptions.?user.orValue('') == '') &&
+        (variables.podSpec.?securityContext.?seLinuxOptions.?role.orValue('') == null ||
+        variables.podSpec.?securityContext.?seLinuxOptions.?role.orValue('') == '')
   validations:
     - expression: >-
         variables.hasValidSELinuxType &&
         variables.allContainerTypes.all(container,
           container.image in exceptions.allowedImages ||
+          container.?securityContext.?seLinuxOptions.?type.orValue('') == null ||
           container.?securityContext.?seLinuxOptions.?type.orValue('') == '' ||
           variables.seLinuxTypes.exists(type, type == container.securityContext.seLinuxOptions.type) ||
           ('type:' + container.?securityContext.?seLinuxOptions.?type.orValue('')) in exceptions.allowedValues)
@@ -73,9 +77,11 @@ spec:
         variables.hasValidSELinuxUserRole &&
         variables.allContainerTypes.all(container,
           container.image in exceptions.allowedImages ||
-          (container.?securityContext.?seLinuxOptions.?user.orValue('') == '' ||
+          (container.?securityContext.?seLinuxOptions.?user.orValue('') == null ||
+          container.?securityContext.?seLinuxOptions.?user.orValue('') == '' ||
           ('user:' + container.?securityContext.?seLinuxOptions.?user.orValue('')) in exceptions.allowedValues) &&
-          (container.?securityContext.?seLinuxOptions.?role.orValue('') == '' ||
+          (container.?securityContext.?seLinuxOptions.?role.orValue('') == null ||
+          container.?securityContext.?seLinuxOptions.?role.orValue('') == '' ||
           ('role:' + container.?securityContext.?seLinuxOptions.?role.orValue('')) in exceptions.allowedValues))
       message: >-
         Setting the SELinux user or role is forbidden. The fields seLinuxOptions.user and seLinuxOptions.role must be unset or empty.
