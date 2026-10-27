@@ -29,11 +29,25 @@ spec:
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["clusterroles"]
+  variables:
+    - name: rules
+      expression: "has(object.rules) && object.rules != null ? object.rules : []"
+    - name: hasNodesProxy
+      expression: >-
+        variables.rules.exists(rule,
+          has(rule.resources) && rule.resources != null &&
+          rule.resources.exists(resource, resource == 'nodes/proxy'))
+    - name: hasCoreApiGroup
+      expression: >-
+        variables.rules.exists(rule,
+          has(rule.apiGroups) && rule.apiGroups != null &&
+          rule.apiGroups.exists(apiGroup, apiGroup == ''))
   validations:
     - expression: >-
-        object.rules == null ||
-        !object.rules.exists(rule,
-          rule.resources.exists(resource,
-            (resource == '*' || (resource == 'nodes/proxy' && !('nodes/proxy' in exceptions.allowedValues))) &&
-            rule.apiGroups.exists(apiGroup, apiGroup == '')))
+        !(variables.hasNodesProxy && variables.hasCoreApiGroup && !('nodes/proxy' in exceptions.allowedValues)) &&
+        !variables.rules.exists(rule,
+          has(rule.resources) && rule.resources != null &&
+          rule.resources.exists(resource, resource == '*') &&
+          has(rule.apiGroups) && rule.apiGroups != null &&
+          rule.apiGroups.exists(apiGroup, apiGroup == ''))
       message: "A ClusterRole containing the nodes/proxy resource is not allowed."
