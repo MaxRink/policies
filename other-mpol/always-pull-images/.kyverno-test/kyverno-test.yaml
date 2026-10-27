@@ -6,7 +6,9 @@ policies:
 - ../always-pull-images.yaml
 resources:
 - resource.yaml
+- edge-resources.yaml
 - resource-exception.yaml
+- exception-sibling.yaml
 - ../.chainsaw-test/podcontrollers.yaml
 exceptions:
 - exceptions.yaml
@@ -30,6 +32,18 @@ results:
   policy: always-pull-images
   resources:
   - image-exception-pod
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: exception-sibling-patched.yaml
+  policy: always-pull-images
+  resources: [image-exception-sibling]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: edge-patched.yaml
+  policy: always-pull-images
+  resources: [null-lists-pod, empty-lists-pod, all-container-types-pod]
   result: pass
   isMutatingPolicy: true
 - kind: Deployment
