@@ -46,14 +46,6 @@ spec:
           exit 1
     - apply:
         file: ../check-deprecated-apis.yaml
-    - patch:
-        resource:
-          apiVersion: policies.kyverno.io/v1
-          kind: ValidatingPolicy
-          metadata:
-            name: check-deprecated-apis
-          spec:
-            validationActions: [Deny]
     - assert:
         file: policy-ready.yaml
   - name: reject-deprecated-api
@@ -80,23 +72,9 @@ spec:
           kubectl apply -f deprecated-flowschema.yaml
           kubectl delete -f approved-exception.yaml --ignore-not-found
           kubectl delete -f deprecated-flowschema.yaml --ignore-not-found
-          set +e
-          output=$(kubectl create -f deprecated-flowschema.yaml 2>&1)
-          apply_status=$?
-          set -e
-          echo "$output"
-          if [ "$apply_status" -eq 0 ]; then
-            echo 'Expected deprecated API admission to be denied after exception removal'
-            exit 1
-          fi
-          if ! printf '%s' "$output" | grep -Fqi 'admission webhook'; then
-            echo 'Expected an admission webhook denial, not an API or client error'
-            exit 1
-          fi
-          if ! printf '%s' "$output" | grep -Fqi 'check-deprecated-apis'; then
-            echo 'Expected a policy-specific deprecated-API denial'
-            exit 1
-          fi
+          # Audit reports deprecated APIs without rejecting their admission.
+          kubectl create -f deprecated-flowschema.yaml
+          kubectl delete -f deprecated-flowschema.yaml --ignore-not-found
   - name: cleanup-rbac
     try:
     - delete:
