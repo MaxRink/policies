@@ -7,6 +7,7 @@ policies:
 - ../allowed-base-images.yaml
 resources:
 - resource.yaml
+- replicationcontrollers.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -49,4 +50,16 @@ results:
   policy: allowed-base-images
   resources:
   - goodcronjob01
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: allowed-base-images
+  resources:
+  - default/badbase-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: allowed-base-images
+  resources:
+  - default/allowedbase-rc
   result: pass
