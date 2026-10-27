@@ -9,6 +9,7 @@ resources:
 - ../.chainsaw-test/pod-good.yaml
 - ../.chainsaw-test/podcontroller-bad.yaml
 - ../.chainsaw-test/podcontroller-good.yaml
+- replicationcontroller-bad.yaml
 results:
 - policy: metadata-match-regex
   isValidatingPolicy: true
@@ -31,6 +32,12 @@ results:
   kind: CronJob
   resources:
   - badcronjob01
+  result: fail
+- policy: metadata-match-regex
+  isValidatingPolicy: true
+  kind: ReplicationController
+  resources:
+  - bad-version-rc
   result: fail
 - policy: metadata-match-regex
   isValidatingPolicy: true
