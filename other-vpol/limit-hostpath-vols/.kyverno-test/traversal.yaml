@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: traversal
+spec:
+  containers:
+  - name: app
+    image: busybox
+  volumes:
+  - name: host
+    hostPath:
+      path: /data/../../etc

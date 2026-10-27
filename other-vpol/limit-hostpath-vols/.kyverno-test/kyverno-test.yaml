@@ -7,6 +7,7 @@ policies:
 resources:
 - goodpod.yaml
 - badpod.yaml
+- traversal.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -20,4 +21,10 @@ results:
   resources:
   - good-pods-all
   result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: limit-hostpath-vols
+  resources:
+  - traversal
+  result: fail
 variables: values.yaml
