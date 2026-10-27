@@ -13,6 +13,7 @@ results:
   resources:
   - bad01
   - bad02
+  - init-cpu-bad
   result: fail
 - isValidatingPolicy: true
   kind: Pod
@@ -21,4 +22,3 @@ results:
   - good01
   - good02
   result: pass
-
