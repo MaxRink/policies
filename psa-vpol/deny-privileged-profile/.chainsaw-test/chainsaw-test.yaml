@@ -1,0 +1,82 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/chainsaw/main/.schemas/json/test-chainsaw-v1alpha1.json
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  creationTimestamp: null
+  name: deny-privileged-profile
+spec:
+  template: false
+  steps:
+    - name: shared-exception-namespace
+      skipDelete: true
+      try:
+        - apply:
+            file: policy-exceptions-namespace.yaml
+    - name: install-policy-and-exception
+      try:
+        - apply:
+            file: ../deny-privileged-profile.yaml
+        - patch:
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              metadata:
+                name: deny-privileged-profile
+              spec:
+                validationActions: [Deny]
+        - apply:
+            file: namespace-editor-rbac.yaml
+        - apply:
+            file: policy-exception.yaml
+        - assert:
+            file: policy-ready.yaml
+    - name: verify-create-update-and-exceptions
+      try:
+        - apply:
+            file: namespace-update-baseline.yaml
+        - script:
+            content: |
+              set -eu
+
+              expect_denied() {
+                file=$1
+                output=$(kubectl --as=psa-vpol-test-user --as-group=system:authenticated -n "$NAMESPACE" apply -f "$file" 2>&1) && status=0 || status=$?
+                printf '%s\n' "$output"
+                if [ "$status" -eq 0 ]; then
+                  echo "expected $file to be denied" >&2
+                  exit 1
+                fi
+                case "$output" in
+                  *"Policy deny-privileged-profile failed"*) ;;
+                  *)
+                    echo "expected deny-privileged-profile in output" >&2
+                    exit 1
+                    ;;
+                esac
+              }
+
+              expect_denied namespace-create-privileged.yaml
+              expect_denied namespace-update-privileged.yaml
+
+              kubectl --as=psa-vpol-test-admin --as-group=system:masters -n "$NAMESPACE" apply -f namespace-update-privileged-original.yaml
+              kubectl --as=psa-vpol-test-user --as-group=system:authenticated -n "$NAMESPACE" apply -f namespace-update-downgrade.yaml
+
+              kubectl --as=psa-vpol-test-admin --as-group=system:masters -n "$NAMESPACE" apply -f namespace-remove-label-original.yaml
+              kubectl --as=psa-vpol-test-user --as-group=system:authenticated -n "$NAMESPACE" apply -f namespace-remove-label.yaml
+
+              output=$(kubectl --as=psa-vpol-test-user --as-group=system:authenticated -n "$NAMESPACE" patch namespace kube-system --type=merge --dry-run=server -p '{"metadata":{"labels":{"pod-security.kubernetes.io/enforce":"privileged"}}}' -o name 2>&1) && status=0 || status=$?
+              printf '%s\n' "$output"
+              if [ "$status" -ne 0 ]; then
+                echo "expected the kube-system PolicyException to allow this dry-run" >&2
+                exit "$status"
+              fi
+
+              kubectl --as=psa-vpol-test-admin --as-group=system:masters -n "$NAMESPACE" apply -f namespace-admin-privileged.yaml
+      finally:
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" delete namespace psa-vpol-denied-create psa-vpol-update-privileged psa-vpol-update-downgrade psa-vpol-update-remove-label psa-vpol-admin-privileged --ignore-not-found --wait=true
+              kubectl -n "$NAMESPACE" delete clusterrole psa-vpol-test-ns-edit --ignore-not-found --wait=true
+              kubectl -n "$NAMESPACE" delete clusterrolebinding psa-vpol-test-ns-edit --ignore-not-found --wait=true
+              kubectl -n policy-exceptions delete -f policy-exception.yaml --ignore-not-found --wait=true

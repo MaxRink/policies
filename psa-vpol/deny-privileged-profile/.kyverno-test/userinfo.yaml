@@ -1,0 +1,8 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: UserInfo
+metadata:
+  name: non-admin-requester
+userInfo:
+  username: psa-vpol-test-user
+  groups:
+    - system:authenticated
