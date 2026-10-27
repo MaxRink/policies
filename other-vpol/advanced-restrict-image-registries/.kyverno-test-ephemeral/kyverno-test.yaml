@@ -1,0 +1,25 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: advanced-restrict-image-registries-ephemeral
+policies:
+- ../advanced-restrict-image-registries.yaml
+resources:
+- resource.yaml
+context: context.yaml
+variables: values.yaml
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: advanced-restrict-image-registries
+  resources:
+  - default/blocked-ephemeral-image
+  result: fail
+  operation: UPDATE
+- isValidatingPolicy: true
+  kind: Pod
+  policy: advanced-restrict-image-registries
+  resources:
+  - default/allowed-ephemeral-image
+  result: pass
+  operation: UPDATE
