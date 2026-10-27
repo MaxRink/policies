@@ -55,7 +55,8 @@ spec:
   validations:
     - expression: >-
         variables.containers.all(container,
-        !container.?volumeMounts.orValue([]).exists(mount, mount.name in variables.emptydirnames && !exceptions.allowedValues.exists(value, value == 'emptyDir:' + mount.name)) ||
+        !((container.?volumeMounts.orValue([]) == null ? [] : container.?volumeMounts.orValue([]))
+        .exists(mount, mount.name in variables.emptydirnames && !exceptions.allowedValues.exists(value, value == 'emptyDir:' + mount.name))) ||
         container.?resources.?requests[?'ephemeral-storage'].hasValue() &&
         container.?resources.?limits[?'ephemeral-storage'].hasValue())
       message: Containers mounting emptyDir volumes must specify requests and limits for ephemeral-storage.
