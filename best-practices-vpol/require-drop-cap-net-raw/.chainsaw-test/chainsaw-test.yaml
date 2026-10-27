@@ -55,3 +55,8 @@ spec:
         - check:
             (contains($error, 'Policy drop-cap-net-raw failed')): true
         file: bad-podcontrollers.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy drop-cap-net-raw failed')): true
+        file: bad-replicationcontroller.yaml

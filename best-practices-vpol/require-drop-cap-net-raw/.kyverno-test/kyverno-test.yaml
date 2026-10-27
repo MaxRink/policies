@@ -39,3 +39,9 @@ results:
   resources:
   - exception-net-raw-positive
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: drop-cap-net-raw
+  resources:
+  - badrc-net-raw
+  result: fail
