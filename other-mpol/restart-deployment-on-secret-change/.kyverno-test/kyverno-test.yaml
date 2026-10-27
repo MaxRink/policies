@@ -1,0 +1,19 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restart-deployment-on-secret-change
+policies:
+  - ../restart-deployment-on-secret-change.yaml
+resources:
+  - secret-update.yaml
+targetResources:
+  - deployment.yaml
+variables: values.yaml
+results:
+  - kind: Deployment
+    patchedResources: patched-deployment.yaml
+    policy: restart-deployment-on-secret-change
+    resources:
+      - default/busybox
+    result: pass
+    isMutatingPolicy: true

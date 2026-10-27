@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+  name: busybox
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+      annotations:
+        ops.corp.com/triggerrestart: "7f7d77fe5d4f40fc1306810a34f2a6f268c01276372f7ec80bb423149558ec76"
+        ops.corp.com/triggerrestart-othersecret: "10"
+    spec:
+      containers:
+        - name: busybox
+          image: busybox:1.36
