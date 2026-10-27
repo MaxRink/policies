@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-proc-mount
+spec:
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      procMount: null
