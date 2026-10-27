@@ -23,4 +23,5 @@ results:
   - gooding01
   - gooding02
   - exception-ingress
+  - null-rules
   result: pass

@@ -29,5 +29,5 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["ingresses"]
   validations:
-    - expression: "!object.spec.?rules.orValue([]).exists(rule, has(rule.host) && rule.host.contains('*') && !exceptions.allowedValues.exists(value, value == 'host:' + rule.host))"
+    - expression: "!(object.spec.?rules.orValue([]) == null ? [] : object.spec.?rules.orValue([])).exists(rule, has(rule.host) && rule.host.contains('*') && !exceptions.allowedValues.exists(value, value == 'host:' + rule.host))"
       message: "Wildcards are not permitted as hosts."
