@@ -10,6 +10,14 @@ spec:
     try:
     - apply:
         file: ../require-probes.yaml
+    - assert:
+        file: policy-ready.yaml
+  - name: step-02
+    try:
+    - apply:
+        file: audit-only-bad-pod.yaml
+    - delete:
+        file: audit-only-bad-pod.yaml
     - patch:
         resource:
           apiVersion: policies.kyverno.io/v1
@@ -20,10 +28,12 @@ spec:
             validationActions: [Deny]
     - assert:
         file: policy-ready.yaml
-  - name: step-02
-    try:
     - apply:
         file: good-pods.yaml
+    - apply:
+        file: legacy-regular-with-init.yaml
+    - delete:
+        file: legacy-regular-with-init.yaml
     - apply:
         file: good-podcontrollers.yaml
     - apply:

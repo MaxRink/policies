@@ -12,15 +12,18 @@ metadata:
       deployments, restarts, and upgrades. Liveness probes help the kubelet determine
       when to restart containers, while readiness probes help Services and Deployments
       determine when Pods are ready to receive traffic. Startup probes provide additional
-      control during container startup. This policy validates that all containers have
-      at least one of livenessProbe, readinessProbe, or startupProbe defined in Pods and
-      supported Pod controllers.
+      control during container startup. This policy audits regular containers in Pods
+      and supported Pod controllers for at least one of livenessProbe, readinessProbe,
+      or startupProbe.
     policies.kyverno.io/minversion: 1.19.1
 spec:
-  validationActions: ["Deny"]
+  validationActions: ["Audit"]
+  evaluation:
+    background:
+      enabled: true
   autogen:
     podControllers:
-      controllers: ["deployments", "statefulsets", "daemonsets", "jobs", "cronjobs", "replicasets", "replicationcontrollers"]
+      controllers: ["daemonsets", "deployments", "statefulsets"]
   matchConstraints:
     resourceRules:
     - apiGroups: [""]
@@ -40,13 +43,12 @@ spec:
       resources: ["replicationcontrollers"]
       operations: ["CREATE", "UPDATE"]
   variables:
-  - name: allContainers
+  - name: podSpec
     expression: >-
-      has(object.spec.containers) ?
-        object.spec.containers + object.spec.?initContainers.orValue([]) + object.spec.?ephemeralContainers.orValue([]) :
-        has(object.spec.template) ?
-          object.spec.template.spec.containers + object.spec.template.spec.?initContainers.orValue([]) + object.spec.template.spec.?ephemeralContainers.orValue([]) :
-          object.spec.jobTemplate.spec.template.spec.containers + object.spec.jobTemplate.spec.template.spec.?initContainers.orValue([]) + object.spec.jobTemplate.spec.template.spec.?ephemeralContainers.orValue([])
+      object.spec.?jobTemplate.?spec.?template.?spec.orValue(
+      object.spec.?template.?spec.orValue(object.spec))
+  - name: allContainers
+    expression: variables.podSpec.containers
   validations:
   - expression: >-
       variables.allContainers.all(container,
@@ -54,7 +56,7 @@ spec:
         has(container.livenessProbe) || has(container.readinessProbe) || has(container.startupProbe)
       )      
     messageExpression: >-
-      'All containers must have at least one probe (livenessProbe, readinessProbe, or startupProbe) defined. Missing probes in containers: ' + 
+      'All regular containers must have at least one probe (livenessProbe, readinessProbe, or startupProbe) defined. Missing probes in containers: ' +
       variables.allContainers.filter(container, 
         !(has(container.livenessProbe) || has(container.readinessProbe) || has(container.startupProbe))
       ).map(container, container.name).join(', ')
