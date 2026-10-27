@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bad-registry-controller-init
+  namespace: ir-pods-namespace
+spec:
+  selector:
+    matchLabels: {app: bad-registry-controller-init}
+  template:
+    metadata:
+      labels: {app: bad-registry-controller-init}
+    spec:
+      initContainers:
+      - name: setup
+        image: registry.k8s.io/busybox:1.36
+      containers:
+      - name: app
+        image: eu.foo.io/app:1.0

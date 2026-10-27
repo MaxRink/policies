@@ -33,3 +33,25 @@ spec:
   - name: busybox
     image: eu.foo.io/busybox
 
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: goodpod-sha384-registry
+  namespace: ir-pods-namespace
+spec:
+  containers:
+  - name: app
+    image: bar.io/app@sha384:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: goodpod-sha512-registry
+  namespace: ir-pods-namespace
+spec:
+  containers:
+  - name: app
+    image: eu.foo.io/app@sha512:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
