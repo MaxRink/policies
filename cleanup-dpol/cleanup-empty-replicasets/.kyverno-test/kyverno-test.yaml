@@ -1,0 +1,28 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: cleanup-empty-replicasets
+policies:
+  - ../cleanup-empty-replicasets.yaml
+resources:
+  - empty-replicaset.yaml
+  - missing-replicas.yaml
+  - null-replicas.yaml
+  - active-replicaset.yaml
+  - excepted-replicaset.yaml
+exceptions:
+  - exceptions.yaml
+results:
+  - policy: cleanup-empty-replicasets
+    kind: ReplicaSet
+    resources:
+      - empty-replicaset
+    result: pass
+  - policy: cleanup-empty-replicasets
+    kind: ReplicaSet
+    resources:
+      - missing-replicas
+      - null-replicas
+      - active-replicaset
+      - excepted-replicaset
+    result: fail

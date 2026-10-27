@@ -1,0 +1,7 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: excepted-replicaset
+  namespace: default
+spec:
+  replicas: 0

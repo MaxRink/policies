@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: preserve-excepted-replicaset
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - name: cleanup-empty-replicasets
+      kind: DeletingPolicy
+  matchConditions:
+    - name: exact-replicaset
+      expression: object.metadata.namespace == 'default' && object.metadata.name == 'excepted-replicaset'
