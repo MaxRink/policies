@@ -3,6 +3,7 @@ version: 1.0.0
 displayName: Restrict Pod Controller ServiceAccount Updates in ValidatingPolicy
 description: >-
   ServiceAccounts which have the ability to edit/patch workloads which they created may potentially use that privilege to update to a different ServiceAccount with higher privileges. This policy, intended to be run in `enforce` mode, blocks updates to Pod controllers if those updates modify the serviceAccountName field. Updates to Pods directly for this field are not possible as it is immutable once set.
+  Kyverno's default resourceFilters exclude ReplicaSets, so ReplicaSet updates are evaluated only when users remove those filters.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-pod-controller-serviceaccount-updates/restrict-pod-controller-serviceaccount-updates.yaml
@@ -13,6 +14,10 @@ keywords:
   - ValidatingPolicy
 readme: |
   ServiceAccounts which have the ability to edit/patch workloads which they created may potentially use that privilege to update to a different ServiceAccount with higher privileges. This policy, intended to be run in `enforce` mode, blocks updates to Pod controllers if those updates modify the serviceAccountName field. Updates to Pods directly for this field are not possible as it is immutable once set.
+
+  Jobs are included in the policy, but their Pod templates are immutable and cannot be changed after creation, so the Chainsaw test does not attempt Job updates. CronJob templates remain mutable and are covered by admission tests.
+
+  Kyverno's default `resourceFilters` exclude ReplicaSets (`ReplicaSet,*,*` and `ReplicaSet/?*,*,*`), so ReplicaSet checks are effective only when users remove those filters from Kyverno's configuration.
   
   ### Fine-grained PolicyException use
 
@@ -32,6 +37,6 @@ annotations:
   kyverno/category: "Other in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: c87c3a4e614de72a9d16592cccd70420521ef507183319b29e25027da9364438
+digest: 9800a8c3d07b32337512fe84348e9fbbc3466087894a14b53a26d365cfdf4081
 
 createdAt: "2025-05-11T17:46:10Z"

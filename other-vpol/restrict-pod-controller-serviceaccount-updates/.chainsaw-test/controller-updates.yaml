@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: unchanged-daemonset
+  namespace: restrict-sa-ns
+spec:
+  selector:
+    matchLabels:
+      app: unchanged-daemonset
+  template:
+    metadata:
+      labels:
+        app: unchanged-daemonset
+    spec:
+      serviceAccountName: serviceaccount01
+      containers:
+      - name: app
+        image: busybox
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: unchanged-statefulset
+  namespace: restrict-sa-ns
+spec:
+  serviceName: unchanged-statefulset
+  selector:
+    matchLabels:
+      app: unchanged-statefulset
+  template:
+    metadata:
+      labels:
+        app: unchanged-statefulset
+    spec:
+      serviceAccountName: serviceaccount01
+      containers:
+      - name: app
+        image: busybox
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: unchanged-replicationcontroller
+  namespace: restrict-sa-ns
+spec:
+  selector:
+    app: unchanged-replicationcontroller
+  template:
+    metadata:
+      labels:
+        app: unchanged-replicationcontroller
+    spec:
+      serviceAccountName: serviceaccount01
+      containers:
+      - name: app
+        image: busybox
