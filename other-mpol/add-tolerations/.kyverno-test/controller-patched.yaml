@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: controller-tolerations
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      tolerations:
+      - key: org.com/role
+        operator: Equal
+        value: service
+        effect: NoSchedule
+      containers:
+      - name: app
+        image: app:v1

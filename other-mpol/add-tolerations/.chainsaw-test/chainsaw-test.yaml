@@ -20,6 +20,12 @@ spec:
         file: kuttlresource.yaml
     - assert:
         file: resource-mutated.yaml
+  - name: step-03-replicationcontroller
+    try:
+    - apply:
+        file: rc-resource.yaml
+    - assert:
+        file: rc-mutated.yaml
   - name: step-03-exception
     try:
     - apply:
