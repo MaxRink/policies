@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: sibling-namespace
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: existing-label-namespace
+  labels:
+    app: user-value
+    mykey: user-value
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: exception-namespace
