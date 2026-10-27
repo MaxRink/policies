@@ -3,7 +3,7 @@ version: 1.0.1
 displayName: Cleanup Empty ReplicaSets
 createdAt: "2023-12-12T17:57:28.000Z"
 description: >-
-  This policy removes all empty ReplicaSets across the cluster without a retention period.
+  This policy removes zero-replica ReplicaSets whose creation timestamps are more than 30 seconds old. It checks once per minute.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/cleanup-dpol/cleanup-empty-replicasets/cleanup-empty-replicasets.yaml
@@ -13,7 +13,7 @@ keywords:
   - cleanup
   - replicaset
 readme: |
-  This policy removes all empty ReplicaSets across the cluster without a retention period. It runs once per minute and can therefore delete a newly scaled-down ReplicaSet on the next cycle.
+  This policy removes ReplicaSets with zero replicas whose `metadata.creationTimestamp` is more than 30 seconds old. It checks once per minute, so deletion occurs on a scheduled run after the age threshold. The age is measured from ReplicaSet creation, not from when its replica count became zero.
 
   ### PolicyException support
 
@@ -26,4 +26,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.27"
   kyverno/subject: "ReplicaSet"
-digest: c8a48e49162be0e927be571b754678adba8be9510e3872c42e784156367272d9
+digest: 7c39c5d7d51cb4f6b9565cbaea1e4b1302f866764e8eadb637a71b158ea01e1c
