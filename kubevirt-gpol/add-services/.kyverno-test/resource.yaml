@@ -7,3 +7,11 @@ metadata:
   labels:
     kubevirt.io/domain: vmi-name
 spec: {}
+---
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstance
+metadata:
+  name: exception-vmi
+  namespace: default
+  uid: feb5a62b-8784-41d2-b104-bf6ebc4a0001
+spec: {}
