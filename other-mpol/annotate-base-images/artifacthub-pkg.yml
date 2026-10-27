@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Annotate Base Images
 createdAt: "2023-04-10T20:30:03.000Z"
 description: >-
-  A base image used to construct a container image is not accessible by any Kubernetes component and not a field in a Pod spec as it must be fetched from a registry. Having this information available in the resource referencing the containers helps to provide a clearer understanding of its contents. This policy adds an annotation to a Pod or its controllers with the base image used for each container if present in an OCI annotation.
+  A base image used to construct a container image is not accessible by any Kubernetes component and not a field in a Pod spec as it must be fetched from a registry. Having this information available in the resource referencing regular containers helps to provide a clearer understanding of their contents. This policy adds an annotation to Pods for each regular container with an OCI base-image annotation.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-mpol/annotate-base-images/annotate-base-images.yaml
@@ -12,7 +12,7 @@ keywords:
   - kyverno
   - Other
 readme: |
-  A base image used to construct a container image is not accessible by any Kubernetes component and not a field in a Pod spec as it must be fetched from a registry. Having this information available in the resource referencing the containers helps to provide a clearer understanding of its contents. This policy adds an annotation to a Pod or its controllers with the base image used for each container if present in an OCI annotation.
+  A base image used to construct a container image is not accessible by any Kubernetes component and not a field in a Pod spec as it must be fetched from a registry. Having this information available in the resource referencing regular containers helps to provide a clearer understanding of their contents. This policy adds an annotation to Pods for each regular container with an OCI base-image annotation.
   
   ### Fine-grained PolicyException use
 
@@ -34,4 +34,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.23"
   kyverno/subject: "Pod"
-digest: 8686f62ab88c1e1a65874e480d718667909d3872ec7ee231e77d70a7b4a37318
+digest: 3d3c595e0d41e5f04f04b87f675a772f7ff6d4811962f0aaf877024c15c186fa
