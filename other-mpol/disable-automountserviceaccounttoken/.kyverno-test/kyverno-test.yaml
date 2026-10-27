@@ -6,6 +6,7 @@ policies:
 - ../disable-automountserviceaccounttoken.yaml
 resources:
 - resource.yaml
+- edge-resources.yaml
 - exception-resource.yaml
 exceptions:
 - exceptions.yaml
@@ -27,4 +28,15 @@ results:
   policy: disable-automountserviceaccounttoken
   resources: [team-b/default]
   result: pass
+  isMutatingPolicy: true
+- kind: ServiceAccount
+  patchedResources: edge-patched.yaml
+  policy: disable-automountserviceaccounttoken
+  resources: [team-c/default, team-d/default]
+  result: pass
+  isMutatingPolicy: true
+- kind: ServiceAccount
+  policy: disable-automountserviceaccounttoken
+  resources: [demo-sa]
+  result: skip
   isMutatingPolicy: true
