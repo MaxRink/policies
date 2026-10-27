@@ -1,0 +1,23 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-devicetaintrule-empty-selector-exception
+policies:
+  - ../restrict-devicetaintrule-empty-selector.yaml
+resources:
+  - resources.yaml
+exceptions:
+  - exceptions.yaml
+results:
+  - isValidatingPolicy: true
+    policy: restrict-devicetaintrule-empty-selector
+    kind: DeviceTaintRule
+    resources:
+      - exception-empty-selector
+    result: pass
+  - isValidatingPolicy: true
+    policy: restrict-devicetaintrule-empty-selector
+    kind: DeviceTaintRule
+    resources:
+      - unexcepted-empty-selector
+    result: fail

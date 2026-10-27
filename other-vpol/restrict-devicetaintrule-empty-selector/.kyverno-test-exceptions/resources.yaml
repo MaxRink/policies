@@ -1,0 +1,19 @@
+apiVersion: resource.k8s.io/v1beta2
+kind: DeviceTaintRule
+metadata:
+  name: exception-empty-selector
+spec:
+  deviceSelector: {}
+  taint:
+    key: test.example.com/exception-empty
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1beta2
+kind: DeviceTaintRule
+metadata:
+  name: unexcepted-empty-selector
+spec:
+  deviceSelector: {}
+  taint:
+    key: test.example.com/unexcepted-empty
+    effect: NoSchedule

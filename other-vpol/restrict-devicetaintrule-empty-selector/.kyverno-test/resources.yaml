@@ -1,0 +1,116 @@
+apiVersion: resource.k8s.io/v1beta2
+kind: DeviceTaintRule
+metadata:
+  name: no-selector
+spec:
+  taint:
+    key: test.example.com/no-selector
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1beta2
+kind: DeviceTaintRule
+metadata:
+  name: null-selector
+spec:
+  deviceSelector: null
+  taint:
+    key: test.example.com/null-selector
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1beta2
+kind: DeviceTaintRule
+metadata:
+  name: empty-selector
+spec:
+  deviceSelector: {}
+  taint:
+    key: test.example.com/empty-selector
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1beta2
+kind: DeviceTaintRule
+metadata:
+  name: empty-fields-selector
+spec:
+  deviceSelector:
+    driver: ""
+    pool: ""
+    device: ""
+  taint:
+    key: test.example.com/empty-fields
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1beta2
+kind: DeviceTaintRule
+metadata:
+  name: scoped-selector
+spec:
+  deviceSelector:
+    driver: gpu.example.com
+  taint:
+    key: test.example.com/driver
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1beta2
+kind: DeviceTaintRule
+metadata:
+  name: pool-selector
+spec:
+  deviceSelector:
+    pool: worker-a
+  taint:
+    key: test.example.com/pool
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1beta2
+kind: DeviceTaintRule
+metadata:
+  name: device-selector
+spec:
+  deviceSelector:
+    device: gpu-0
+  taint:
+    key: test.example.com/device
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1
+kind: DeviceTaintRule
+metadata:
+  name: v1-empty-selector
+spec:
+  deviceSelector: {}
+  taint:
+    key: test.example.com/v1-empty
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1
+kind: DeviceTaintRule
+metadata:
+  name: v1-scoped-selector
+spec:
+  deviceSelector:
+    device: gpu-1
+  taint:
+    key: test.example.com/v1-device
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1alpha3
+kind: DeviceTaintRule
+metadata:
+  name: alpha3-empty-selector
+spec:
+  deviceSelector: {}
+  taint:
+    key: test.example.com/alpha3-empty
+    effect: NoSchedule
+---
+apiVersion: resource.k8s.io/v1alpha3
+kind: DeviceTaintRule
+metadata:
+  name: alpha3-scoped-selector
+spec:
+  deviceSelector:
+    device: gpu-2
+  taint:
+    key: test.example.com/alpha3-device
+    effect: NoSchedule

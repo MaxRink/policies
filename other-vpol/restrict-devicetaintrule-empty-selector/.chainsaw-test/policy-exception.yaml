@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: empty-device-selector-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: restrict-devicetaintrule-empty-selector
+  matchConditions:
+    - name: exact-device-taint-rule
+      expression: request.name == 'chainsaw-exception-selector' && request.operation == 'CREATE'
+  allowedValues:
+    - restrict-devicetaintrule-empty-selector:allow-exact-empty-selector
