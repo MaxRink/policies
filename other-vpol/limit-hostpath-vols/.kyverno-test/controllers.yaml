@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hostpath-bad-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hostpath-bad-deployment
+  template:
+    metadata:
+      labels:
+        app: hostpath-bad-deployment
+    spec:
+      containers:
+      - {name: app, image: busybox}
+      volumes:
+      - name: host
+        hostPath:
+          path: /etc

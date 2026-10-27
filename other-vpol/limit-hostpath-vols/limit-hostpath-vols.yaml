@@ -28,13 +28,24 @@ spec:
     - apiGroups:   [""]
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
-      resources:   ["pods"]
+      resources:   ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
   matchConditions:
     - name: "has-host-path-volume"
-      expression: "object.spec.?volumes.orValue([]).exists(volume, has(volume.hostPath))"
+      expression: "object.spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec.?template.?spec.orValue(object.spec)).?volumes.orValue([]).exists(volume, has(volume.hostPath))"
+  variables:
+    - name: podSpec
+      expression: "object.spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec.?template.?spec.orValue(object.spec))"
   validations:
     - expression: >-
-        object.spec.volumes.all(volume, !has(volume.hostPath) ||
+        variables.podSpec.volumes.all(volume, !has(volume.hostPath) ||
         volume.hostPath.path == '/data' ||
         (volume.hostPath.path.startsWith('/data/') &&
         !volume.hostPath.path.split('/').exists(segment, segment == '..')) ||
