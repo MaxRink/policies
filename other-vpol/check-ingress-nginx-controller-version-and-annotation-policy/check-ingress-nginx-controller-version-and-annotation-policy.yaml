@@ -12,7 +12,7 @@ metadata:
     policies.kyverno.io/subject: Ingress, Pod
     policies.kyverno.io/description: >-
       This policy ensures that Ingress resources do not have certain disallowed annotations and that the ingress-nginx
-      controller Pod is running an appropriate version of the image. It checks for the presence of the 
+      controller Pod is running version 1.11.2 or higher. It checks for the presence of the
       `nginx.ingress.kubernetes.io/server-snippet` annotation and disallows its usage, enforces specific values 
       for `auth-tls-verify-client`, and ensures that the ingress-nginx controller image is of the required version.
 spec:
@@ -31,6 +31,10 @@ spec:
     expression: "object.metadata.?annotations[?'nginx.ingress.kubernetes.io/auth-tls-verify-client'].orValue('')"
   - name: validAuthTlsValues
     expression: "['on', 'off', 'optional', 'optional_no_ca']"
+  - name: controllerVersionPattern
+    expression: "'^v(0|[1-9][0-9]*)\\\\.(0|[1-9][0-9]*)\\\\.(0|[1-9][0-9]*)$'"
+  - name: minimumControllerVersion
+    expression: "semver('1.11.2')"
   matchConstraints:
     resourceRules:
     - resources:
@@ -63,17 +67,7 @@ spec:
     expression: >-
       !variables.isPod || variables.controllerContainers.all(c,
         (has(exceptions.allowedImages) && c.image in exceptions.allowedImages) ||
-        (c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.11.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.11.0') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.11.1') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.10.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.9.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.8.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.7.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.6.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.5.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.4.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.3.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.2.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.1.') &&
-        !c.image.startsWith('registry.k8s.io/ingress-nginx/controller:v1.0.')))
+        (image(c.image).registry() == 'registry.k8s.io' &&
+        image(c.image).repository() == 'ingress-nginx/controller' &&
+        image(c.image).tag().matches(variables.controllerVersionPattern) &&
+        !semver(image(c.image).tag().substring(1)).isLessThan(variables.minimumControllerVersion)))
