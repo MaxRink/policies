@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-emptydir-fail-pod
+spec:
+  initContainers:
+    - name: init
+      image: busybox:1.36
+      volumeMounts:
+        - name: cache
+          mountPath: /cache
+  containers:
+    - name: app
+      image: nginx:1.25
+  volumes:
+    - name: cache
+      emptyDir: {}
