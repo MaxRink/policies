@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: ingress-controller-rc
+spec:
+  replicas: 1
+  selector:
+    app: ingress-controller-rc
+  template:
+    metadata:
+      labels:
+        app: ingress-controller-rc
+    spec:
+      containers:
+      - name: controller
+        image: registry.k8s.io/ingress-nginx/controller:v1.11.0

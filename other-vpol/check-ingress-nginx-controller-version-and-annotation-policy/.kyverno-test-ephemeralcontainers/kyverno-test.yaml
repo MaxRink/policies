@@ -1,0 +1,34 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: ingress-controller-ephemeralcontainers
+policies:
+- ../check-ingress-nginx-controller-version-and-annotation-policy.yaml
+resources:
+- resource.yaml
+values:
+  subresources:
+  - parentResource:
+      name: pods
+      singularName: pod
+      namespaced: true
+      kind: Pod
+      version: v1
+    subresource:
+      name: pods/ephemeralcontainers
+      singularName: pod
+      namespaced: true
+      kind: Pod
+      version: v1
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  operation: UPDATE
+  policy: check-ingress-nginx-controller-version-and-annotation-policy
+  resourceSpecs:
+  - group: ""
+    version: v1
+    kind: Pod
+    name: ephemeral-controller
+    subresource: ephemeralcontainers
+  result: fail
