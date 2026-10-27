@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-added-capabilities
+spec:
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      capabilities:
+        add: null
+        drop:
+        - ALL
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-drop-capabilities
+spec:
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      capabilities:
+        add: []
+        drop: null
