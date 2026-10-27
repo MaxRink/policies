@@ -28,21 +28,39 @@ spec:
       - apiGroups:   [""]
         apiVersions: ["v1"]
         operations:  ["CREATE", "UPDATE"]
-        resources:   ["pods"]
+        resources:   ["pods", "replicationcontrollers"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs", "cronjobs"]
+      - apiGroups: [""]
+        apiVersions: ["v1"]
+        operations: ["UPDATE"]
+        resources: ["pods/ephemeralcontainers"]
   variables:
+    - name: podSpec
+      expression: >-
+        object.spec.?jobTemplate.?spec.?template.?spec.orValue(
+        object.spec.?template.?spec.orValue(object.spec))
     - name: allContainers
       expression: >-
-        object.spec.containers +
-        object.spec.?initContainers.orValue([]) +
-        object.spec.?ephemeralContainers.orValue([])
+        variables.podSpec.containers +
+        variables.podSpec.?initContainers.orValue([]) +
+        variables.podSpec.?ephemeralContainers.orValue([])
     - name: allowedTypes
       expression: "['RuntimeDefault', 'Localhost']"
     - name: annotations
-      expression: "has(object.metadata) ? object.metadata.?annotations.orValue({}) : {}"
+      expression: >-
+        object.spec.?jobTemplate.?spec.?template.?metadata.?annotations.orValue(
+        object.spec.?template.?metadata.?annotations.orValue(object.metadata.?annotations.orValue({})))
   validations:
     - expression: >-
-        (!has(object.spec.securityContext) || !has(object.spec.securityContext.appArmorProfile) ||
-          object.spec.securityContext.appArmorProfile.?type.orValue('') in variables.allowedTypes) &&
+        (!has(variables.podSpec.securityContext) || !has(variables.podSpec.securityContext.appArmorProfile) ||
+          variables.podSpec.securityContext.appArmorProfile.?type.orValue('') in variables.allowedTypes) &&
         variables.allContainers.all(container,
           !has(container.securityContext) || !has(container.securityContext.appArmorProfile) ||
           container.securityContext.appArmorProfile.?type.orValue('') in variables.allowedTypes) &&
