@@ -6,6 +6,7 @@ policies:
 - ../enforce-pod-duration.yaml
 resources:
 - resources.yaml
+- replicationcontroller.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -20,3 +21,9 @@ results:
   resources:
   - test-lifetime-pass
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: pod-lifetime
+  resources:
+  - lifetime-bad-rc
+  result: fail
