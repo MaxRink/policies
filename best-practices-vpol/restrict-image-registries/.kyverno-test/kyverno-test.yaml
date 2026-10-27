@@ -16,6 +16,8 @@ results:
   - badpod01
   - badpod03
   - badpod04
+  - badpod-init-unapproved
+  - badpod-ephemeral-unapproved
   result: fail
 - isValidatingPolicy: true
   kind: Pod
@@ -59,6 +61,11 @@ results:
   kind: Deployment
   policy: restrict-image-registries
   resources: [badcontroller-deployment]
+  result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: restrict-image-registries
+  resources: [badcontroller-init]
   result: fail
 - isValidatingPolicy: true
   kind: StatefulSet

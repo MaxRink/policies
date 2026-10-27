@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-registry-init
+  namespace: ir-pods-namespace
+spec:
+  initContainers:
+  - name: setup
+    image: registry.k8s.io/busybox:1.36
+  containers:
+  - name: app
+    image: eu.foo.io/app:1.0

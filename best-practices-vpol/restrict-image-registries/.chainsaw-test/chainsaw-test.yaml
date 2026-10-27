@@ -63,15 +63,26 @@ spec:
         - check:
             (contains($error, 'Policy restrict-image-registries failed')): true
         file: bad-pod-false.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy restrict-image-registries failed')): true
+        file: bad-pod-init-unapproved.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy restrict-image-registries failed')): true
+        file: bad-podcontroller-init.yaml
   - name: step-03
     try:
     - script:
-        content: | 
+        content: |
+                NAMESPACE=ir-pods-namespace
                 if kubectl debug goodpod02-registry \
                 --profile=general \
                 --image=busybox:1.35 \
                 --target=k8s-nginx \
-                -n ir-pods-namespace; then
+                -n "$NAMESPACE"; then
                 exit 1
                 else
                 exit 0
@@ -79,9 +90,14 @@ spec:
 
   - name: step-98
     try:
+    - script:
+        content: |
+          NAMESPACE=ir-pods-namespace
+          kubectl delete pod bad-registry-init --ignore-not-found -n "$NAMESPACE"
+          kubectl delete deployment bad-registry-controller-init --ignore-not-found -n "$NAMESPACE"
+          kubectl delete pods goodpod01-registry goodpod02-registry --ignore-not-found --force --grace-period=0 -n "$NAMESPACE"
+          kubectl delete namespace "$NAMESPACE" --ignore-not-found
     - delete:
         file: rbac-ephemeralcontainers.yaml
     - delete:
         file: rbac-ephemeralcontainers-reports.yaml
-    - script:
-        content: kubectl delete pods --all --force --grace-period=0 -n ir-pods-namespace
