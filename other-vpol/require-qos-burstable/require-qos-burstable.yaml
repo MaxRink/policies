@@ -51,17 +51,19 @@ spec:
         variables.qosContainers.exists(container,
         (has(container.resources) &&
         ((has(container.resources.requests) &&
-        ((has(container.resources.requests.cpu) && quantity(container.resources.requests.cpu) != quantity('0')) ||
-        (has(container.resources.requests.memory) && quantity(container.resources.requests.memory) != quantity('0')))) ||
+        ((has(container.resources.requests.cpu) && container.resources.requests.cpu != null && quantity(container.resources.requests.cpu) != quantity('0')) ||
+        (has(container.resources.requests.memory) && container.resources.requests.memory != null && quantity(container.resources.requests.memory) != quantity('0')))) ||
         (has(container.resources.limits) &&
-        ((has(container.resources.limits.cpu) && quantity(container.resources.limits.cpu) != quantity('0')) ||
-        (has(container.resources.limits.memory) && quantity(container.resources.limits.memory) != quantity('0')))))))
+        ((has(container.resources.limits.cpu) && container.resources.limits.cpu != null && quantity(container.resources.limits.cpu) != quantity('0')) ||
+        (has(container.resources.limits.memory) && container.resources.limits.memory != null && quantity(container.resources.limits.memory) != quantity('0')))))))
     - name: isGuaranteed
       expression: >-
         variables.qosContainers.all(container,
         has(container.resources) && has(container.resources.requests) && has(container.resources.limits) &&
         has(container.resources.requests.cpu) && has(container.resources.limits.cpu) &&
         has(container.resources.requests.memory) && has(container.resources.limits.memory) &&
+        container.resources.requests.cpu != null && container.resources.limits.cpu != null &&
+        container.resources.requests.memory != null && container.resources.limits.memory != null &&
         quantity(container.resources.requests.cpu) != quantity('0') &&
         quantity(container.resources.requests.memory) != quantity('0') &&
         quantity(container.resources.limits.cpu) != quantity('0') &&
