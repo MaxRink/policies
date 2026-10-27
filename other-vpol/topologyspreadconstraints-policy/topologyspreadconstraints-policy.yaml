@@ -30,7 +30,7 @@ spec:
         resources: ["deployments", "statefulsets"]
   matchConditions:
     - name: "replicas-must-be-3-or-more"
-      expression: "object.spec.replicas >= 3"
+      expression: "object.spec.?replicas.orValue(null) != null && object.spec.replicas >= 3"
   validations:
     - expression: >-
         size(object.spec.template.spec.?topologySpreadConstraints.orValue([]).filter(t, t.topologyKey == 'kubernetes.io/hostname' || t.topologyKey == 'topology.kubernetes.io/zone')) == 2 || 'topologySpreadConstraints:missing' in exceptions.allowedValues
