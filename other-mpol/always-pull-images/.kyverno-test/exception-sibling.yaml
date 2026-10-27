@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: image-exception-sibling
+  namespace: team-a
+spec:
+  containers:
+  - name: first
+    image: registry.example/skip-first:1
+  - name: second
+    image: registry.example/mutate-middle:1
