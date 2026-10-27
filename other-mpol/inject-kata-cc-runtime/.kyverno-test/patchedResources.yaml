@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: coco-enabled-pod
+  namespace: default
+  labels:
+    coco: enabled
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+  runtimeClassName: kata-cc
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: coco-enabled-existing-runtime
+  namespace: default
+  labels:
+    coco: enabled
+spec:
+  containers:
+  - image: nginx:latest
+    name: nginx
+  runtimeClassName: kata-cc
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: coco-enabled-multiple-labels
+  namespace: test-namespace
+  labels:
+    app: web
+    coco: enabled
+    tier: frontend
+spec:
+  containers:
+  - image: httpd:2.4
+    name: web-server
+  - image: busybox:latest
+    name: sidecar
+  runtimeClassName: kata-cc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coco-deployment
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: coco-app
+  template:
+    metadata:
+      labels:
+        app: coco-app
+        coco: enabled
+    spec:
+      containers:
+      - image: nginx:latest
+        name: app
+      runtimeClassName: kata-cc
