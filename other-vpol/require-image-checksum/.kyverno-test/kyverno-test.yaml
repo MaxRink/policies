@@ -8,6 +8,8 @@ resources:
 - resource.yaml
 - replicationcontroller-bad.yaml
 - invalid-digest-pod.yaml
+- ephemeral-subresource-pod.yaml
+variables: values.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -26,6 +28,12 @@ results:
   policy: require-image-checksum
   resources:
   - invalid-digest-pod
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: require-image-checksum
+  resources:
+  - ephemeral-image-pod
   result: fail
 - isValidatingPolicy: true
   kind: ReplicationController
