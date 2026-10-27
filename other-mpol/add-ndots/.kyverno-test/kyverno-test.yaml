@@ -6,10 +6,24 @@ policies:
 - ../add-ndots.yaml
 resources:
 - resource.yaml
+- null-resource.yaml
+- null-options-resource.yaml
 - exception-resource.yaml
 exceptions:
 - exceptions.yaml
 results:
+- kind: Pod
+  patchedResources: null-options-patched.yaml
+  policy: add-ndots
+  resources: [null-dns-options]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: null-patched.yaml
+  policy: add-ndots
+  resources: [null-dns-config]
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: patchedResource.yaml
   policy: add-ndots
