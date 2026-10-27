@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Other in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Service"
-digest: 1990baff3577deb0b6c8d980288717284737fca0c7b926852d327a2aefc8d1e2
+digest: 42099b321b2fde5e3393b64ba34d4002fc2f113bf13e8f5d12d70bffea147ed3
 
 
 createdAt: "2025-05-11T17:46:12Z"
