@@ -1,0 +1,27 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: exception-admin-template
+  namespace: team-a
+spec:
+  spec:
+    devices:
+      requests:
+        - name: device
+          exactly:
+            deviceClassName: gpu.example.com
+            adminAccess: true
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaimTemplate
+metadata:
+  name: unauthorized-template-sibling
+  namespace: team-a
+spec:
+  spec:
+    devices:
+      requests:
+        - name: device
+          exactly:
+            deviceClassName: gpu.example.com
+            adminAccess: true

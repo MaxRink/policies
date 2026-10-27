@@ -1,0 +1,92 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: restrict-dra-adminaccess-claims
+  annotations:
+    policies.kyverno.io/title: Restrict DRA AdminAccess Claims
+    policies.kyverno.io/category: Other
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/minversion: 1.19.1
+    policies.kyverno.io/kubernetes-version: "1.34"
+    policies.kyverno.io/subject: ResourceClaim, ResourceClaimTemplate
+    policies.kyverno.io/description: >-
+      Kubernetes 1.34+ requires the containing namespace to carry
+      resource.kubernetes.io/admin-access=true before a ResourceClaim or
+      ResourceClaimTemplate can request DRA adminAccess. That built-in check
+      does not distinguish requesters. This policy adds a SubjectAccessReview
+      for a dedicated resourceclaims/adminaccess or
+      resourceclaimtemplates/adminaccess create permission.
+      ResourceClaims generated from an authorized template are created by
+      kube-controller-manager's resource-claim controller, which this policy
+      exempts from the second check.
+spec:
+  evaluation:
+    background:
+      enabled: false
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - resource.k8s.io
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - resourceclaims
+          - resourceclaimtemplates
+  variables:
+    - name: requestsAdminAccess
+      expression: >-
+        request.resource.resource == 'resourceclaimtemplates'
+          ? object.spec.?spec.?devices.?requests.orValue([]).exists(request, request.?exactly.?adminAccess.orValue(false))
+          : object.spec.?devices.?requests.orValue([]).exists(request, request.?exactly.?adminAccess.orValue(false))
+    - name: resourceClaimController
+      expression: >-
+        request.resource.resource == 'resourceclaims' &&
+        request.?userInfo.?username.orValue('') == 'system:serviceaccount:kube-system:resource-claim-controller'
+    - name: hasAdminAccessException
+      expression: >-
+        exceptions.allowedValues.orValue([]).exists(
+          value, value == 'restrict-dra-adminaccess-claims:allow-exact-request')
+    - name: requiresAuthorization
+      expression: >-
+        variables.requestsAdminAccess &&
+        !variables.resourceClaimController &&
+        !variables.hasAdminAccessException
+    - name: subjectAccessReviewRequest
+      expression: >-
+        variables.requiresAuthorization
+          ? {
+              "kind": dyn("SubjectAccessReview"),
+              "apiVersion": dyn("authorization.k8s.io/v1"),
+              "spec": dyn({
+                "resourceAttributes": dyn({
+                  "group": "resource.k8s.io",
+                  "resource": request.resource.resource,
+                  "subresource": "adminaccess",
+                  "namespace": string(object.metadata.namespace),
+                  "verb": "create"
+                }),
+                "user": dyn(request.userInfo.username),
+                "groups": dyn(request.userInfo.groups)
+              })
+            }
+          : {}
+    - name: subjectAccessReview
+      expression: >-
+        variables.requiresAuthorization
+          ? resource.Post("authorization.k8s.io/v1", "subjectaccessreviews", variables.subjectAccessReviewRequest)
+          : {}
+  validations:
+    - expression: >-
+        !variables.requestsAdminAccess ||
+        variables.resourceClaimController ||
+        variables.hasAdminAccessException ||
+        (has(variables.subjectAccessReview.status) && variables.subjectAccessReview.status.allowed == true)
+      messageExpression: >-
+        'Requesting DRA adminAccess requires the resource.k8s.io ' +
+        request.resource.resource +
+        '/adminaccess create permission. Ask a cluster administrator to grant this synthetic permission to the requesting identity.'

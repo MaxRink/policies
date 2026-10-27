@@ -1,0 +1,260 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-dra-adminaccess-claims
+spec:
+  steps:
+    - name: shared-exception-namespace
+      skipDelete: true
+      try:
+        - apply:
+            file: policy-exceptions-namespace.yaml
+    - name: apply-policy-and-rbac
+      try:
+        - apply:
+            file: ../restrict-dra-adminaccess-claims.yaml
+        - patch:
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              metadata:
+                name: restrict-dra-adminaccess-claims
+              spec:
+                validationActions:
+                  - Deny
+        - assert:
+            file: policy-ready.yaml
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" apply -f - <<'YAML'
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: Role
+              metadata:
+                name: dra-claim-creators
+              rules:
+                - apiGroups: ["resource.k8s.io"]
+                  resources: ["resourceclaims", "resourceclaimtemplates"]
+                  verbs: ["create"]
+              ---
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: RoleBinding
+              metadata:
+                name: dra-claim-creators
+              subjects:
+                - kind: User
+                  name: dra-adminaccess-allowed
+                - kind: User
+                  name: dra-adminaccess-denied
+              roleRef:
+                kind: Role
+                name: dra-claim-creators
+                apiGroup: rbac.authorization.k8s.io
+              ---
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: Role
+              metadata:
+                name: dra-adminaccess-allowed
+              rules:
+                - apiGroups: ["resource.k8s.io"]
+                  resources: ["resourceclaims/adminaccess", "resourceclaimtemplates/adminaccess"]
+                  verbs: ["create"]
+              ---
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: RoleBinding
+              metadata:
+                name: dra-adminaccess-allowed
+              subjects:
+                - kind: User
+                  name: dra-adminaccess-allowed
+              roleRef:
+                kind: Role
+                name: dra-adminaccess-allowed
+                apiGroup: rbac.authorization.k8s.io
+              YAML
+              kubectl label namespace "$NAMESPACE" resource.kubernetes.io/admin-access=true --overwrite
+              kubectl -n policy-exceptions apply -f - <<YAML
+              apiVersion: policies.kyverno.io/v1
+              kind: PolicyException
+              metadata:
+                name: claim-adminaccess-exception
+                namespace: policy-exceptions
+              spec:
+                policyRefs:
+                  - kind: ValidatingPolicy
+                    name: restrict-dra-adminaccess-claims
+                matchConditions:
+                  - name: exact-claim
+                    expression: request.namespace == '$NAMESPACE' && request.name == 'exception-admin-claim' && request.resource.resource == 'resourceclaims' && request.operation == 'CREATE'
+                allowedValues:
+                  - restrict-dra-adminaccess-claims:allow-exact-request
+              ---
+              apiVersion: policies.kyverno.io/v1
+              kind: PolicyException
+              metadata:
+                name: template-adminaccess-exception
+                namespace: policy-exceptions
+              spec:
+                policyRefs:
+                  - kind: ValidatingPolicy
+                    name: restrict-dra-adminaccess-claims
+                matchConditions:
+                  - name: exact-template
+                    expression: request.namespace == '$NAMESPACE' && request.name == 'exception-admin-template' && request.resource.resource == 'resourceclaimtemplates' && request.operation == 'CREATE'
+                allowedValues:
+                  - restrict-dra-adminaccess-claims:allow-exact-request
+              YAML
+              cat <<'YAML' | kubectl -n "$NAMESPACE" --as=dra-adminaccess-denied create -f -
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: exception-admin-claim
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: gpu.example.com
+                        adminAccess: true
+              YAML
+              cat <<'YAML' | kubectl -n "$NAMESPACE" --as=dra-adminaccess-denied create -f -
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: ordinary-claim
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: gpu.example.com
+              YAML
+              if output=$(kubectl -n "$NAMESPACE" --as=dra-adminaccess-denied create -f - 2>&1 <<'YAML'
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: denied-admin-claim
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: gpu.example.com
+                        adminAccess: true
+              YAML
+              ); then
+                printf '%s\n' "$output"
+                echo "expected a denied SubjectAccessReview to reject the claim"
+                exit 1
+              else
+                printf '%s\n' "$output"
+                printf '%s\n' "$output" | grep -Fq 'Requesting DRA adminAccess requires the resource.k8s.io'
+              fi
+              cat <<'YAML' | kubectl -n "$NAMESPACE" --as=dra-adminaccess-allowed create -f -
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: allowed-admin-claim
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: gpu.example.com
+                        adminAccess: true
+              YAML
+              if output=$(kubectl -n "$NAMESPACE" --as=dra-adminaccess-denied create -f - 2>&1 <<'YAML'
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaimTemplate
+              metadata:
+                name: denied-admin-template
+              spec:
+                spec:
+                  devices:
+                    requests:
+                      - name: device
+                        exactly:
+                          deviceClassName: gpu.example.com
+                          adminAccess: true
+              YAML
+              ); then
+                printf '%s\n' "$output"
+                echo "expected a denied SubjectAccessReview to reject the template"
+                exit 1
+              else
+                printf '%s\n' "$output"
+                printf '%s\n' "$output" | grep -Fq 'Requesting DRA adminAccess requires the resource.k8s.io'
+              fi
+              cat <<'YAML' | kubectl -n "$NAMESPACE" --as=dra-adminaccess-denied create -f -
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaimTemplate
+              metadata:
+                name: exception-admin-template
+              spec:
+                spec:
+                  devices:
+                    requests:
+                      - name: device
+                        exactly:
+                          deviceClassName: gpu.example.com
+                          adminAccess: true
+              YAML
+              cat <<'YAML' | kubectl -n "$NAMESPACE" --as=dra-adminaccess-allowed create -f -
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaimTemplate
+              metadata:
+                name: allowed-admin-template
+              spec:
+                spec:
+                  devices:
+                    requests:
+                      - name: device
+                        exactly:
+                          deviceClassName: gpu.example.com
+                          adminAccess: true
+              YAML
+              kubectl -n "$NAMESPACE" create -f - <<'YAML'
+              apiVersion: v1
+              kind: Pod
+              metadata:
+                name: claim-template-consumer
+              spec:
+                resourceClaims:
+                  - name: device
+                    resourceClaimTemplateName: allowed-admin-template
+                containers:
+                  - name: pause
+                    image: registry.k8s.io/pause:3.10
+                    resources:
+                      claims:
+                        - name: device
+              YAML
+              generated_claim=''
+              for attempt in $(seq 1 60); do
+                claims=$(kubectl -n "$NAMESPACE" get resourceclaims -o jsonpath='{range .items[*]}{.metadata.name}{" "}{range .metadata.ownerReferences[*]}{.kind}:{.name}{" "}{end}{"\n"}{end}')
+                generated_claim=$(printf '%s\n' "$claims" | awk '$0 ~ /Pod:claim-template-consumer/ {print $1; exit}')
+                if [ -n "$generated_claim" ]; then
+                  break
+                fi
+                sleep 1
+              done
+              if [ -z "$generated_claim" ]; then
+                printf '%s\n' "$claims"
+                echo "resource-claim controller did not create a claim from the approved template"
+                exit 1
+              fi
+              admin_access=$(kubectl -n "$NAMESPACE" get resourceclaim "$generated_claim" -o jsonpath='{.spec.devices.requests[0].exactly.adminAccess}')
+              test "$admin_access" = true
+      finally:
+        - script:
+            content: |
+              generated_claim=$(kubectl -n "$NAMESPACE" get resourceclaims -o jsonpath='{range .items[*]}{.metadata.name}{" "}{range .metadata.ownerReferences[*]}{.kind}:{.name}{" "}{end}{"\n"}{end}' 2>/dev/null | awk '$0 ~ /Pod:claim-template-consumer/ {print $1; exit}' || true)
+              kubectl -n "$NAMESPACE" delete pods claim-template-consumer --wait=true --ignore-not-found=true
+              if [ -n "$generated_claim" ]; then
+                kubectl -n "$NAMESPACE" delete resourceclaims "$generated_claim" --ignore-not-found=true
+              fi
+              kubectl -n "$NAMESPACE" delete rolebindings dra-claim-creators dra-adminaccess-allowed --ignore-not-found=true
+              kubectl -n "$NAMESPACE" delete roles dra-claim-creators dra-adminaccess-allowed --ignore-not-found=true
+              kubectl -n "$NAMESPACE" delete resourceclaims ordinary-claim exception-admin-claim denied-admin-claim allowed-admin-claim --ignore-not-found=true
+              kubectl -n "$NAMESPACE" delete resourceclaimtemplates exception-admin-template denied-admin-template allowed-admin-template --ignore-not-found=true
+              kubectl -n policy-exceptions delete policyexceptions.policies.kyverno.io claim-adminaccess-exception template-adminaccess-exception --ignore-not-found=true
