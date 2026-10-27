@@ -18,11 +18,27 @@ metadata:
   namespace: myservice
 spec:
   containers:
-    - env:
-        - name: DISABLE_OPA
-          value: "true"
-      image: quay.io/sdase/sdase-version-collector
-      name: myservice
+  - env:
+    - name: DISABLE_OPA
+      value: "true"
+    image: quay.io/sdase/sdase-version-collector
+    name: myservice
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-opa-enabled-init
+  namespace: myservice
+spec:
+  initContainers:
+  - name: setup
+    image: busybox
+    env:
+    - name: DISABLE_OPA
+      value: "true"
+  containers:
+  - name: app
+    image: busybox
 ---
 apiVersion: v1
 kind: Pod
@@ -33,4 +49,24 @@ spec:
   containers:
     - image: quay.io/sdase/sdase-version-collector
       name: myservice
-
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc-with-opa-enabled
+  namespace: myservice
+spec:
+  replicas: 1
+  selector:
+    app: rc-with-opa-enabled
+  template:
+    metadata:
+      labels:
+        app: rc-with-opa-enabled
+    spec:
+      containers:
+      - name: app
+        image: busybox
+        env:
+        - name: DISABLE_OPA
+          value: "true"

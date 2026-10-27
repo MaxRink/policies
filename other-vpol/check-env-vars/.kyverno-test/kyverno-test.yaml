@@ -11,6 +11,7 @@ results:
   policy: check-env-vars
   resources:
   - pod-with-opa-enabled
+  - pod-with-opa-enabled-init
   result: fail
 - kind: Pod
   policy: check-env-vars
@@ -18,3 +19,8 @@ results:
   - pod-with-opa-disabled
   - pod-without-opa-env
   result: pass
+- kind: ReplicationController
+  policy: check-env-vars
+  resources:
+  - myservice/rc-with-opa-enabled
+  result: fail

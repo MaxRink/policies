@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: opa-disabled-rc
+spec:
+  replicas: 1
+  selector:
+    app: opa-disabled-rc
+  template:
+    metadata:
+      labels:
+        app: opa-disabled-rc
+    spec:
+      containers:
+      - name: app
+        image: busybox
+        env:
+        - name: DISABLE_OPA
+          value: "true"

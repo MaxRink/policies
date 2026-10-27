@@ -1,0 +1,35 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: check-env-vars-ephemeralcontainers
+policies:
+- ../check-env-vars.yaml
+resources:
+- resource.yaml
+values:
+  subresources:
+  - parentResource:
+      name: pods
+      singularName: pod
+      namespaced: true
+      kind: Pod
+      version: v1
+    subresource:
+      name: pods/ephemeralcontainers
+      singularName: pod
+      namespaced: true
+      kind: Pod
+      version: v1
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  operation: UPDATE
+  policy: check-env-vars
+  resourceSpecs:
+  - group: ""
+    version: v1
+    kind: Pod
+    namespace: myservice
+    name: pod-with-opa-enabled-ephemeral
+    subresource: ephemeralcontainers
+  result: fail

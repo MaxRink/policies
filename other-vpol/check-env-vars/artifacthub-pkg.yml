@@ -13,6 +13,7 @@ keywords:
   - ValidatingPolicy
 readme: |
   Environment variables control many aspects of a container's execution and are often the source of many different configuration settings. Being able to ensure that the value of a specific environment variable either is or is not set to a specific string is useful to maintain such controls. This policy checks every container to ensure that if the `DISABLE_OPA` environment variable is defined, it must not be set to a value of `"true"`.
+  Background reporting for `pods/ephemeralcontainers` requires granting Kyverno's reports controller `get/list/watch` on that subresource; see the [sample ClusterRole](https://github.com/kyverno/policies/blob/main/other-vpol/check-env-vars/.chainsaw-test/ephemeral-rbac.yaml).
   
   ### Fine-grained PolicyException use
 
@@ -32,7 +33,7 @@ annotations:
   kyverno/category: "Other in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 09cdaa24848f6c6248845266e24dae36a476b7cb0d4aaec75b625f2dd99613f5
+digest: f5cc59fdd83baf8e925ddffaabbe5f60b81a1efd016d1d0dc9811318c617f4db
 
 
 createdAt: "2025-05-11T17:46:11Z"
