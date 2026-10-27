@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: immutable-or-tagged
+spec:
+  containers:
+  - name: immutable
+    image: nginx@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+    imagePullPolicy: IfNotPresent
+  - name: tagged
+    image: busybox:1.35
+    imagePullPolicy: IfNotPresent
