@@ -31,5 +31,5 @@ annotations:
   kyverno/category: "Pod Security Standards (Baseline)"
   kyverno/kubernetesVersion: "1.30+"
   kyverno/subject: "Pod,Volume"
-digest: ba6e6bc99588095ac1442930daf71122f1407dc7796db78943ba568684589562
+digest: b0feccebfbf4385d3406b558062face4e5d48a138012b02457744bf2b2583e91
 createdAt: "2025-03-13T23:26:58Z"

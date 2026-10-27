@@ -6,6 +6,7 @@ policies:
 - ../disallow-host-path.yaml
 resources:
 - resource.yaml
+- null-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -48,4 +49,11 @@ results:
   resources:
   - goodpod01
   - goodpod02
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-host-path
+  resources:
+  - null-volumes
+  - null-hostpath
   result: pass
