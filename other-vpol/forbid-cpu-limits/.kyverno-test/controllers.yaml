@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-limit-bad-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cpu-limit-bad-deployment
+  template:
+    metadata:
+      labels:
+        app: cpu-limit-bad-deployment
+    spec:
+      initContainers:
+      - name: init
+        image: busybox
+        resources:
+          limits:
+            cpu: 1
+      containers:
+      - name: app
+        image: busybox
