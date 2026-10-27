@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: missing-access-modes
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: null-access-modes
+spec:
+  accessModes: null
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: empty-access-modes
+spec:
+  accessModes: []
+  resources:
+    requests:
+      storage: 1Gi

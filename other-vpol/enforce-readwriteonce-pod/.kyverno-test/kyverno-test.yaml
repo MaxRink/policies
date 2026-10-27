@@ -6,6 +6,7 @@ policies:
 - ../enforce-readwriteonce-pod.yaml
 resources:
 - resource.yaml
+- edge-cases.yaml
 results:
 - isValidatingPolicy: true
   kind: PersistentVolumeClaim
@@ -19,4 +20,11 @@ results:
   resources:
   - goodpvc
   result: pass
-
+- isValidatingPolicy: true
+  kind: PersistentVolumeClaim
+  policy: readwriteonce-pod
+  resources:
+  - missing-access-modes
+  - null-access-modes
+  - empty-access-modes
+  result: fail
