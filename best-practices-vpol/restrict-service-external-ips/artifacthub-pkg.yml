@@ -20,9 +20,10 @@ readme: |
   `restrict-external-ips` in `spec.policyRefs`, and narrow the exception with
   `spec.matchConditions` using the exact request identity.
   Put the exact control token `externalIPs` in `spec.allowedValues` to permit
-  the matched Service to set a non-empty externalIPs list. Kyverno exposes it as
-  `exceptions.allowedValues`. This waives the whole field check, not individual
-  IP addresses; scope the approved Service with `spec.matchConditions`.
+  the matched Service to set the field. Kyverno exposes it as
+  `exceptions.allowedValues`. This waives the whole field-presence check, not
+  individual IP addresses or list values; scope the approved Service with
+  `spec.matchConditions`.
   See the [tested example](https://github.com/kyverno/policies/blob/main/best-practices-vpol/restrict-service-external-ips/.kyverno-test/exceptions.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal enforcement behavior.
@@ -32,5 +33,5 @@ annotations:
   kyverno/category: "Best Practices in VPOL"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Service"
-digest: 237d21396875fbc62fa438ce3b9805d8039a5359693b53f33559575a5cab9a89
+digest: 3468980427f962def655d047572079413823cd3ffde8f2ad5e6b6e6d43379eaf
 createdAt: "2025-05-05T13:19:13Z"
