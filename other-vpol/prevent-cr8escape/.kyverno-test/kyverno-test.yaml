@@ -6,6 +6,7 @@ policies:
 - ../prevent-cr8escape.yaml
 resources:
 - resources.yaml
+- replicationcontroller-bad.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -14,10 +15,15 @@ results:
   - badpod01
   result: fail
 - isValidatingPolicy: true
+  kind: ReplicationController
+  policy: prevent-cr8escape
+  resources:
+  - bad-sysctl-rc
+  result: fail
+- isValidatingPolicy: true
   kind: Pod
   policy: prevent-cr8escape
   resources:
   - pod-sysctl-good
   - pod-no-sysctl
   result: pass
-

@@ -25,9 +25,22 @@ spec:
     - apiGroups:   [""]
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
-      resources:   ["pods"]
+      resources:   ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
+  variables:
+    - name: podSpec
+      expression: >-
+        object.spec.?jobTemplate.?spec.?template.?spec.orValue(
+        object.spec.?template.?spec.orValue(object.spec))
   validations:
     - expression: >-
-        object.spec.?securityContext.?sysctls.orValue([]).all(sysctl, 
+        variables.podSpec.?securityContext.?sysctls.orValue([]).all(sysctl,
         !has(sysctl.value) || (has(exceptions.allowedValues) && string(sysctl.value) in exceptions.allowedValues) || (!sysctl.value.contains('+') && !sysctl.value.contains('=')))
       message: "characters '+' or '=' are not allowed in sysctls values"      
