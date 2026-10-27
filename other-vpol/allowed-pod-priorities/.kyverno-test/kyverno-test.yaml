@@ -6,6 +6,7 @@ policies:
 - ../allowed-pod-priorities.yaml
 resources:
 - resource.yaml
+- replicationcontrollers.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -53,6 +54,18 @@ results:
   resources:
   - pod-priority-ns/goodcronjob01
   - no-priority-ns/goodcronjob02
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: allowed-podpriorities
+  resources:
+  - pod-priority-ns/badpriority-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: allowed-podpriorities
+  resources:
+  - pod-priority-ns/goodpriority-rc
   result: pass
 context: context.yaml
 variables: value.yaml

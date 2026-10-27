@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: badpriority-rc
+  namespace: pod-priority-ns
+spec:
+  selector:
+    app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      priorityClassName: foo
+      containers:
+      - name: app
+        image: busybox:1.35
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: goodpriority-rc
+  namespace: pod-priority-ns
+spec:
+  selector:
+    app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      priorityClassName: high
+      containers:
+      - name: app
+        image: busybox:1.35
