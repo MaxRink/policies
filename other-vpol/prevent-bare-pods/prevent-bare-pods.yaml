@@ -31,5 +31,5 @@ spec:
       operations:  ["CREATE", "UPDATE"]
       resources:   ["pods"]
   validations:
-    - expression: "object.metadata.?ownerReferences.orValue([]).size() > 0"
+    - expression: "object.metadata.?ownerReferences.orValue([]).exists(ownerReference, ownerReference.?controller.orValue(false))"
       message: "Bare Pods are not allowed. They must be created by Pod controllers."
