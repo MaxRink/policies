@@ -33,11 +33,16 @@ spec:
     try:
     - apply:
         file: ../cleanup-empty-replicasets.yaml
-  - name: Wait
+  - name: Wait for age-gated deletion
     try:
     - sleep:
         duration: 1m30s
-  - name: Check replica set was deleted
-    try:
     - error:
         file: chainsaw-assert-1.yaml
+    cleanup:
+    - script:
+        content: |
+          set -eu
+          kubectl delete replicasets.apps example-797bfc7b6f -n "$NAMESPACE" --ignore-not-found
+          kubectl delete deletingpolicies.policies.kyverno.io cleanup-empty-replicasets --ignore-not-found
+          kubectl delete clusterroles.rbac.authorization.k8s.io kyverno:cleanup-controller:replicasets --ignore-not-found

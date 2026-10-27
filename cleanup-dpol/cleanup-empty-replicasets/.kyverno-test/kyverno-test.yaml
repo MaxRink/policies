@@ -6,6 +6,9 @@ policies:
   - ../cleanup-empty-replicasets.yaml
 resources:
   - empty-replicaset.yaml
+  - young-replicaset.yaml
+  - missing-timestamp.yaml
+  - null-timestamp.yaml
   - missing-replicas.yaml
   - null-replicas.yaml
   - active-replicaset.yaml
@@ -25,4 +28,7 @@ results:
       - null-replicas
       - active-replicaset
       - excepted-replicaset
+      - young-replicaset
+      - missing-timestamp
+      - null-timestamp
     result: fail

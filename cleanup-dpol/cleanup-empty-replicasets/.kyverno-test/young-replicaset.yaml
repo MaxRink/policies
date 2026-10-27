@@ -1,0 +1,8 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: young-replicaset
+  namespace: default
+  creationTimestamp: "2099-01-01T00:00:00Z"
+spec:
+  replicas: 0
