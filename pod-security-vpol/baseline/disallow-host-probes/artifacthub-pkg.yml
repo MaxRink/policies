@@ -14,10 +14,20 @@ keywords:
 readme: |
   Probes and lifecycle handlers that set a `host` let a Pod direct the kubelet to make requests to arbitrary addresses, including link-local metadata endpoints. This policy ensures the `httpGet.host` and `tcpSocket.host` fields of every probe and lifecycle handler are unset or empty. It implements the `hostProbesAndHostLifecycle` check that Kubernetes added to the Baseline profile in v1.34.
 
+  ### Fine-grained PolicyException use
+
+  Enable PolicyException support in Kyverno, reference the `ValidatingPolicy` named
+  `disallow-host-probes` in `spec.policyRefs`, and narrow the exception with
+  `spec.matchConditions` using the exact request identity. Exact `spec.images` entries exempt
+  only matching containers; other containers in the same Pod remain checked. See the
+  [tested example](https://github.com/kyverno/policies/blob/main/pod-security-vpol/baseline/disallow-host-probes/.kyverno-test-exceptions/).
+  With PolicyException support disabled, or when no exception matches, the policy keeps its
+  normal enforcement behavior.
+
   Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
 annotations:
   kyverno/category: "Pod Security Standards (Baseline) in ValidatingPolicy"
   kyverno/kubernetesVersion: "1.34+"
   kyverno/subject: "Pod"
-digest: 6d0d9c5ca747b2576ab6282e5324977daad71e98a7562924aab59e82fc7c0aa5
+digest: 8d8b22b71479c8d35e2ea818a64e582e411c687d5626326631e761970bc338c9
 createdAt: "2026-09-28T08:51:40Z"
