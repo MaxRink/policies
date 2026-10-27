@@ -12,9 +12,10 @@ metadata:
       deployments, restarts, and upgrades. Liveness probes help the kubelet determine
       when to restart containers, while readiness probes help Services and Deployments
       determine when Pods are ready to receive traffic. Startup probes provide additional
-      control during container startup. This policy audits regular containers in Pods
-      and supported Pod controllers for at least one of livenessProbe, readinessProbe,
-      or startupProbe.
+      control during container startup. This policy audits regular and sidecar containers
+      in Pods and supported Pod controllers for at least one of livenessProbe,
+      readinessProbe, or startupProbe. Plain init and ephemeral containers are excluded
+      because Kubernetes does not support probes on them.
     policies.kyverno.io/minversion: 1.19.1
 spec:
   validationActions: ["Audit"]
@@ -48,7 +49,10 @@ spec:
       object.spec.?jobTemplate.?spec.?template.?spec.orValue(
       object.spec.?template.?spec.orValue(object.spec))
   - name: allContainers
-    expression: variables.podSpec.containers
+    expression: >-
+      variables.podSpec.containers +
+      variables.podSpec.?initContainers.orValue([]).filter(container,
+      container.?restartPolicy.orValue("") == "Always")
   validations:
   - expression: >-
       variables.allContainers.all(container,
@@ -56,7 +60,7 @@ spec:
         has(container.livenessProbe) || has(container.readinessProbe) || has(container.startupProbe)
       )      
     messageExpression: >-
-      'All regular containers must have at least one probe (livenessProbe, readinessProbe, or startupProbe) defined. Missing probes in containers: ' +
+      'All regular and sidecar containers must have at least one probe (livenessProbe, readinessProbe, or startupProbe) defined. Missing probes in containers: ' +
       variables.allContainers.filter(container, 
         !(has(container.livenessProbe) || has(container.readinessProbe) || has(container.startupProbe))
       ).map(container, container.name).join(', ')
