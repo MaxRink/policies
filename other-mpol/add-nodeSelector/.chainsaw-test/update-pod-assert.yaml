@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: update-pod
+  labels:
+    app: test
+  annotations:
+    update-tested: "true"
+spec:
+  (nodeSelector == null): true
+  containers:
+  - name: app
+    image: nginx:latest
