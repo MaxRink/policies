@@ -6,6 +6,7 @@ policies:
 - ../limit-containers-per-pod.yaml
 resources:
 - resource.yaml
+- replicationcontroller.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -31,3 +32,9 @@ results:
   resources:
   - myapp-pod-1
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: limit-containers-per-pod
+  resources:
+  - too-many-containers-rc
+  result: fail
