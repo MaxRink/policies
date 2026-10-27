@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: require-workload-serviceaccount-irsa-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: require-workload-serviceaccount-irsa
+  matchConditions:
+    - name: exact-serviceaccount
+      expression: >-
+        request.name == "legacy-serviceaccount" &&
+        request.namespace == "default"
