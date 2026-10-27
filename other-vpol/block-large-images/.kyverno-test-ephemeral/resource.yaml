@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: large-ephemeral-image
+  namespace: default
+spec:
+  containers:
+  - name: app
+    image: test.example/small:v1
+  ephemeralContainers:
+  - name: debug
+    image: test.example/large:v1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: small-ephemeral-image
+  namespace: default
+spec:
+  containers:
+  - name: app
+    image: test.example/small:v1
+  ephemeralContainers:
+  - name: debug
+    image: test.example/small:v1
