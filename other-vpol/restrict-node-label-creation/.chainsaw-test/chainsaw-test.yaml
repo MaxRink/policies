@@ -44,16 +44,37 @@ spec:
             kubectl get nodes "$node" -o go-template='{{range $key, $value := .metadata.labels}}{{if eq $key "foo"}}present:{{$value}}{{end}}{{end}}'
           }
           test -z "$(foo_state)"
-          if ! kubectl label --overwrite nodes "$node" foo= > "$output_dir/empty" 2>&1; then
-            cat "$output_dir/empty"
+          if kubectl label --overwrite nodes "$node" foo= > "$output_dir/deny-empty" 2>&1; then
+            cat "$output_dir/deny-empty"
+            echo "Failure: successfully set empty label foo"
             exit 1
           fi
+          grep -F 'restrict-node-label-creation' "$output_dir/deny-empty"
+          test -z "$(foo_state)"
+          kubectl apply -f - <<EOF
+          apiVersion: policies.kyverno.io/v1
+          kind: PolicyException
+          metadata:
+            name: live-node-empty-label-exception
+            namespace: policy-exceptions
+          spec:
+            policyRefs:
+            - kind: ValidatingPolicy
+              name: restrict-node-label-creation
+            matchConditions:
+            - name: exact-node-and-empty-value
+              expression: object.metadata.name == '$node' && object.metadata.labels.?foo.orValue('<absent>') == ''
+            allowedValues:
+            - 'foo:'
+          EOF
+          kubectl label --overwrite nodes "$node" foo=
           test "$(foo_state)" = 'present:'
           if ! kubectl label nodes "$node" foo- > "$output_dir/remove" 2>&1; then
             cat "$output_dir/remove"
             exit 1
           fi
           test -z "$(foo_state)"
+          kubectl delete policyexceptions.policies.kyverno.io live-node-empty-label-exception -n policy-exceptions
           if kubectl label --overwrite nodes "$node" foo=shouldfail > "$output_dir/deny" 2>&1; then
             cat "$output_dir/deny"
             echo "Failure: successfully set label foo"

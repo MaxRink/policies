@@ -19,9 +19,9 @@ readme: |
   Enable PolicyException support in Kyverno, reference the `ValidatingPolicy` named
   `restrict-node-label-creation` in `spec.policyRefs`, and narrow the exception with
   `spec.matchConditions` using the exact request identity.
-  `variables.fooExceptionValue` encodes the resulting Node label as `foo:<value>` or
-  `foo:<absent>`. Put that exact token in `spec.allowedValues` to permit the matched label
-  change, including removal only with `foo:<absent>`. CEL consumes `spec.allowedValues` as
+  Put `foo:<value>` in `spec.allowedValues` to permit setting or changing the label to
+  that exact value. Removing `foo` is allowed because only a present new label is checked.
+  CEL consumes `spec.allowedValues` as
   `exceptions.allowedValues`; unlisted values remain checked.
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-vpol/restrict-node-label-creation/.chainsaw-test/exceptions.yaml).
   With PolicyException support disabled, or when no exception matches, the
@@ -32,6 +32,6 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Node, Label"
-digest: 4f0c82793553b3f49ef2d850dbfc1e28de4cbabcf124e1da81863bca646cff45
+digest: 27e6e27e37e2b9d1206d843db6a5ee14ca4cbaee934b9f652d2c685f9e5d2ed6
 
 createdAt: "2025-05-11T17:46:11Z"
