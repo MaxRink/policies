@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Inject Sealed Secret Configuration
 createdAt: "2026-04-08T00:00:00Z"
 description: >-
-  Injects sealed secret configuration environment variables into pods with the coco=enabled label and coco.io/sealed-secret-config annotation. Retrieves configuration from a ConfigMap to enable containers to retrieve secrets from KBS for Confidential Containers.
+  Adds sealed secret configuration environment variables from a ConfigMap to regular and init containers in Pods with the coco=enabled label and coco.io/sealed-secret-config annotation. Existing variables with those names are preserved.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-mpol/inject-sealed-secret-config/inject-sealed-secret-config.yaml
@@ -13,7 +13,7 @@ keywords:
   - Confidential Computing
   - MutatingPolicy
 readme: |
-  Injects sealed secret configuration environment variables into pods with the coco=enabled label and coco.io/sealed-secret-config annotation. Retrieves configuration from a ConfigMap to enable containers to retrieve secrets from KBS for Confidential Containers.
+  Adds sealed secret configuration environment variables from a ConfigMap to regular and init containers in Pods with the coco=enabled label and coco.io/sealed-secret-config annotation. Existing variables with those names are preserved; ephemeral containers are not modified.
   
   ### Fine-grained PolicyException use
 
@@ -21,9 +21,10 @@ readme: |
   `inject-sealed-secret-config` in `spec.policyRefs`, and narrow the exception with
   `spec.matchConditions` using the exact request identity.
   Kyverno exposes matching exceptions' `spec.images` as `exceptions.allowedImages`.
-  Exact image matches preserve the existing regular, init, or ephemeral container
-  rather than injecting sealed-secret environment variables. Other containers
-  still receive the configured variables; ConfigMap lookup remains unchanged.
+  Exact image matches preserve the existing regular or init container rather than
+  injecting sealed-secret environment variables. Other regular and init containers
+  receive any missing variables; existing values are preserved. Ephemeral
+  containers are not modified.
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-mpol/inject-sealed-secret-config/.chainsaw-test/exception/exception.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal mutation behavior.
@@ -32,4 +33,4 @@ readme: |
 annotations:
   kyverno/category: "Confidential Computing"
   kyverno/subject: "Pod"
-digest: a16f5dce0132ff23b2ab8f179819ec7560da0547c6d69e4aeff373dfffce3100
+digest: d5772b9e07017a7676a638ad90af6fe6d52823e89bcdc83e99bb67475128a74a
