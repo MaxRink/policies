@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: psa-vpol-report-exempt
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: psa-vpol-report-sibling

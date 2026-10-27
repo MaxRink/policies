@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: report-exact-namespace
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - name: add-psa-namespace-reporting
+      kind: ValidatingPolicy
+  matchConditions:
+    - name: exact-namespace
+      expression: object.metadata.name == 'psa-vpol-report-exempt'

@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/chainsaw/main/.schemas/json/test-chainsaw-v1alpha1.json
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  creationTimestamp: null
+  name: add-psa-namespace-reporting
+spec:
+  template: false
+  steps:
+    - name: shared-exception-namespace
+      skipDelete: true
+      try:
+        - apply:
+            file: policy-exceptions-namespace.yaml
+    - name: install-policy
+      try:
+        - apply:
+            file: ../add-psa-namespace-reporting.yaml
+        - patch:
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              metadata:
+                name: add-psa-namespace-reporting
+              spec:
+                validationActions: [Deny]
+        - apply:
+            file: policy-exception.yaml
+        - assert:
+            file: policy-ready.yaml
+    - name: verify-label-reporting
+      try:
+        - apply:
+            file: namespace-exempt.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: namespace-sibling.yaml
+        - apply:
+            file: namespace-with-psa-label.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: namespace-without-psa-label.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: namespace-with-empty-psa-label.yaml
+        - script:
+            content: |
+              set -eu
+              output=$(kubectl -n "$NAMESPACE" patch namespace psa-vpol-report-valid --type=json -p='[{"op":"remove","path":"/metadata/labels/pod-security.kubernetes.io~1warn-version"}]' 2>&1) && status=0 || status=$?
+              printf '%s\n' "$output"
+              if [ "$status" -eq 0 ]; then
+                echo "expected removing the last PSA label on UPDATE to be denied" >&2
+                exit 1
+              fi
+              case "$output" in
+                *"Policy add-psa-namespace-reporting failed"*) ;;
+                *)
+                  echo "expected add-psa-namespace-reporting in update denial output" >&2
+                  exit 1
+                  ;;
+              esac
+      finally:
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" delete namespace psa-vpol-report-valid psa-vpol-report-exempt psa-vpol-report-sibling --ignore-not-found --wait=true
+              kubectl -n policy-exceptions delete -f policy-exception.yaml --ignore-not-found --wait=true
