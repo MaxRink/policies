@@ -1,0 +1,63 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: inject-coco-initdata
+policies:
+- ../inject-coco-initdata.yaml
+resources:
+- resource.yaml
+- edge-resources.yaml
+- controllers.yaml
+- replicationcontroller.yaml
+exceptions:
+- exceptions.yaml
+context: context.yaml
+results:
+- kind: Pod
+  patchedResources: patchedResource.yaml
+  policy: inject-coco-initdata
+  resources:
+  - coco-pod
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: controllers-patched.yaml
+  policy: inject-coco-initdata
+  resources:
+  - coco-deployment
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: patchedResource.yaml
+  policy: inject-coco-initdata
+  resources: [sibling-pod]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  policy: inject-coco-initdata
+  resources: [exception-pod]
+  result: skip
+  isMutatingPolicy: true
+- kind: Pod
+  policy: inject-coco-initdata
+  resources: [no-label-pod, no-annotation-pod]
+  result: skip
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: empty-config-patched.yaml
+  policy: inject-coco-initdata
+  resources: [empty-config-pod]
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: controllers-patched.yaml
+  policy: inject-coco-initdata
+  resources:
+  - coco-cronjob
+  result: pass
+  isMutatingPolicy: true
+- kind: ReplicationController
+  policy: inject-coco-initdata
+  resources: [coco-replicationcontroller]
+  result: skip
+  isMutatingPolicy: true

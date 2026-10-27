@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: coco-deployment
+  namespace: default
+spec:
+  selector:
+    matchLabels:
+      app: coco
+  template:
+    metadata:
+      labels:
+        app: coco
+        coco: enabled
+      annotations:
+        coco.io/initdata-configmap: initdata
+        io.katacontainers.config.hypervisor.cc_init_data: H4sIAAAAAAAA/ytLLSrOzM9TsFVQMtAz1DNQ4krMSc8vyizJyAWJFWckGpmaKXFFpySWJMZyKRXk52QmV+oVpabnK4HkCxKTsxPTUxWAOK8kHiKrxAUAS9AYxFUAAAA=
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.27
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: coco-cronjob
+  namespace: default
+spec:
+  schedule: "*/5 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: coco
+            coco: enabled
+          annotations:
+            coco.io/initdata-configmap: initdata
+            io.katacontainers.config.hypervisor.cc_init_data: H4sIAAAAAAAA/ytLLSrOzM9TsFVQMtAz1DNQ4krMSc8vyizJyAWJFWckGpmaKXFFpySWJMZyKRXk52QmV+oVpabnK4HkCxKTsxPTUxWAOK8kHiKrxAUAS9AYxFUAAAA=
+        spec:
+          containers:
+          - name: app
+            image: nginx:1.27
+          restartPolicy: OnFailure
