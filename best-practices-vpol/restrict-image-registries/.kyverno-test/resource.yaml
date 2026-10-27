@@ -214,3 +214,20 @@ spec:
   containers:
   - name: app
     image: ""
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: missing-image
+spec:
+  containers:
+  - name: app
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-image
+spec:
+  containers:
+  - name: app
+    image: null
