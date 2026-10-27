@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: null-ttl
+spec:
+  ttlSecondsAfterFinished: 900
+  template:
+    spec:
+      containers:
+      - name: app
+        image: app:v1
+      restartPolicy: Never
