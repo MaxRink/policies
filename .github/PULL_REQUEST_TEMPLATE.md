@@ -1,7 +1,7 @@
 ## Related Issue(s)
 
 <!--
-Please link the GitHub issue this pull request resolves by using the appropriate [closing keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue).
+Please link the GitHub issue this pull request resolves by using the appropriate [closing keywords](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue).
 -->
 
 ## Description
