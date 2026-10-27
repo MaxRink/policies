@@ -174,3 +174,16 @@ spec:
             resources:
               limits: {memory: "128Mi"}
           restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: badrc-requests-limits
+spec:
+  selector: {app: badrc-requests-limits}
+  template:
+    metadata: {labels: {app: badrc-requests-limits}}
+    spec:
+      containers:
+      - name: app
+        image: ghcr.io/kyverno/test-busybox:1.35
