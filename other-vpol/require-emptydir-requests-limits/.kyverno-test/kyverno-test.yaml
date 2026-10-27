@@ -12,6 +12,13 @@ resources:
 - no-resources-pod.yaml
 - null-volume-mounts-pod.yaml
 - null-size-limit-pod.yaml
+- null-ephemeral-storage-pod.yaml
+- empty-ephemeral-storage-pod.yaml
+- init-emptydir-fail-pod.yaml
+- memory-emptydir-pod.yaml
+- no-volumes-pod.yaml
+- update-emptydir-pod.yaml
+variables: values.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -23,6 +30,11 @@ results:
   - pod-no-resources
   - pod-null-resources
   - null-size-limit-pod
+  - null-ephemeral-storage-pod
+  - empty-ephemeral-storage-pod
+  - init-emptydir-fail-pod
+  - memory-emptydir-pod
+  - update-emptydir-pod
   - exception-emptydir-wrong-token
   - exception-emptydir-sibling-name
   - exception-emptydir-sibling-volume
@@ -47,4 +59,5 @@ results:
   policy: require-emptydir-requests-and-limits
   resources:
   - skip-pod
+  - no-volumes-pod
   result: skip
