@@ -24,7 +24,13 @@ spec:
         file: podcontroller-patched.yaml
     - assert:
         file: pod-resources-patched.yaml
-  - name: step-04-exception
+  - name: step-04-large-dns-options
+    try:
+    - apply:
+        file: large-options-pod.yaml
+    - assert:
+        file: large-options-pod-patched.yaml
+  - name: step-05-exception
     try:
     - apply:
         file: policy-exceptions-namespace.yaml

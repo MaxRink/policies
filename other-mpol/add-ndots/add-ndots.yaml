@@ -28,159 +28,51 @@ spec:
       operations: ["CREATE", "UPDATE"]
       resources: ["jobs", "cronjobs"]
 
+  variables:
+  - name: podSpec
+    expression: >-
+      object.kind == "Pod" ? object.spec :
+      object.kind == "CronJob" ? object.spec.?jobTemplate.?spec.?template.?spec.orValue({}) :
+      object.spec.?template.?spec.orValue({})
+  - name: dnsConfigPath
+    expression: >-
+      object.kind == "Pod" ? "/spec/dnsConfig" :
+      object.kind == "CronJob" ? "/spec/jobTemplate/spec/template/spec/dnsConfig" :
+      "/spec/template/spec/dnsConfig"
+  - name: dnsConfig
+    expression: '!has(variables.podSpec.dnsConfig) || variables.podSpec.dnsConfig == null ? {} : variables.podSpec.dnsConfig'
+  - name: hasDnsOptions
+    expression: has(variables.dnsConfig.options) && variables.dnsConfig.options != null
+  - name: dnsOptions
+    expression: >-
+      variables.hasDnsOptions ? variables.dnsConfig.options : []
+  - name: ndotsIndexes
+    expression: lists.range(variables.dnsOptions.size()).filter(i, variables.dnsOptions[i].name == "ndots")
   mutations:
-  # ===== PODS =====
-  # First mutation for Pods: Remove existing ndots option if it exists
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        object.kind == "Pod" && 
-        has(object.spec.dnsConfig) && object.spec.dnsConfig != null &&
-        has(object.spec.dnsConfig.options) && object.spec.dnsConfig.options != null &&
-        object.spec.dnsConfig.options.exists(opt, opt.name == "ndots") ?
-        [JSONPatch{
-          op: "remove",
-          path: "/spec/dnsConfig/options/" + string(object.spec.dnsConfig.options.map(opt, opt.name).indexOf("ndots"))
-        }] : []
-  
-  # Second mutation for Pods: Add ndots with value "1"
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        object.kind == "Pod" ?
-        (has(object.spec.dnsConfig) && object.spec.dnsConfig != null && has(object.spec.dnsConfig.options) && object.spec.dnsConfig.options != null ?
+        (variables.hasDnsOptions && variables.ndotsIndexes.size() > 0 ?
+          [JSONPatch{
+            op: "remove",
+            path: variables.dnsConfigPath + "/options/" + string(variables.ndotsIndexes[0])
+          }] : []) +
+        (variables.hasDnsOptions ?
           [JSONPatch{
             op: "add",
-            path: "/spec/dnsConfig/options/-",
+            path: variables.dnsConfigPath + "/options/-",
             value: {"name": "ndots", "value": "1"}
           }] :
-          (has(object.spec.dnsConfig) && object.spec.dnsConfig != null ?
+          (has(variables.podSpec.dnsConfig) && variables.podSpec.dnsConfig != null ?
             [JSONPatch{
               op: "add",
-              path: "/spec/dnsConfig/options",
+              path: variables.dnsConfigPath + "/options",
               value: [{"name": "ndots", "value": "1"}]
             }] :
             [JSONPatch{
               op: "add",
-              path: "/spec/dnsConfig",
+              path: variables.dnsConfigPath,
               value: {"options": [{"name": "ndots", "value": "1"}]}
             }]
           )
-        ) : []
-
-  # ===== DEPLOYMENTS, DAEMONSETS, STATEFULSETS =====
-  # First mutation: Remove existing ndots option if it exists
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        object.kind in ["Deployment", "DaemonSet", "StatefulSet"] && 
-        has(object.spec.template.spec.dnsConfig) && object.spec.template.spec.dnsConfig != null &&
-        has(object.spec.template.spec.dnsConfig.options) && object.spec.template.spec.dnsConfig.options != null &&
-        object.spec.template.spec.dnsConfig.options.exists(opt, opt.name == "ndots") ?
-        [JSONPatch{
-          op: "remove",
-          path: "/spec/template/spec/dnsConfig/options/" + string(object.spec.template.spec.dnsConfig.options.map(opt, opt.name).indexOf("ndots"))
-        }] : []
-  
-  # Second mutation: Add ndots with value "1"
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        object.kind in ["Deployment", "DaemonSet", "StatefulSet"] ?
-        (has(object.spec.template.spec.dnsConfig) && object.spec.template.spec.dnsConfig != null && has(object.spec.template.spec.dnsConfig.options) && object.spec.template.spec.dnsConfig.options != null ?
-          [JSONPatch{
-            op: "add",
-            path: "/spec/template/spec/dnsConfig/options/-",
-            value: {"name": "ndots", "value": "1"}
-          }] :
-          (has(object.spec.template.spec.dnsConfig) && object.spec.template.spec.dnsConfig != null ?
-            [JSONPatch{
-              op: "add",
-              path: "/spec/template/spec/dnsConfig/options",
-              value: [{"name": "ndots", "value": "1"}]
-            }] :
-            [JSONPatch{
-              op: "add",
-              path: "/spec/template/spec/dnsConfig",
-              value: {"options": [{"name": "ndots", "value": "1"}]}
-            }]
-          )
-        ) : []
-
-  # ===== JOBS =====
-  # First mutation: Remove existing ndots option if it exists
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        object.kind == "Job" && 
-        has(object.spec.template.spec.dnsConfig) && object.spec.template.spec.dnsConfig != null &&
-        has(object.spec.template.spec.dnsConfig.options) && object.spec.template.spec.dnsConfig.options != null &&
-        object.spec.template.spec.dnsConfig.options.exists(opt, opt.name == "ndots") ?
-        [JSONPatch{
-          op: "remove",
-          path: "/spec/template/spec/dnsConfig/options/" + string(object.spec.template.spec.dnsConfig.options.map(opt, opt.name).indexOf("ndots"))
-        }] : []
-  
-  # Second mutation: Add ndots with value "1"
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        object.kind == "Job" ?
-        (has(object.spec.template.spec.dnsConfig) && object.spec.template.spec.dnsConfig != null && has(object.spec.template.spec.dnsConfig.options) && object.spec.template.spec.dnsConfig.options != null ?
-          [JSONPatch{
-            op: "add",
-            path: "/spec/template/spec/dnsConfig/options/-",
-            value: {"name": "ndots", "value": "1"}
-          }] :
-          (has(object.spec.template.spec.dnsConfig) && object.spec.template.spec.dnsConfig != null ?
-            [JSONPatch{
-              op: "add",
-              path: "/spec/template/spec/dnsConfig/options",
-              value: [{"name": "ndots", "value": "1"}]
-            }] :
-            [JSONPatch{
-              op: "add",
-              path: "/spec/template/spec/dnsConfig",
-              value: {"options": [{"name": "ndots", "value": "1"}]}
-            }]
-          )
-        ) : []
-
-  # ===== CRONJOBS =====
-  # First mutation: Remove existing ndots option if it exists
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        object.kind == "CronJob" && 
-        has(object.spec.jobTemplate.spec.template.spec.dnsConfig) && object.spec.jobTemplate.spec.template.spec.dnsConfig != null &&
-        has(object.spec.jobTemplate.spec.template.spec.dnsConfig.options) && object.spec.jobTemplate.spec.template.spec.dnsConfig.options != null &&
-        object.spec.jobTemplate.spec.template.spec.dnsConfig.options.exists(opt, opt.name == "ndots") ?
-        [JSONPatch{
-          op: "remove",
-          path: "/spec/jobTemplate/spec/template/spec/dnsConfig/options/" + string(object.spec.jobTemplate.spec.template.spec.dnsConfig.options.map(opt, opt.name).indexOf("ndots"))
-        }] : []
-  
-  # Second mutation: Add ndots with value "1"
-  - patchType: JSONPatch
-    jsonPatch:
-      expression: |
-        object.kind == "CronJob" ?
-        (has(object.spec.jobTemplate.spec.template.spec.dnsConfig) && object.spec.jobTemplate.spec.template.spec.dnsConfig != null && has(object.spec.jobTemplate.spec.template.spec.dnsConfig.options) && object.spec.jobTemplate.spec.template.spec.dnsConfig.options != null ?
-          [JSONPatch{
-            op: "add",
-            path: "/spec/jobTemplate/spec/template/spec/dnsConfig/options/-",
-            value: {"name": "ndots", "value": "1"}
-          }] :
-          (has(object.spec.jobTemplate.spec.template.spec.dnsConfig) && object.spec.jobTemplate.spec.template.spec.dnsConfig != null ?
-            [JSONPatch{
-              op: "add",
-              path: "/spec/jobTemplate/spec/template/spec/dnsConfig/options",
-              value: [{"name": "ndots", "value": "1"}]
-            }] :
-            [JSONPatch{
-              op: "add",
-              path: "/spec/jobTemplate/spec/template/spec/dnsConfig",
-              value: {"options": [{"name": "ndots", "value": "1"}]}
-            }]
-          )
-        ) : []
+        )
