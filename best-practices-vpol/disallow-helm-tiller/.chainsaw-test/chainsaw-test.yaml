@@ -46,3 +46,8 @@ spec:
         - check:
             (contains($error, 'Policy disallow-helm-tiller failed')): true
         file: bad-pod-success-first.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy disallow-helm-tiller failed')): true
+        file: bad-replicationcontroller.yaml

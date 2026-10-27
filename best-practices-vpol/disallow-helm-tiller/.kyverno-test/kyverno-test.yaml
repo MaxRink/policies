@@ -52,3 +52,9 @@ results:
   resources:
   - exception-tiller-positive
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: disallow-helm-tiller
+  resources:
+  - badrc-tiller
+  result: fail
