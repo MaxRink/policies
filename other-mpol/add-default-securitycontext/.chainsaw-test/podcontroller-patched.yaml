@@ -43,3 +43,24 @@ spec:
           - name: bb-01
             image: nginx:latest
           restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc01
+spec:
+  selector:
+    app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 3000
+        fsGroup: 2000
+      containers:
+      - name: bb-01
+        image: nginx:latest

@@ -29,4 +29,4 @@ readme: |
 annotations:
   kyverno/category: "Sample"
   kyverno/subject: "Pod"
-digest: f33739ea5db4b43d3aefcbe557de54dbeb749975eff98968e8b571465a723822
+digest: 5e80310558794416dd7524aa2a71295a0cd3e52f659be6d3597f3e4448906bd6

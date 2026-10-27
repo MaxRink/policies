@@ -37,3 +37,19 @@ spec:
           - name: bb-01
             image: nginx:latest
           restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc01
+spec:
+  selector:
+    app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+    spec:
+      containers:
+      - name: bb-01
+        image: nginx:latest
