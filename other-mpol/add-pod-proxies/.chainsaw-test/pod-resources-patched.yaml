@@ -49,3 +49,19 @@ spec:
       value: localhost,*.example.com
     - name: FOO
       value: bar
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod03
+spec:
+  containers:
+  - name: app
+    image: ghcr.io/kyverno/test-busybox:1.35
+    env:
+    - name: HTTP_PROXY
+      value: http://proxy.corp.domain:8080
+    - name: HTTPS_PROXY
+      value: https://secureproxy.corp.domain:8080
+    - name: NO_PROXY
+      value: localhost,*.example.com

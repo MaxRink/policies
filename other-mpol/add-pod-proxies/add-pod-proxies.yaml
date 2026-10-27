@@ -41,13 +41,13 @@ spec:
             object.spec.containers.indexOf(container)
           ).map(idx,
             JSONPatch{
-              op: has(object.spec.containers[idx].env) ? "replace" : "add",
+              op: has(object.spec.containers[idx].env) && object.spec.containers[idx].env != null ? "replace" : "add",
               path: "/spec/containers/" + string(idx) + "/env",
               value: [
                 {"name": "HTTP_PROXY", "value": "http://proxy.corp.domain:8080"},
                 {"name": "HTTPS_PROXY", "value": "https://secureproxy.corp.domain:8080"},
                 {"name": "NO_PROXY", "value": "localhost,*.example.com"}
-              ] + (has(object.spec.containers[idx].env) ?
+              ] + (has(object.spec.containers[idx].env) && object.spec.containers[idx].env != null ?
                 object.spec.containers[idx].env.filter(e, 
                   e.name != "HTTP_PROXY" && 
                   e.name != "HTTPS_PROXY" && 
@@ -67,13 +67,13 @@ spec:
             object.spec.template.spec.containers.indexOf(container)
           ).map(idx,
             JSONPatch{
-              op: has(object.spec.template.spec.containers[idx].env) ? "replace" : "add",
+              op: has(object.spec.template.spec.containers[idx].env) && object.spec.template.spec.containers[idx].env != null ? "replace" : "add",
               path: "/spec/template/spec/containers/" + string(idx) + "/env",
               value: [
                 {"name": "HTTP_PROXY", "value": "http://proxy.corp.domain:8080"},
                 {"name": "HTTPS_PROXY", "value": "https://secureproxy.corp.domain:8080"},
                 {"name": "NO_PROXY", "value": "localhost,*.example.com"}
-              ] + (has(object.spec.template.spec.containers[idx].env) ?
+              ] + (has(object.spec.template.spec.containers[idx].env) && object.spec.template.spec.containers[idx].env != null ?
                 object.spec.template.spec.containers[idx].env.filter(e, 
                   e.name != "HTTP_PROXY" && 
                   e.name != "HTTPS_PROXY" && 
@@ -93,13 +93,13 @@ spec:
             object.spec.template.spec.containers.indexOf(container)
           ).map(idx,
             JSONPatch{
-              op: has(object.spec.template.spec.containers[idx].env) ? "replace" : "add",
+              op: has(object.spec.template.spec.containers[idx].env) && object.spec.template.spec.containers[idx].env != null ? "replace" : "add",
               path: "/spec/template/spec/containers/" + string(idx) + "/env",
               value: [
                 {"name": "HTTP_PROXY", "value": "http://proxy.corp.domain:8080"},
                 {"name": "HTTPS_PROXY", "value": "https://secureproxy.corp.domain:8080"},
                 {"name": "NO_PROXY", "value": "localhost,*.example.com"}
-              ] + (has(object.spec.template.spec.containers[idx].env) ?
+              ] + (has(object.spec.template.spec.containers[idx].env) && object.spec.template.spec.containers[idx].env != null ?
                 object.spec.template.spec.containers[idx].env.filter(e, 
                   e.name != "HTTP_PROXY" && 
                   e.name != "HTTPS_PROXY" && 
@@ -119,13 +119,13 @@ spec:
             object.spec.jobTemplate.spec.template.spec.containers.indexOf(container)
           ).map(idx,
             JSONPatch{
-              op: has(object.spec.jobTemplate.spec.template.spec.containers[idx].env) ? "replace" : "add",
+              op: has(object.spec.jobTemplate.spec.template.spec.containers[idx].env) && object.spec.jobTemplate.spec.template.spec.containers[idx].env != null ? "replace" : "add",
               path: "/spec/jobTemplate/spec/template/spec/containers/" + string(idx) + "/env",
               value: [
                 {"name": "HTTP_PROXY", "value": "http://proxy.corp.domain:8080"},
                 {"name": "HTTPS_PROXY", "value": "https://secureproxy.corp.domain:8080"},
                 {"name": "NO_PROXY", "value": "localhost,*.example.com"}
-              ] + (has(object.spec.jobTemplate.spec.template.spec.containers[idx].env) ?
+              ] + (has(object.spec.jobTemplate.spec.template.spec.containers[idx].env) && object.spec.jobTemplate.spec.template.spec.containers[idx].env != null ?
                 object.spec.jobTemplate.spec.template.spec.containers[idx].env.filter(e, 
                   e.name != "HTTP_PROXY" && 
                   e.name != "HTTPS_PROXY" && 
