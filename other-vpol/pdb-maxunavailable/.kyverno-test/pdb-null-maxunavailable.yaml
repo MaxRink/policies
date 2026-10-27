@@ -1,0 +1,11 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: null-maxunavailable-pdb
+  namespace: kube-system
+spec:
+  maxUnavailable: null
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: test

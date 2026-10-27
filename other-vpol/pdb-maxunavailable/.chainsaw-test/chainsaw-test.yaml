@@ -30,6 +30,8 @@ spec:
     - apply:
         file: pdb-good.yaml
     - apply:
+        file: ../.kyverno-test/pdb-null-maxunavailable.yaml
+    - apply:
         file: ../.kyverno-test/pdb-percentage.yaml
     - apply:
         expect:

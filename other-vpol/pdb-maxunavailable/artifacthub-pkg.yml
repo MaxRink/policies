@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Other in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "PodDisruptionBudget"
-digest: db023bc6bb3c03706ef3b13448f32e49ecb560c3090890a3b639a33e636b07fd
+digest: 8d68fda99e16a9d0e6fe9538d5f2e92e0ab3f74314714db8520a7071e08a09e0
 
 
 createdAt: "2025-05-11T17:46:12Z"
