@@ -9,6 +9,7 @@ resources:
 - exception-resource.yaml
 - ../.chainsaw-test/kuttlresource.yaml
 - optional-tls-resource.yaml
+- repeated-suffix-resource.yaml
 exceptions:
 - exception.yaml
 results:
@@ -28,6 +29,12 @@ results:
   patchedResources: optional-tls-patched.yaml
   policy: replace-ingress-hosts
   resources: [optional-tls-ingress]
+  result: pass
+  isMutatingPolicy: true
+- kind: Ingress
+  patchedResources: repeated-suffix-patched.yaml
+  policy: replace-ingress-hosts
+  resources: [repeated-suffix-ingress]
   result: pass
   isMutatingPolicy: true
 - kind: Ingress
