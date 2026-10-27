@@ -29,11 +29,13 @@ readme: |
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal enforcement behavior.
 
+  Background reporting for `pods/ephemeralcontainers` requires the reports controller to have `get`, `list`, and `watch` on that subresource; see the [sample ClusterRoles](https://github.com/kyverno/policies/blob/main/other-vpol/require-non-root-groups/.chainsaw-test/ephemeral-rbac.yaml).
+
   Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
 annotations:
   kyverno/category: "Sample, EKS Best Practices in vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: eeb06eb4edfec508e109f222750f573ca2b000b7234ae00bde324199ba41bd4a
+digest: 815ce80ea1bb1e25f18a98bf17550c2c2c7abb805a7f77fcb563a0f544da2390
 
 createdAt: "2025-05-11T17:46:11Z"
