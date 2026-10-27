@@ -8,3 +8,4 @@ results:
 - {isValidatingPolicy: true, kind: Pod, policy: secrets-not-from-env-vars, resources: [default/secret-env-pod], result: pass}
 - {isValidatingPolicy: true, kind: Pod, policy: secrets-not-from-env-vars, resources: [default/secret-ref-pod], result: fail}
 - {isValidatingPolicy: true, kind: Pod, policy: secrets-not-from-env-vars, resources: [default/good-pod], result: pass}
+- {isValidatingPolicy: true, kind: Deployment, policy: secrets-not-from-env-vars, resources: [default/deployment-secret-env-init], result: fail}

@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ephemeral-secret-env
+spec:
+  containers:
+  - name: app
+    image: busybox
+  ephemeralContainers:
+  - name: debug
+    image: busybox
+    envFrom:
+    - secretRef:
+        name: credentials
