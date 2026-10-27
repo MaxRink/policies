@@ -52,6 +52,109 @@ spec:
   priorityLevelConfiguration:
     name: exempt
 ---
+apiVersion: flowcontrol.apiserver.k8s.io/v1beta1
+kind: FlowSchema
+metadata:
+  name: bad-flowschema-v1beta1
+spec:
+  matchingPrecedence: 1000
+  priorityLevelConfiguration:
+    name: exempt
+---
+apiVersion: flowcontrol.apiserver.k8s.io/v1beta3
+kind: FlowSchema
+metadata:
+  name: bad-flowschema-v1beta3
+spec:
+  matchingPrecedence: 1000
+  priorityLevelConfiguration:
+    name: exempt
+---
+apiVersion: flowcontrol.apiserver.k8s.io/v1beta1
+kind: PriorityLevelConfiguration
+metadata:
+  name: bad-prioritylevel-v1beta1
+spec:
+  type: Limited
+  limited:
+    assuredConcurrencyShares: 30
+---
+apiVersion: flowcontrol.apiserver.k8s.io/v1beta2
+kind: PriorityLevelConfiguration
+metadata:
+  name: bad-prioritylevel-v1beta2
+spec:
+  type: Limited
+  limited:
+    assuredConcurrencyShares: 30
+---
+apiVersion: flowcontrol.apiserver.k8s.io/v1beta3
+kind: PriorityLevelConfiguration
+metadata:
+  name: bad-prioritylevel-v1beta3
+spec:
+  type: Limited
+  limited:
+    assuredConcurrencyShares: 30
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: bad-hpa
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: app
+  maxReplicas: 2
+---
+apiVersion: storage.k8s.io/v1beta1
+kind: CSIStorageCapacity
+metadata:
+  name: bad-csisc
+  namespace: test
+spec:
+  storageClassName: standard
+---
+apiVersion: discovery.k8s.io/v1beta1
+kind: EndpointSlice
+metadata:
+  name: bad-endpointslice
+addressType: IPv4
+---
+apiVersion: events.k8s.io/v1beta1
+kind: Event
+metadata:
+  name: bad-event
+  namespace: test
+type: Normal
+reason: Deprecated
+message: old API version
+action: test
+reportingController: test
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: bad-pdb
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels: {app: app}
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: bad-psp
+spec:
+  privileged: false
+---
+apiVersion: node.k8s.io/v1beta1
+kind: RuntimeClass
+metadata:
+  name: bad-runtimeclass
+handler: runc
+---
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:

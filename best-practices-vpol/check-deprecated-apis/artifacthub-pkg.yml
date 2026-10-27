@@ -2,7 +2,7 @@ name: check-deprecated-apis-vpol
 version: 1.0.0
 displayName: Check deprecated APIs in VPOL
 description: >-
-  Kubernetes APIs are sometimes deprecated and removed after a few releases. As a best practice, older API versions should be replaced with newer versions. This policy validates for APIs that are deprecated or scheduled for removal. Note that checking for some of these resources may require modifying the Kyverno ConfigMap to remove filters. PodSecurityPolicy is removed in v1.25 so therefore the validate-v1-25-removals rule may not completely work on 1.25+. 
+  Kubernetes APIs are sometimes deprecated and removed after a few releases. As a best practice, older API versions should be replaced with newer versions. This policy audits deprecated or soon-to-be-removed APIs without blocking requests. Note that checking some resources may require modifying the Kyverno ConfigMap to remove filters. PodSecurityPolicy is removed in v1.25, so that check may not work on 1.25+.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/best-practices-vpol/check-deprecated-apis/check-deprecated-apis.yaml
@@ -12,7 +12,7 @@ keywords:
   - Best Practices
   - VPOL
 readme: |
-  Kubernetes APIs are sometimes deprecated and removed after a few releases. As a best practice, older API versions should be replaced with newer versions. This policy validates for APIs that are deprecated or scheduled for removal. Note that checking for some of these resources may require modifying the Kyverno ConfigMap to remove filters. PodSecurityPolicy is removed in v1.25 so therefore the validate-v1-25-removals rule may not completely work on 1.25+. 
+  Kubernetes APIs are sometimes deprecated and removed after a few releases. As a best practice, older API versions should be replaced with newer versions. This policy audits deprecated or soon-to-be-removed APIs without blocking requests. Note that checking some resources may require modifying the Kyverno ConfigMap to remove filters. PodSecurityPolicy is removed in v1.25, so that check may not work on 1.25+.
   
   ### Fine-grained PolicyException use
 
@@ -33,5 +33,5 @@ annotations:
   kyverno/category: "Best Practices in VPOL"
   kyverno/kubernetesVersion: "1.30+"
   kyverno/subject: "Kubernetes APIs"
-digest: ff3381547d52102aae74e8426bc0aa2c9eb11ce473bc2af1380a6b3dcff9caeb
+digest: fe73a148743b850d84bee23546a6353d720de65353e0b14e052cb144a7546719
 createdAt: "2025-05-08T15:39:46Z"

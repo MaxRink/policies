@@ -28,6 +28,63 @@ results:
   - bad-flowschema
   result: fail
 - isValidatingPolicy: true
+  kind: FlowSchema
+  policy: check-deprecated-apis
+  resources:
+  - bad-flowschema-v1beta1
+  - bad-flowschema-v1beta3
+  result: fail
+- isValidatingPolicy: true
+  kind: PriorityLevelConfiguration
+  policy: check-deprecated-apis
+  resources:
+  - bad-prioritylevel-v1beta1
+  - bad-prioritylevel-v1beta2
+  - bad-prioritylevel-v1beta3
+  result: fail
+- isValidatingPolicy: true
+  kind: HorizontalPodAutoscaler
+  policy: check-deprecated-apis
+  resources:
+  - bad-hpa
+  result: fail
+- isValidatingPolicy: true
+  kind: CSIStorageCapacity
+  policy: check-deprecated-apis
+  resources:
+  - bad-csisc
+  result: fail
+- isValidatingPolicy: true
+  kind: EndpointSlice
+  policy: check-deprecated-apis
+  resources:
+  - bad-endpointslice
+  result: fail
+- isValidatingPolicy: true
+  kind: Event
+  policy: check-deprecated-apis
+  resources:
+  - bad-event
+  result: fail
+- isValidatingPolicy: true
+  kind: PodDisruptionBudget
+  policy: check-deprecated-apis
+  resources:
+  - bad-pdb
+  result: fail
+- isValidatingPolicy: true
+  kind: PodSecurityPolicy
+  policy: check-deprecated-apis
+  resources:
+  - bad-psp
+  result: fail
+- isValidatingPolicy: true
+  kind: RuntimeClass
+  policy: check-deprecated-apis
+  resources:
+  - bad-runtimeclass
+  result: fail
+- isValidatingPolicy: true
   kind: CronJob
   policy: check-deprecated-apis
   resources:
