@@ -8,6 +8,12 @@ resources:
 - resource.yaml
 - partial-tls-ingress.yaml
 - null-ingress-fields.yaml
+- null-rules-ingress.yaml
+- wildcard-tls-pass.yaml
+- wildcard-tls-multilabel.yaml
+- wildcard-tls-apex.yaml
+- null-tls-hosts-ingress.yaml
+- null-tls-ingress-annotated.yaml
 results:
 - isValidatingPolicy: true
   kind: Ingress
@@ -15,6 +21,9 @@ results:
   resources:
   - goodingress01
   - goodingress02
+  - null-rules-ingress
+  - wildcard-tls-pass
+  - null-tls-hosts-ingress
   result: pass
 - isValidatingPolicy: true
   kind: Ingress
@@ -39,4 +48,7 @@ results:
   - badingress-empty-tls
   - partial-tls-ingress
   - null-ingress-fields
+  - wildcard-tls-multilabel
+  - wildcard-tls-apex
+  - null-tls-ingress-annotated
   result: fail
