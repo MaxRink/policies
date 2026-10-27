@@ -6,12 +6,14 @@ policies:
 - ../require-storageclass.yaml
 resources:
 - resource.yaml
+- null-storage-class.yaml
 results:
 - isValidatingPolicy: true
   kind: PersistentVolumeClaim
   policy: require-storageclass
   resources:
   - badpvc
+  - null-storageclass-pvc
   result: fail
 - isValidatingPolicy: true
   kind: PersistentVolumeClaim
@@ -24,6 +26,7 @@ results:
   policy: require-storageclass
   resources:
   - badss
+  - null-storageclass-statefulset
   result: fail
 - isValidatingPolicy: true
   kind: StatefulSet
