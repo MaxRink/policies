@@ -25,9 +25,12 @@ spec:
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
       resources:   ["pods"]
+  variables:
+    - name: allContainers
+      expression: "object.spec.containers + object.spec.?initContainers.orValue([]) + object.spec.?ephemeralContainers.orValue([])"
   validations:
     - expression: >-
-        !object.spec.containers.exists(container,
+        !variables.allContainers.exists(container,
         container.?resources.?limits.?cpu.hasValue() &&
         !(has(exceptions.allowedValues) && string(container.name) in exceptions.allowedValues))
       message: Containers may not define CPU limits.
