@@ -43,6 +43,10 @@ results:
   - ipv6-registry-pod
   - digest-pod
   - latest-tag-digest-pod
+  - sha384-digest-pod
+  - sha512-digest-pod
+  - latest-sha384-digest-pod
+  - latest-sha512-digest-pod
   result: pass
 - isValidatingPolicy: true
   kind: Pod
@@ -51,7 +55,11 @@ results:
   - init-latest-pod
   - ephemeral-latest-pod
   - latest-port-pod
+  - invalid-sha512-digest-pod
+  - invalid-extra-at-digest-pod
   - invalid-image
+  - missing-image
+  - null-image
   result: fail
 - isValidatingPolicy: true
   kind: Deployment

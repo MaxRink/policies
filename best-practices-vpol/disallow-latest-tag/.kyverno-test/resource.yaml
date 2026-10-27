@@ -55,6 +55,23 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
+  name: missing-image
+spec:
+  containers:
+  - name: app
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-image
+spec:
+  containers:
+  - name: app
+    image: null
+---
+apiVersion: v1
+kind: Pod
+metadata:
   name: init-latest-pod
 spec:
   initContainers:
@@ -278,3 +295,63 @@ spec:
       - image: busybox:latest
         name: busybox
         command: ["sleep", "9999"]
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sha384-digest-pod
+spec:
+  containers:
+  - name: app
+    image: nginx@sha384:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sha512-digest-pod
+spec:
+  containers:
+  - name: app
+    image: nginx@sha512:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: latest-sha384-digest-pod
+spec:
+  containers:
+  - name: app
+    image: nginx:latest@sha384:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: latest-sha512-digest-pod
+spec:
+  containers:
+  - name: app
+    image: registry.example:5000/app:latest@sha512:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: invalid-sha512-digest-pod
+spec:
+  containers:
+  - name: app
+    image: nginx:1.2@sha512:deadbeef
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: invalid-extra-at-digest-pod
+spec:
+  containers:
+  - name: app
+    image: nginx:1.2@invalid@sha512:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
