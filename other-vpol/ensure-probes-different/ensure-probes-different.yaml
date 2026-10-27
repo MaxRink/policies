@@ -32,7 +32,8 @@ spec:
   validations:
     - expression: >-
         !object.spec.template.spec.containers.exists(container,
-        has(container.readinessProbe) && has(container.livenessProbe) &&
-        container.readinessProbe == container.livenessProbe &&
+        ((!has(container.readinessProbe) && !has(container.livenessProbe)) ||
+        (has(container.readinessProbe) && has(container.livenessProbe) &&
+        container.readinessProbe == container.livenessProbe)) &&
         !(container.name in exceptions.allowedValues))
       message: "Liveness and readiness probes cannot be the same."

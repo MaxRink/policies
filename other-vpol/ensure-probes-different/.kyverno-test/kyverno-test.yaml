@@ -6,6 +6,7 @@ policies:
 - ../ensure-probes-different.yaml
 resources:
 - resource.yaml
+- no-probes.yaml
 results:
 - isValidatingPolicy: true
   kind: Deployment
@@ -19,3 +20,9 @@ results:
   resources:
   - mydeploy-1
   result: pass
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: validate-probes
+  resources:
+  - no-probes
+  result: fail
