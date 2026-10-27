@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-dns-config
+spec:
+  dnsConfig:
+    options:
+    - name: ndots
+      value: "1"
+  containers:
+  - name: app
+    image: app:v1
