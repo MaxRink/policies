@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - exception-resource.yaml
+- replicationcontroller.yaml
 exceptions:
 - exception.yaml
 results:
@@ -28,4 +29,10 @@ results:
   resources:
   - demo-pod02
   result: skip
+  isMutatingPolicy: true
+- kind: ReplicationController
+  patchedResources: replicationcontroller-patched.yaml
+  policy: mutate-termination-grace-period-seconds
+  resources: [rc]
+  result: pass
   isMutatingPolicy: true
