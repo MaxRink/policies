@@ -19,3 +19,25 @@ spec:
       - image: somejunkbusyboximage:1.28
         name: busybox
         command: ["sleep", "9999"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox-user-selected
+  namespace: add-pod-priorityclassname
+  labels:
+    app: busybox-user-selected
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox-user-selected
+  template:
+    metadata:
+      labels:
+        app: busybox-user-selected
+    spec:
+      priorityClassName: user-selected
+      containers:
+      - name: busybox
+        image: somejunkbusyboximage:1.28
