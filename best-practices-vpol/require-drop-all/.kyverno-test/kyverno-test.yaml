@@ -33,3 +33,9 @@ results:
   resources:
   - exception-drop-all-positive
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: drop-all-capabilities
+  resources:
+  - badrc-capabilities
+  result: fail
