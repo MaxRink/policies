@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-privilege-escalation
+spec:
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      allowPrivilegeEscalation: null
