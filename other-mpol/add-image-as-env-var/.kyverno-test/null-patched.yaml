@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-env
+spec:
+  initContainers: null
+  containers:
+  - name: app
+    image: app:v1
+    env:
+    - name: K8S_IMAGE
+      value: app:v1

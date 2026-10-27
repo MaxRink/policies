@@ -29,13 +29,13 @@ spec:
       jsonPatch:
         expression: |-
           object.spec.containers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
-            has(c.env) && c.env.exists(e, e.name == "K8S_IMAGE") ?
+            has(c.env) && c.env != null && c.env.exists(e, e.name == "K8S_IMAGE") ?
             JSONPatch{
               op: "replace",
               path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/env/" + string(c.env.map(e, e.name).indexOf("K8S_IMAGE")),
               value: {"name": "K8S_IMAGE", "value": string(c.image)}
             } :
-            !has(c.env) ?
+            (!has(c.env) || c.env == null) ?
             JSONPatch{
               op: "add",
               path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/env",
@@ -47,14 +47,14 @@ spec:
               value: {"name": "K8S_IMAGE", "value": string(c.image)}
             }
           ) +
-          (has(object.spec.initContainers) ? object.spec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
-            has(c.env) && c.env.exists(e, e.name == "K8S_IMAGE") ?
+          (has(object.spec.initContainers) && object.spec.initContainers != null ? object.spec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
+            has(c.env) && c.env != null && c.env.exists(e, e.name == "K8S_IMAGE") ?
             JSONPatch{
               op: "replace",
               path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/env/" + string(c.env.map(e, e.name).indexOf("K8S_IMAGE")),
               value: {"name": "K8S_IMAGE", "value": string(c.image)}
             } :
-            !has(c.env) ?
+            (!has(c.env) || c.env == null) ?
             JSONPatch{
               op: "add",
               path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/env",

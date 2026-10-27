@@ -6,7 +6,14 @@ policies:
 - ../add-image-as-env-var.yaml
 resources:
 - resource.yaml
+- null-resource.yaml
 results:
+- kind: Pod
+  patchedResources: null-patched.yaml
+  policy: add-image-as-env-var
+  resources: [null-env]
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: patched-pod01.yaml
   policy: add-image-as-env-var
