@@ -68,7 +68,7 @@ body:
       description: >-
         By submitting this issue, you agree that you have performed some basic attempts at researching and solving your problem.
       options:
-        - label: I have read and followed the documentation AND the [troubleshooting guide](https://kyverno.io/docs/troubleshooting/).
+        - label: I have read and followed the documentation AND the [troubleshooting guide](https://kyverno.io/docs/guides/troubleshooting/).
           required: true
         - label: I have verified the policy does not exist in the [samples library](https://kyverno.io/policies/).
           required: true
