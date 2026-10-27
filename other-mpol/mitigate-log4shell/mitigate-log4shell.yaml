@@ -51,47 +51,56 @@ spec:
         variables.isPod ? "/spec" :
         variables.isCronJob ? "/spec/jobTemplate/spec/template/spec" :
         "/spec/template/spec"
+    - name: containerIndices
+      expression: |
+        lists.range(size(variables.podSpec.containers)).filter(i,
+          !exceptions.allowedImages.exists(image, image == variables.podSpec.containers[i].image)
+        )
+    - name: initContainerIndices
+      expression: |
+        has(variables.podSpec.initContainers) ?
+          lists.range(size(variables.podSpec.initContainers)).filter(i,
+            !exceptions.allowedImages.exists(image, image == variables.podSpec.initContainers[i].image)
+          ) : []
   mutations:
     - patchType: JSONPatch
       jsonPatch:
         expression: |
-          variables.podSpec.containers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
-            has(c.env) && c.env.exists(e, e.name == "LOG4J_FORMAT_MSG_NO_LOOKUPS") ?
+          variables.containerIndices.map(i,
+            has(variables.podSpec.containers[i].env) && variables.podSpec.containers[i].env.exists(e, e.name == "LOG4J_FORMAT_MSG_NO_LOOKUPS") ?
               JSONPatch{
                 op: "replace",
-                path: variables.specPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/env/" + string(c.env.map(e, e.name).indexOf("LOG4J_FORMAT_MSG_NO_LOOKUPS")),
+                path: variables.specPath + "/containers/" + string(i) + "/env/" + string(variables.podSpec.containers[i].env.map(e, e.name).indexOf("LOG4J_FORMAT_MSG_NO_LOOKUPS")),
                 value: {"name": "LOG4J_FORMAT_MSG_NO_LOOKUPS", "value": "true"}
               } :
-            has(c.env) ?
+            has(variables.podSpec.containers[i].env) ?
               JSONPatch{
                 op: "add",
-                path: variables.specPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/env/-",
+                path: variables.specPath + "/containers/" + string(i) + "/env/-",
                 value: {"name": "LOG4J_FORMAT_MSG_NO_LOOKUPS", "value": "true"}
               } :
               JSONPatch{
                 op: "add",
-                path: variables.specPath + "/containers/" + string(variables.podSpec.containers.indexOf(c)) + "/env",
+                path: variables.specPath + "/containers/" + string(i) + "/env",
                 value: [{"name": "LOG4J_FORMAT_MSG_NO_LOOKUPS", "value": "true"}]
               }
           ) +
-          (has(variables.podSpec.initContainers) ?
-            variables.podSpec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
-              has(c.env) && c.env.exists(e, e.name == "LOG4J_FORMAT_MSG_NO_LOOKUPS") ?
+          variables.initContainerIndices.map(i,
+              has(variables.podSpec.initContainers[i].env) && variables.podSpec.initContainers[i].env.exists(e, e.name == "LOG4J_FORMAT_MSG_NO_LOOKUPS") ?
                 JSONPatch{
                   op: "replace",
-                  path: variables.specPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/env/" + string(c.env.map(e, e.name).indexOf("LOG4J_FORMAT_MSG_NO_LOOKUPS")),
+                  path: variables.specPath + "/initContainers/" + string(i) + "/env/" + string(variables.podSpec.initContainers[i].env.map(e, e.name).indexOf("LOG4J_FORMAT_MSG_NO_LOOKUPS")),
                   value: {"name": "LOG4J_FORMAT_MSG_NO_LOOKUPS", "value": "true"}
                 } :
-              has(c.env) ?
+              has(variables.podSpec.initContainers[i].env) ?
                 JSONPatch{
                   op: "add",
-                  path: variables.specPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/env/-",
+                  path: variables.specPath + "/initContainers/" + string(i) + "/env/-",
                   value: {"name": "LOG4J_FORMAT_MSG_NO_LOOKUPS", "value": "true"}
                 } :
                 JSONPatch{
                   op: "add",
-                  path: variables.specPath + "/initContainers/" + string(variables.podSpec.initContainers.indexOf(c)) + "/env",
+                  path: variables.specPath + "/initContainers/" + string(i) + "/env",
                   value: [{"name": "LOG4J_FORMAT_MSG_NO_LOOKUPS", "value": "true"}]
                 }
-            ) : []
           )
