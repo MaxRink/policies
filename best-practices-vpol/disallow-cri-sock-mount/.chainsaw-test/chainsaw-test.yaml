@@ -58,3 +58,8 @@ spec:
         file: pod-emptydir-vol.yaml
     - apply:
         file: pod-no-volumes.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy disallow-container-sock-mounts failed')): true
+        file: bad-replicationcontroller.yaml
