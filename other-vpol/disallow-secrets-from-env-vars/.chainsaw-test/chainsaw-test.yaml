@@ -11,6 +11,8 @@ spec:
   - name: step-01
     try:
     - apply:
+        file: ephemeral-rbac.yaml
+    - apply:
         file: ../disallow-secrets-from-env-vars.yaml
     - patch:
         resource:
@@ -39,4 +41,21 @@ spec:
         - check:
             ($error != null): true
         file: podcontrollers-bad.yaml
-
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: replicationcontroller-bad.yaml
+    - apply:
+        file: ephemeral-pod.yaml
+    - script:
+        content: |
+          set -eu
+          if output=$(kubectl patch pod secret-env-ephemeral -n default --subresource=ephemeralcontainers --type=strategic --patch '{"spec":{"ephemeralContainers":[{"name":"debug","image":"busybox","envFrom":[{"secretRef":{"name":"credentials"}}]}]}}' 2>&1); then
+            echo 'expected the ephemeral Secret envFrom reference to be denied'
+            exit 1
+          fi
+          echo "$output" | grep -F 'Secrets must not come from envFrom statements' >/dev/null
+    finally:
+    - script:
+        content: kubectl delete pod secret-env-ephemeral -n default --ignore-not-found

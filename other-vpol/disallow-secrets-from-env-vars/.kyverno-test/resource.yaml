@@ -54,4 +54,27 @@ spec:
   - name: mysecret
     secret:
       secretName: mysecret
-
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc-secret-env
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    app: rc-secret-env
+  template:
+    metadata:
+      labels:
+        app: rc-secret-env
+    spec:
+      containers:
+      - name: app
+        image: busybox
+        env:
+        - name: TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: credentials
+              key: token
