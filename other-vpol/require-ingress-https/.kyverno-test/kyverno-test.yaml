@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - partial-tls-ingress.yaml
+- null-ingress-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: Ingress
@@ -37,4 +38,5 @@ results:
   - badingress04
   - badingress-empty-tls
   - partial-tls-ingress
+  - null-ingress-fields
   result: fail
