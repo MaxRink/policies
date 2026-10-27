@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-ephemeral-seccomp
+spec:
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+  initContainers:
+  - name: init
+    image: test:latest
+  ephemeralContainers:
+  - name: debug
+    image: test:latest
