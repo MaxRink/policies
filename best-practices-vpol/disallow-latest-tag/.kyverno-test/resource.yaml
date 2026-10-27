@@ -19,6 +19,33 @@ spec:
 apiVersion: v1
 kind: Pod
 metadata:
+  name: digest-pod
+spec:
+  containers:
+  - name: app
+    image: nginx@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: latest-tag-digest-pod
+spec:
+  containers:
+  - name: app
+    image: nginx:latest@sha256:0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: latest-port-pod
+spec:
+  containers:
+  - name: app
+    image: registry.example:5000/app:latest
+---
+apiVersion: v1
+kind: Pod
+metadata:
   name: init-latest-pod
 spec:
   initContainers:
