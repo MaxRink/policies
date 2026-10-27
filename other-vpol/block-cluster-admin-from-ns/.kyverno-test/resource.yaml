@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ordinary-user
+  namespace: testnamespace
+spec:
+  containers:
+  - name: test
+    image: busybox:1.35
