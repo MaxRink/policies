@@ -15,3 +15,25 @@ spec:
       containers:
       - name: app
         image: busybox
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: one-probe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: one-probe
+  template:
+    metadata:
+      labels:
+        app: one-probe
+    spec:
+      containers:
+      - name: app
+        image: busybox
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080

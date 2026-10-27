@@ -26,3 +26,9 @@ results:
   resources:
   - no-probes
   result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: validate-probes
+  resources:
+  - one-probe
+  result: pass
