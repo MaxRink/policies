@@ -57,3 +57,37 @@ rules:
   resources: ["*"]
   verbs: ["get"]
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: goodcr04
+rules:
+- apiGroups: ["apps"]
+  resources: ["nodes/proxy"]
+  verbs: ["get"]
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: badcr05
+rules:
+- apiGroups: ["*"]
+  resources: ["nodes/proxy"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: goodcr03
+rules:
+- nonResourceURLs: ["/healthz"]
+  verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: omitted-rules
+---

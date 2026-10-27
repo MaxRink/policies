@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "ClusterRole, RBAC"
-digest: f7bf8749c981c9905c8ccfd0be85abbafa69684999234ec69841b69d2673e971
+digest: b2d5ad699621a943bf47b911b2ad8fe50dc722904c90ca11b4ca6e8e8594cd4b
 
 
 createdAt: "2025-05-11T17:46:11Z"
