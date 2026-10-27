@@ -18,6 +18,8 @@ results:
   policy: imagepullpolicy-always
   resources:
   - myapp-pod-2
+  - registry-port
+  - init-latest
   result: fail
 - isValidatingPolicy: true
   kind: Deployment
