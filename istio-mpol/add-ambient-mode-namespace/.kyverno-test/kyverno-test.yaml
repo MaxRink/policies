@@ -5,17 +5,18 @@ metadata:
 policies:
 - ../add-ambient-mode-namespace.yaml
 resources:
-- ../.chainsaw-test/patched-ns-disabled.yaml
-- ../.chainsaw-test/patched-ns-enabled.yaml
-- ../.chainsaw-test/patched-ns-alt.yaml
-- ../.chainsaw-test/patched-ns-none.yaml
+- resource.yaml
 results:
-- policy: add-ambient-mode-namespace
-  isMutatingPolicy: true
-  kind: Namespace
+- kind: Namespace
+  patchedResources: patched-ambient.yaml
+  policy: add-ambient-mode-namespace
   resources:
-  - istio-test-none-ns
-  - istio-test-dis-ns
-  - istio-test-en-ns
-  - istio-test-alt-ns
+  - ambient-ns
   result: pass
+  isMutatingPolicy: true
+- kind: Namespace
+  policy: add-ambient-mode-namespace
+  resources:
+  - sidecar-ns
+  result: skip
+  isMutatingPolicy: true
