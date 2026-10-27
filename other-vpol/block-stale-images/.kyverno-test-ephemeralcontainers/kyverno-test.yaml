@@ -1,0 +1,36 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: block-stale-images-ephemeralcontainers
+policies:
+- ../block-stale-images.yaml
+resources:
+- resource.yaml
+context: ../.kyverno-test/context.yaml
+values:
+  subresources:
+  - parentResource:
+      name: pods
+      singularName: pod
+      namespaced: true
+      kind: Pod
+      version: v1
+    subresource:
+      name: pods/ephemeralcontainers
+      singularName: pod
+      namespaced: true
+      kind: Pod
+      version: v1
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  operation: UPDATE
+  policy: block-stale-images
+  resourceSpecs:
+  - group: ""
+    version: v1
+    kind: Pod
+    namespace: default
+    name: redis-ephemeral-bad
+    subresource: ephemeralcontainers
+  result: fail
