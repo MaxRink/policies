@@ -12,8 +12,8 @@ metadata:
     policies.kyverno.io/description: >-
       The ':latest' tag is mutable and can lead to unexpected errors if the
       image changes. A best practice is to use an immutable tag that maps to
-      a specific version of an application Pod. This policy validates that the image
-      specifies a tag and that it is not called `latest`.
+      a specific version of an application Pod.       This policy validates that an image has a tag or digest and rejects the `latest`
+      tag unless the image is pinned by digest.
 spec:
   validationActions: [Audit]
   evaluation: 
@@ -53,13 +53,15 @@ spec:
   validations:
           - expression: >-
               variables.allContainers.all(container,
-              (has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
+              has(container.image) && container.image != null &&
+              ((has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
               (isImage(container.image) &&
-              (image(container.image).tag() != '' || image(container.image).containsDigest())))
+              (image(container.image).tag() != '' || image(container.image).containsDigest()))))
             message: "An image tag is required."
           - expression: >-
               variables.allContainers.all(container,
-              (has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
+              has(container.image) && container.image != null &&
+              ((has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
               (isImage(container.image) &&
-              (image(container.image).tag() != 'latest' || image(container.image).containsDigest())))
+              (image(container.image).tag() != 'latest' || image(container.image).containsDigest()))))
             message: "Using a mutable image tag e.g. 'latest' is not allowed."

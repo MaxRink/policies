@@ -2,7 +2,7 @@ name: disallow-latest-tag-VPOL
 version: 1.0.0
 displayName: Disallow Latest Tag in VPOL
 description: >-
-  The ':latest' tag is mutable and can lead to unexpected errors if the image changes. A best practice is to use an immutable tag that maps to a specific version of an application Pod. This policy validates that the image specifies a tag and that it is not called `latest`.
+  The ':latest' tag is mutable and can lead to unexpected errors if the image changes. A best practice is to use an immutable tag that maps to a specific version of an application Pod. This policy requires a tag or digest, rejects the `latest` tag unless the image is pinned by digest, and denies missing, null, or invalid image references.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/best-practices-vpol/disallow-latest-tag/disallow-latest-tag.yaml
@@ -12,7 +12,7 @@ keywords:
   - Best Practices
   - VPOL
 readme: |
-  The ':latest' tag is mutable and can lead to unexpected errors if the image changes. A best practice is to use an immutable tag that maps to a specific version of an application Pod. This policy validates that the image specifies a tag and that it is not called `latest`.
+  The ':latest' tag is mutable and can lead to unexpected errors if the image changes. A best practice is to use an immutable tag that maps to a specific version of an application Pod. This policy requires a tag or digest, rejects the `latest` tag unless the image is pinned by digest, and denies missing, null, or invalid image references.
   
   ### Fine-grained PolicyException use
 
@@ -33,5 +33,5 @@ annotations:
   kyverno/category: "Best Practices in VPOL"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: f1907782d6d60356d72a3a30fbfb93ae3bc50a2fb16f590fae3b2b3c17549828
+digest: 1db93c44a57b1d330fc13b5b1b573b8416094084bef18c93505bcad53c2bb3b2
 createdAt: "2025-05-05T13:19:12Z"
