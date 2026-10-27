@@ -41,4 +41,5 @@ results:
   resources:
   - goodrb01
   - goodrb02
+  - goodrb03
   result: pass
