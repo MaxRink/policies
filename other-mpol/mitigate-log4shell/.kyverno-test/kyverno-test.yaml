@@ -6,6 +6,7 @@ policies:
 - ../mitigate-log4shell.yaml
 resources:
 - resource.yaml
+- controllers-resource.yaml
 results:
 - kind: Pod
   patchedResources: patchedResource.yaml
@@ -19,5 +20,19 @@ results:
   policy: log4shell-mitigation
   resources:
   - demo-pod02
+  result: pass
+  isMutatingPolicy: true
+- kind: ReplicationController
+  patchedResources: controllers-patched.yaml
+  policy: log4shell-mitigation
+  resources:
+  - log4shell-replicationcontroller
+  result: pass
+  isMutatingPolicy: true
+- kind: ReplicaSet
+  patchedResources: controllers-patched.yaml
+  policy: log4shell-mitigation
+  resources:
+  - log4shell-replicaset
   result: pass
   isMutatingPolicy: true
