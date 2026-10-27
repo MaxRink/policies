@@ -12,6 +12,7 @@ results:
   policy: pod-lifetime
   resources:
   - test-lifetime-fail
+  - test-lifetime-invalid
   result: fail
 - isValidatingPolicy: true
   kind: Pod
