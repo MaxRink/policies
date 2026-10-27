@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: best-effort-rc
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    app: best-effort
+  template:
+    metadata:
+      labels:
+        app: best-effort
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.25

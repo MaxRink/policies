@@ -39,3 +39,8 @@ spec:
         - check:
             (contains($error, 'The Pod must have Burstable QoS')): true
         file: podcontroller-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'The Pod must have Burstable QoS')): true
+        file: ../.kyverno-test/replicationcontroller-bad.yaml

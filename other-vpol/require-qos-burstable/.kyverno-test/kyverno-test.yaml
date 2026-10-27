@@ -6,6 +6,7 @@ policies:
 - ../require-qos-burstable.yaml
 resources:
 - resource.yaml
+- replicationcontroller-bad.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -16,6 +17,12 @@ results:
   - zero-resources-pod
   - zero-exponent-pod
   - badpod01
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: require-qos-burstable
+  resources:
+  - best-effort-rc
   result: fail
 - isValidatingPolicy: true
   kind: Pod
