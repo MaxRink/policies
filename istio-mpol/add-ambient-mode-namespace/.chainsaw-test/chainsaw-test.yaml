@@ -37,6 +37,18 @@ spec:
         file: patched-ns-enabled.yaml
     - assert:
         file: patched-ns-none.yaml
+  - name: system-namespaces
+    try:
+    - apply:
+        resource: {apiVersion: v1, kind: Namespace, metadata: {name: kube-system}}
+    - apply:
+        resource: {apiVersion: v1, kind: Namespace, metadata: {name: istio-system}}
+    - script:
+        content: |
+          set -eu
+          for ns in kube-system istio-system; do
+            kubectl get namespace "$ns" -o json | jq -e '(.metadata.labels // {}) | has("istio.io/dataplane-mode") | not' >/dev/null
+          done
   - name: exception-isolation
     try:
     - apply:

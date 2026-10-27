@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Add Istio Ambient Mode
 createdAt: "2024-07-25T20:07:52.000Z"
 description: >-
-  Istio ambient mode uses `istio.io/dataplane-mode=ambient`. This policy adds the label only when no Istio mode is already selected, preserving sidecar injection and revision labels. Use it as an alternative to, not together with, the sidecar-injection policy.
+  Istio ambient mode uses `istio.io/dataplane-mode=ambient`. This policy adds the label to application namespaces only, excluding `kube-system` and `istio-system`, and preserves sidecar injection and revision selections. Use it as an alternative to, not together with, the sidecar-injection policy.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/istio-mpol/add-ambient-mode-namespace/add-ambient-mode-namespace.yaml
@@ -12,7 +12,7 @@ keywords:
   - kyverno
   - Istio
 readme: |
-  Istio ambient mode uses `istio.io/dataplane-mode=ambient`. This policy adds the label only when no Istio mode is already selected, preserving sidecar injection and revision labels. Use it as an alternative to, not together with, the sidecar-injection policy.
+  Istio ambient mode uses `istio.io/dataplane-mode=ambient`. This policy adds the label to application namespaces only, excluding `kube-system` and `istio-system`, and preserves sidecar injection and revision selections. Use it as an alternative to, not together with, the sidecar-injection policy.
   
   ### Fine-grained PolicyException use
 
@@ -30,4 +30,4 @@ annotations:
   kyverno/category: "Istio"
   kyverno/kubernetesVersion: "1.24"
   kyverno/subject: "Namespace"
-digest: f3422d82b8e18e2f0461f652870eb85c7c3b9e73204535ea4d8778c68c73a297
+digest: 10918323c64a859591506fe6ff3ca38d277986194b5f96455a0ab0ab2df2eaa8
