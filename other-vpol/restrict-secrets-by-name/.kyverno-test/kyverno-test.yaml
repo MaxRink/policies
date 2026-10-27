@@ -6,6 +6,9 @@ policies:
 - ../restrict-secrets-by-name.yaml
 resources:
 - resource.yaml
+- ../.chainsaw-test/podcontroller-bad.yaml
+- ../.chainsaw-test/podcontroller-good.yaml
+- replicationcontroller-unsafe-secret.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -27,6 +30,40 @@ results:
   resources:
   - good-pod-all
   result: pass
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: restrict-secrets-by-name
+  resources:
+  - baddeployment01
+  - baddeployment02
+  result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: restrict-secrets-by-name
+  resources:
+  - gooddeployment01
+  - gooddeployment02
+  result: pass
+- isValidatingPolicy: true
+  kind: CronJob
+  policy: restrict-secrets-by-name
+  resources:
+  - badcronjob01
+  - badcronjob02
+  result: fail
+- isValidatingPolicy: true
+  kind: CronJob
+  policy: restrict-secrets-by-name
+  resources:
+  - goodcronjob01
+  - goodcronjob02
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-secrets-by-name
+  resources:
+  - unsafe-secret-rc
+  result: fail
 - isValidatingPolicy: true
   kind: Deployment
   policy: restrict-secrets-by-name
