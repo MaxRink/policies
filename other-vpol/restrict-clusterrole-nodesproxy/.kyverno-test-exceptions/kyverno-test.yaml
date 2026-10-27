@@ -6,3 +6,4 @@ resources: [../.kyverno-test/resource.yaml]
 exceptions: [../.kyverno-test/exceptions.yaml]
 results:
 - {kind: ClusterRole, policy: restrict-clusterrole-nodesproxy, resources: [badcr01], result: pass, isValidatingPolicy: true}
+- {kind: ClusterRole, policy: restrict-clusterrole-nodesproxy, resources: [badcr03], result: fail, isValidatingPolicy: true}
