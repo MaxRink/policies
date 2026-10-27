@@ -1,0 +1,21 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: report-dra-adminaccess-namespaces
+spec:
+  steps:
+    - name: apply-and-check-policy
+      try:
+        - apply:
+            file: ../report-dra-adminaccess-namespaces.yaml
+        - assert:
+            file: policy-ready.yaml
+        - script:
+            content: |
+              set -eu
+              kubectl label namespace "$NAMESPACE" resource.kubernetes.io/admin-access=true --overwrite
+              kubectl -n "$NAMESPACE" get serviceaccount default
+  finally:
+    - script:
+        content: |
+          kubectl delete validatingpolicy report-dra-adminaccess-namespaces --ignore-not-found
