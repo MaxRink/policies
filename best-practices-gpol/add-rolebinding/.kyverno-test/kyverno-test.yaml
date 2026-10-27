@@ -1,0 +1,17 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: add-rolebinding
+policies:
+  - ../add-rolebinding.yaml
+resources:
+  - ../.chainsaw-test/ns.yaml
+userinfo: userinfo.yaml
+results:
+  - generatedResource: generatedResource.yaml
+    kind: Namespace
+    policy: add-rolebinding
+    resources:
+      - bad-addrb-ns
+    result: pass
+    isGeneratingPolicy: true
