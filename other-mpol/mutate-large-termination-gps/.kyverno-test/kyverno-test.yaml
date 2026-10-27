@@ -8,6 +8,7 @@ resources:
 - resource.yaml
 - exception-resource.yaml
 - replicationcontroller.yaml
+- controller-resource.yaml
 exceptions:
 - exception.yaml
 results:
@@ -34,5 +35,17 @@ results:
   patchedResources: replicationcontroller-patched.yaml
   policy: mutate-termination-grace-period-seconds
   resources: [rc]
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: controller-patched.yaml
+  policy: mutate-termination-grace-period-seconds
+  resources: [deployment01]
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: controller-patched.yaml
+  policy: mutate-termination-grace-period-seconds
+  resources: [cronjob01]
   result: pass
   isMutatingPolicy: true
