@@ -8,6 +8,7 @@ policies:
 resources:
 - resource.yaml
 - prefix-bypass.yaml
+- replicationcontrollers.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -26,6 +27,18 @@ results:
   - imageregistries-ns01/goodpod01
   - imageregistries-ns01/goodpod02
   - goodpod03
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: advanced-restrict-image-registries
+  resources:
+  - default/badregistry-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: advanced-restrict-image-registries
+  resources:
+  - default/allowedregistry-rc
   result: pass
 - isValidatingPolicy: true
   kind: Deployment
