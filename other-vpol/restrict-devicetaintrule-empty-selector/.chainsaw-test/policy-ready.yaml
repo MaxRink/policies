@@ -1,0 +1,8 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: restrict-devicetaintrule-empty-selector
+status:
+  conditionStatus:
+    (conditions[?type == 'WebhookConfigured']):
+      - status: "True"

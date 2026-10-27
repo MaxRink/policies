@@ -1,0 +1,48 @@
+apiVersion: policies.kyverno.io/v1
+kind: ValidatingPolicy
+metadata:
+  name: restrict-devicetaintrule-empty-selector
+  annotations:
+    policies.kyverno.io/title: Restrict Empty DeviceTaintRule Selectors
+    policies.kyverno.io/category: Other
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/minversion: 1.19.1
+    policies.kyverno.io/kubernetes-version: "1.34"
+    policies.kyverno.io/subject: DeviceTaintRule
+    policies.kyverno.io/description: >-
+      Reject a DeviceTaintRule whose deviceSelector is present but empty.
+      An empty selector matches every device, while an omitted selector matches
+      none. The resource.k8s.io API and DRADeviceTaintRules feature gate must be
+      enabled on the cluster.
+spec:
+  evaluation:
+    background:
+      enabled: false
+  validationActions:
+    - Audit
+  matchConstraints:
+    resourceRules:
+      - apiGroups:
+          - resource.k8s.io
+        apiVersions:
+          - v1alpha3
+          - v1beta2
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - devicetaintrules
+  validations:
+    - expression: >-
+        exceptions.allowedValues.orValue([]).exists(
+          value, value == 'restrict-devicetaintrule-empty-selector:allow-exact-empty-selector') ||
+        !has(object.spec.deviceSelector) ||
+        object.spec.deviceSelector == null ||
+        object.spec.deviceSelector.?driver.orValue('') != '' ||
+        object.spec.deviceSelector.?pool.orValue('') != '' ||
+        object.spec.deviceSelector.?device.orValue('') != ''
+      message: >-
+        A DeviceTaintRule deviceSelector must set at least one of driver, pool,
+        or device. An empty selector matches every device; omit the selector
+        entirely when no device should match.
