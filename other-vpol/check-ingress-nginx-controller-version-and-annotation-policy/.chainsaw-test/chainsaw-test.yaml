@@ -31,3 +31,12 @@ spec:
         - check:
             (contains($error, 'Policy check-ingress-nginx-controller-version-and-annotation-policy failed')): true
         file: bad-resource.yaml
+  - name: step-04
+    try:
+    - apply:
+        file: newer-controller.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'controller container must use ingress-nginx version 1.11.2 or higher')): true
+        file: spoofed-controller.yaml
