@@ -160,3 +160,20 @@ metadata:
   name: default-rules
 rules: null
 ---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: no-rules
+---
+# A non-resource URL rule has no resources field.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: nonresource-only
+rules:
+- nonResourceURLs: ["/healthz", "/livez"]
+  verbs: ["get"]
+- nonResourceURLs: ["/readyz"]
+  resources: null
+  verbs: ["get"]
+---

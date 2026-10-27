@@ -24,7 +24,15 @@ results:
   - goodcr03
   - goodcr04
   - default-rules
+  - no-rules
+  - nonresource-get
   result: pass
+- policy: restrict-wildcard-verbs
+  isValidatingPolicy: true
+  kind: ClusterRole
+  resources:
+  - nonresource-only
+  result: fail
 - policy: restrict-wildcard-verbs
   isValidatingPolicy: true
   kind: Role
@@ -43,4 +51,3 @@ results:
   - goodrole04
   - default-rules
   result: pass
-
