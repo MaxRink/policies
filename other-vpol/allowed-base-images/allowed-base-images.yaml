@@ -27,14 +27,28 @@ spec:
       expression: 'resource.Get("v1", "configmaps", "platform", "baseimages")'
     - name: allowedBaseImages
       expression: 'variables.baseImageConfigMap.data.?allowedbaseimages.orValue("").split(",").filter(img, img.trim() != "")'
+    - name: podSpec
+      expression: 'object.spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec.?template.?spec.orValue(object.spec))'
     - name: allContainers
-      expression: 'object.spec.containers + object.spec.?initContainers.orValue([]) + object.spec.?ephemeralContainers.orValue([])'
+      expression: 'variables.podSpec.containers + variables.podSpec.?initContainers.orValue([]) + variables.podSpec.?ephemeralContainers.orValue([])'
     - name: baseImages
       expression: 'variables.allContainers.map(container, image.GetMetadata(container.image).manifest.?annotations[?"org.opencontainers.image.base.name"].orValue(""))'
   matchConstraints:
     resourceRules:
-      - resources: ["pods"]
+      - resources: ["pods", "replicationcontrollers"]
         operations: ["CREATE", "UPDATE"]
+        apiGroups: [""]
+        apiVersions: ["v1"]
+      - resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+        operations: ["CREATE", "UPDATE"]
+        apiGroups: ["apps"]
+        apiVersions: ["v1"]
+      - resources: ["jobs", "cronjobs"]
+        operations: ["CREATE", "UPDATE"]
+        apiGroups: ["batch"]
+        apiVersions: ["v1"]
+      - resources: ["pods/ephemeralcontainers"]
+        operations: ["UPDATE"]
         apiGroups: [""]
         apiVersions: ["v1"]
   validations:
