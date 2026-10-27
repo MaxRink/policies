@@ -1,0 +1,32 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: init-pod
+  annotations:
+    inject-certs: enabled
+spec:
+  initContainers:
+  - name: init
+    image: init:v1
+    volumeMounts:
+    - name: existing
+      mountPath: /existing
+    - name: etc-ssl-certs
+      mountPath: /etc/ssl/certs
+  - name: init-without-mounts
+    image: init:v1
+    volumeMounts:
+    - name: etc-ssl-certs
+      mountPath: /etc/ssl/certs
+  containers:
+  - name: app
+    image: app:v1
+    volumeMounts:
+    - name: etc-ssl-certs
+      mountPath: /etc/ssl/certs
+  volumes:
+  - name: existing
+    emptyDir: {}
+  - name: etc-ssl-certs
+    configMap:
+      name: ca-pemstore

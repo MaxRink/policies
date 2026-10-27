@@ -42,18 +42,18 @@ spec:
           spec: Object.spec{
             containers: object.spec.containers.filter(container, !exceptions.allowedImages.exists(image, image == container.image)).map(container, Object.spec.containers{
               name: container.name,
-              volumeMounts: (has(container.volumeMounts) && container.volumeMounts.exists(vm, vm.name == "etc-ssl-certs")) 
+              volumeMounts: (has(container.volumeMounts) && container.volumeMounts != null && container.volumeMounts.exists(vm, vm.mountPath == "/etc/ssl/certs"))
                 ? container.volumeMounts 
-                : ((has(container.volumeMounts) ? container.volumeMounts : []) + [
+                : ((has(container.volumeMounts) && container.volumeMounts != null ? container.volumeMounts : []) + [
                     Object.spec.containers.volumeMounts{
                       name: "etc-ssl-certs",
                       mountPath: "/etc/ssl/certs"
                     }
                   ])
             }),
-            volumes: (has(object.spec.volumes) && object.spec.volumes.exists(v, v.name == "etc-ssl-certs"))
+            volumes: (has(object.spec.volumes) && object.spec.volumes != null && object.spec.volumes.exists(v, v.name == "etc-ssl-certs"))
               ? object.spec.volumes
-              : ((has(object.spec.volumes) ? object.spec.volumes : []) + [
+              : ((has(object.spec.volumes) && object.spec.volumes != null ? object.spec.volumes : []) + [
                   Object.spec.volumes{
                     name: "etc-ssl-certs",
                     configMap: Object.spec.volumes.configMap{
@@ -63,3 +63,26 @@ spec:
                 ])
           }
         }
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        object.spec.?initContainers.orValue([]).filter(container,
+          !exceptions.allowedImages.exists(image, image == container.image) &&
+          (!has(container.volumeMounts) || container.volumeMounts == null ||
+           !container.volumeMounts.exists(vm, vm.mountPath == "/etc/ssl/certs"))
+        ).map(container,
+          JSONPatch{
+            op: "add",
+            path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(container)) +
+                ((has(container.volumeMounts) && container.volumeMounts != null) ? "/volumeMounts/-" : "/volumeMounts"),
+            value: (has(container.volumeMounts) && container.volumeMounts != null)
+                ? dyn({
+                    "name": "etc-ssl-certs",
+                    "mountPath": "/etc/ssl/certs"
+                  })
+                : dyn([{
+                    "name": "etc-ssl-certs",
+                    "mountPath": "/etc/ssl/certs"
+                  }])
+          }
+        )

@@ -19,7 +19,7 @@ readme: |
   Enable PolicyException support in Kyverno, reference the `MutatingPolicy` named
   `add-certificates-volume` in `spec.policyRefs`, and narrow the exception with
   `spec.matchConditions` using the exact request identity.
-  The policy compares each regular container's image exactly against
+  The policy compares each regular and init container's image exactly against
   `exceptions.allowedImages`, populated from `spec.images` on matching exceptions.
   Matching containers skip the certificate volumeMount; other containers still
   receive it. The shared Pod volume is still added, even if every image is exempt.
@@ -32,4 +32,4 @@ annotations:
   kyverno/category: "Sample"
   kyverno/kubernetesVersion: "1.21"
   kyverno/subject: "Pod,Volume"
-digest: b634755888a56c1b422233aaa7b01a846fadd4841823433b64943f69fa50f62a
+digest: c5f9d2ab2b2f8a131a23d7fa7451952adb165b7a9b7d241a869a03ff78318f9a

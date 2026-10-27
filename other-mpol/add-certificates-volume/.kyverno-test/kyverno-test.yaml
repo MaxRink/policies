@@ -6,15 +6,44 @@ policies:
 - ../add-certificates-volume.yaml
 resources:
 - resource.yaml
+- init-resource.yaml
+- already-injected.yaml
+- conflicting-mounts-resource.yaml
+- null-resource.yaml
 - exception-resource.yaml
 exceptions:
 - exception.yaml
 results:
 - kind: Pod
+  patchedResources: conflicting-mounts-patched.yaml
+  policy: add-certificates-volume
+  resources: [conflicting-mounts]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: null-patched.yaml
+  policy: add-certificates-volume
+  resources: [null-lists]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: already-injected.yaml
+  policy: add-certificates-volume
+  resources: [already-injected]
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
   patchedResources: patchedResource.yaml
   policy: add-certificates-volume
   resources:
   - mypod
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: init-patched.yaml
+  policy: add-certificates-volume
+  resources:
+  - init-pod
   result: pass
   isMutatingPolicy: true
 - kind: Pod
