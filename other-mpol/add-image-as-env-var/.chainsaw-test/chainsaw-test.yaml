@@ -27,3 +27,9 @@ spec:
         file: kuttlresource.yaml
     - assert:
         file: resource-mutated.yaml
+  - name: step-03-large-container-list
+    try:
+    - apply:
+        file: large-pod.yaml
+    - assert:
+        file: large-pod-patched.yaml

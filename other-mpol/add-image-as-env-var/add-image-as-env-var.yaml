@@ -24,45 +24,54 @@ spec:
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
         resources: ["pods"]
+  variables:
+    - name: containers
+      expression: object.spec.containers
+    - name: initContainers
+      expression: '!has(object.spec.initContainers) || object.spec.initContainers == null ? [] : object.spec.initContainers'
+    - name: containersPath
+      expression: '"/spec/containers"'
+    - name: initContainersPath
+      expression: '"/spec/initContainers"'
   mutations:
     - patchType: JSONPatch
       jsonPatch:
         expression: |-
-          object.spec.containers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
-            has(c.env) && c.env != null && c.env.exists(e, e.name == "K8S_IMAGE") ?
+          lists.range(variables.containers.size()).filter(i, !exceptions.allowedImages.exists(image, image == variables.containers[i].image)).map(i,
+            has(variables.containers[i].env) && variables.containers[i].env != null && variables.containers[i].env.exists(e, e.name == "K8S_IMAGE") ?
             JSONPatch{
               op: "replace",
-              path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/env/" + string(c.env.map(e, e.name).indexOf("K8S_IMAGE")),
-              value: {"name": "K8S_IMAGE", "value": string(c.image)}
+              path: variables.containersPath + "/" + string(i) + "/env/" + string(variables.containers[i].env.map(e, e.name).indexOf("K8S_IMAGE")),
+              value: {"name": "K8S_IMAGE", "value": string(variables.containers[i].image)}
             } :
-            (!has(c.env) || c.env == null) ?
+            (!has(variables.containers[i].env) || variables.containers[i].env == null) ?
             JSONPatch{
               op: "add",
-              path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/env",
-              value: [{"name": "K8S_IMAGE", "value": string(c.image)}]
+              path: variables.containersPath + "/" + string(i) + "/env",
+              value: [{"name": "K8S_IMAGE", "value": string(variables.containers[i].image)}]
             } :
             JSONPatch{
               op: "add",
-              path: "/spec/containers/" + string(object.spec.containers.indexOf(c)) + "/env/-",
-              value: {"name": "K8S_IMAGE", "value": string(c.image)}
+              path: variables.containersPath + "/" + string(i) + "/env/-",
+              value: {"name": "K8S_IMAGE", "value": string(variables.containers[i].image)}
             }
           ) +
-          (has(object.spec.initContainers) && object.spec.initContainers != null ? object.spec.initContainers.filter(c, !exceptions.allowedImages.exists(image, image == c.image)).map(c,
-            has(c.env) && c.env != null && c.env.exists(e, e.name == "K8S_IMAGE") ?
+          lists.range(variables.initContainers.size()).filter(i, !exceptions.allowedImages.exists(image, image == variables.initContainers[i].image)).map(i,
+            has(variables.initContainers[i].env) && variables.initContainers[i].env != null && variables.initContainers[i].env.exists(e, e.name == "K8S_IMAGE") ?
             JSONPatch{
               op: "replace",
-              path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/env/" + string(c.env.map(e, e.name).indexOf("K8S_IMAGE")),
-              value: {"name": "K8S_IMAGE", "value": string(c.image)}
+              path: variables.initContainersPath + "/" + string(i) + "/env/" + string(variables.initContainers[i].env.map(e, e.name).indexOf("K8S_IMAGE")),
+              value: {"name": "K8S_IMAGE", "value": string(variables.initContainers[i].image)}
             } :
-            (!has(c.env) || c.env == null) ?
+            (!has(variables.initContainers[i].env) || variables.initContainers[i].env == null) ?
             JSONPatch{
               op: "add",
-              path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/env",
-              value: [{"name": "K8S_IMAGE", "value": string(c.image)}]
+              path: variables.initContainersPath + "/" + string(i) + "/env",
+              value: [{"name": "K8S_IMAGE", "value": string(variables.initContainers[i].image)}]
             } :
             JSONPatch{
               op: "add",
-              path: "/spec/initContainers/" + string(object.spec.initContainers.indexOf(c)) + "/env/-",
-              value: {"name": "K8S_IMAGE", "value": string(c.image)}
+              path: variables.initContainersPath + "/" + string(i) + "/env/-",
+              value: {"name": "K8S_IMAGE", "value": string(variables.initContainers[i].image)}
             }
-          ) : [])
+          )
