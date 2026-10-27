@@ -25,6 +25,13 @@ spec:
     - sample-frontend.example.com
     secretName: sample-frontend-tls
 ---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: null-default-backend
+spec:
+  defaultBackend: null
+---
 
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -60,4 +67,3 @@ spec:
   - hosts:
     - sample-frontend.example.com
     secretName: sample-frontend-tls
-

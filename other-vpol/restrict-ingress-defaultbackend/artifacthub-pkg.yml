@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Best Practices in vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Ingress"
-digest: d6f08b29b1a103a56bb255dde1d7c2646fccef2ccd9bd49f84de1d2ed6a21554
+digest: 11a2861526ed8c99958e0e97856a3fffa632d6d3b4b2504b5b8a94a937148ac4
 
 
 createdAt: "2025-05-11T17:46:12Z"
