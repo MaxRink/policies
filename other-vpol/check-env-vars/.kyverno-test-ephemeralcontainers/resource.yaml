@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-opa-enabled-ephemeral
+  namespace: myservice
+spec:
+  containers:
+  - name: app
+    image: busybox
+  ephemeralContainers:
+  - name: debug
+    image: busybox
+    env:
+    - name: DISABLE_OPA
+      value: "true"

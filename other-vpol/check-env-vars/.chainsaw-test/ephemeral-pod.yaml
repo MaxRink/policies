@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: opa-ephemeral
+spec:
+  nodeSelector:
+    kyverno.io/chainsaw-never-schedule: "true"
+  containers:
+  - name: app
+    image: busybox
