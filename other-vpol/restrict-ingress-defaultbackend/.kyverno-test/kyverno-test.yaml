@@ -19,3 +19,9 @@ results:
   resources:
   - default/sample-app-2
   result: pass
+- isValidatingPolicy: true
+  kind: Ingress
+  policy: restrict-ingress-defaultbackend
+  resources:
+  - null-default-backend
+  result: pass
