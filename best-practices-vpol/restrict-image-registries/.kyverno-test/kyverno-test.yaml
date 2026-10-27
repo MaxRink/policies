@@ -30,7 +30,16 @@ results:
   - goodpod01
   - goodpod02
   - goodpod03
+  - goodpod-digest
   result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-image-registries
+  resources:
+  - implicit-docker-hub
+  - evil-registry-prefix
+  - registry-port
+  result: fail
 - isValidatingPolicy: true
   kind: Pod
   policy: restrict-image-registries
