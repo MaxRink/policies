@@ -44,3 +44,5 @@ spec:
         - check:
             ($error != null): true
         file: ../.kyverno-test/replicationcontroller-bad.yaml
+    - apply:
+        file: ../.kyverno-test/null-ports-pod.yaml
