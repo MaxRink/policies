@@ -20,7 +20,7 @@ their own API versions.
 The [migration audit](.github/legacy-policy-migration.json) records every removed
 sample, its immutable source revision, replacement candidates, and any behavioral
 gaps. A partial replacement is not considered equivalent. See
-[kyverno/kyverno#17771](https://github.com/kyverno/kyverno/issues/17771) for the complete
+[kyverno/policies#1543](https://github.com/kyverno/policies/issues/1543) for the complete
 missing-policy checklist and per-sample remediation details.
 
 ## Usage and Documentation
@@ -31,13 +31,13 @@ See https://kyverno.io/policies/ for a list of all the policies represented here
 
 Anyone and everyone is welcome to write and contribute Kyverno policies! We have standardized on several practices to ensure these policies are effective, descriptive, and assist in easy location on the website. Please follow these guidelines when contributing or modifying a policy.
 
-* As a CNCF project, Kyverno requires all contributors to abide by the DCO guidelines published [here](https://github.com/cncf/foundation/blob/main/dco-guidelines.md). This entails signing off on all git commits.
+* As a CNCF project, Kyverno requires all contributors to abide by the DCO guidelines published [here](https://github.com/cncf/foundation/blob/main/policies-guidance/dco-guidelines.md). This entails signing off on all git commits.
 
 * Use the [Kyverno annotations](https://github.com/kyverno/policies/wiki/Kyverno-annotations) to mark your policy with descriptive metadata. This is not only important to explain your policy, but to allow the filtering logic on the [policies page](https://kyverno.io/policies/) to work effectively.
 
 * Name your policy something descriptive which matches its function. Either dashes or underscores are permitted.
 
-* Provide test resources (where possible) which allow your policy to be validated using the Kyverno CLI. See an example of a complete policy, resource, and test [here](pod-security-vpol/baseline/disallow-capabilities). If unfamiliar with the Kyverno CLI and its test ability, please see the documentation [here](https://kyverno.io/docs/testing-policies/).
+* Provide test resources (where possible) which allow your policy to be validated using the Kyverno CLI. See an example of a complete policy, resource, and test [here](pod-security-vpol/baseline/disallow-capabilities). If unfamiliar with the Kyverno CLI and its test ability, please see the documentation [here](https://kyverno.io/docs/guides/testing-policies/).
 
 * For validating policies, please set `spec.validationActions: [Audit]` so that should a user download and apply the policy without having a yet full understanding of Kyverno, it will not cause unintended harm to their environment by blocking resources.
 
