@@ -1,0 +1,62 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: ClusterResource
+metadata:
+  name: dra-claims
+spec:
+  resources:
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: team-a
+        labels:
+          resource.kubernetes.io/admin-access: "true"
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: team-b
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: team-c
+        labels:
+          resource.kubernetes.io/admin-access: "true"
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: team-d
+        labels:
+          resource.kubernetes.io/admin-access: "true"
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: team-e
+        labels:
+          resource.kubernetes.io/admin-access: "true"
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: team-f
+        labels:
+          resource.kubernetes.io/admin-access: "true"
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: team-g
+        labels:
+          resource.kubernetes.io/admin-access: "true"
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: team-h
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: team-i
+        labels:
+          resource.kubernetes.io/admin-access: "true"
+    - apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: team-j
+        labels:
+          resource.kubernetes.io/admin-access: "true"

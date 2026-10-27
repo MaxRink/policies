@@ -1,0 +1,67 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: admin-overlap
+  namespace: team-a
+  uid: admin-overlap-exception-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: gpu.example.com
+          adminAccess: true
+status:
+  allocation:
+    devices:
+      results:
+        - request: device
+          driver: gpu.example.com
+          pool: worker-a
+          device: gpu-0
+          adminAccess: true
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: ordinary-overlap
+  namespace: team-b
+  uid: ordinary-overlap-exception-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: gpu.example.com
+status:
+  allocation:
+    devices:
+      results:
+        - request: device
+          driver: gpu.example.com
+          pool: worker-a
+          device: gpu-0
+          adminAccess: false
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: admin-overlap-sibling
+  namespace: team-j
+  uid: admin-overlap-sibling-exception-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: gpu.example.com
+          adminAccess: true
+status:
+  allocation:
+    devices:
+      results:
+        - request: device
+          driver: gpu.example.com
+          pool: worker-a
+          device: gpu-0
+          adminAccess: true

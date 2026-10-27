@@ -1,0 +1,123 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: report-dra-adminaccess-device-overlap
+spec:
+  steps:
+    - name: shared-exception-namespace
+      skipDelete: true
+      try:
+        - apply:
+            file: policy-exceptions-namespace.yaml
+    - name: apply-policy
+      try:
+        - apply:
+            file: rbac-reporting.yaml
+        - script:
+            content: |
+              set -eu
+              for attempt in $(seq 1 30); do
+                ready=true
+                for controller in kyverno-admission-controller kyverno-background-controller kyverno-reports-controller; do
+                  if ! kubectl auth can-i list resourceclaims.resource.k8s.io --as="system:serviceaccount:kyverno:$controller" | grep -qx yes; then
+                    ready=false
+                  fi
+                done
+                if [ "$ready" = true ]; then
+                  exit 0
+                fi
+                sleep 1
+              done
+              echo 'DRA ResourceClaim list RBAC did not aggregate for Kyverno controllers'
+              exit 1
+        - apply:
+            file: ../report-dra-adminaccess-device-overlap.yaml
+        - assert:
+            file: policy-ready.yaml
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" delete resourceclaims chainsaw-admin-overlap chainsaw-admin-overlap-sibling --ignore-not-found=true
+              kubectl delete namespace dra-overlap-peer --wait=true --ignore-not-found=true
+              kubectl create namespace dra-overlap-peer
+              kubectl label namespace "$NAMESPACE" resource.kubernetes.io/admin-access=true --overwrite
+              kubectl label namespace dra-overlap-peer resource.kubernetes.io/admin-access=true --overwrite
+              kubectl -n policy-exceptions apply -f - <<YAML
+              apiVersion: policies.kyverno.io/v1
+              kind: PolicyException
+              metadata:
+                name: dra-adminaccess-overlap-exception
+                namespace: policy-exceptions
+              spec:
+                policyRefs:
+                  - kind: ValidatingPolicy
+                    name: report-dra-adminaccess-device-overlap
+                matchConditions:
+                  - name: exact-claim
+                    expression: object.metadata.namespace == '$NAMESPACE' && object.metadata.name == 'chainsaw-admin-overlap'
+                allowedValues:
+                  - report-dra-adminaccess-device-overlap:allow-exact-report
+              YAML
+              kubectl -n "$NAMESPACE" create -f - <<'YAML'
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: chainsaw-admin-overlap
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: gpu.example.com
+                        adminAccess: true
+              YAML
+              kubectl -n "$NAMESPACE" create -f - <<'YAML'
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: chainsaw-admin-overlap-sibling
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: gpu.example.com
+                        adminAccess: true
+              YAML
+              kubectl -n dra-overlap-peer create -f - <<'YAML'
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: chainsaw-ordinary-overlap
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: gpu.example.com
+              YAML
+              kubectl -n "$NAMESPACE" patch resourceclaim chainsaw-admin-overlap --subresource=status --type=merge -p '{"status":{"allocation":{"devices":{"results":[{"request":"device","driver":"gpu.example.com","pool":"worker-a","device":"gpu-0","adminAccess":true}]}}}}'
+              kubectl -n "$NAMESPACE" patch resourceclaim chainsaw-admin-overlap-sibling --subresource=status --type=merge -p '{"status":{"allocation":{"devices":{"results":[{"request":"device","driver":"gpu.example.com","pool":"worker-a","device":"gpu-0","adminAccess":true}]}}}}'
+              kubectl -n dra-overlap-peer patch resourceclaim chainsaw-ordinary-overlap --subresource=status --type=merge -p '{"status":{"allocation":{"devices":{"results":[{"request":"device","driver":"gpu.example.com","pool":"worker-a","device":"gpu-0","adminAccess":false}]}}}}'
+              for attempt in $(seq 1 60); do
+                report=$(kubectl -n "$NAMESPACE" get policyreport -o jsonpath='{range .items[*]}{.scope.kind}:{.scope.name}:{range .results[*]}{.policy}:{.result}{"\n"}{end}{end}' 2>/dev/null || true)
+                if printf '%s\n' "$report" | grep -Fqx "ResourceClaim:chainsaw-admin-overlap-sibling:report-dra-adminaccess-device-overlap:fail"; then
+                  if printf '%s\n' "$report" | grep -Fqx "ResourceClaim:chainsaw-admin-overlap:report-dra-adminaccess-device-overlap:fail"; then
+                    printf '%s\n' "$report"
+                    echo "the exact ResourceClaim PolicyException did not suppress its overlap report"
+                    exit 1
+                  fi
+                  printf '%s\n' "$report"
+                  exit 0
+                fi
+                sleep 2
+              done
+              printf '%s\n' "$report"
+              echo "timed out waiting for the adminAccess device overlap report"
+              exit 1
+      finally:
+        - script:
+            content: |
+              kubectl delete namespace dra-overlap-peer --wait=true --ignore-not-found=true
+              kubectl -n "$NAMESPACE" delete resourceclaims chainsaw-admin-overlap chainsaw-admin-overlap-sibling --ignore-not-found=true
+              kubectl -n policy-exceptions delete policyexceptions.policies.kyverno.io dra-adminaccess-overlap-exception --ignore-not-found=true
