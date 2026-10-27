@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: low-limits
+spec:
+  initContainers:
+  - name: init-all
+    image: init:v1
+    resources:
+      limits:
+        cpu: 50m
+        memory: 64Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  - name: init-cpu-missing
+    image: init:v1
+    resources:
+      limits:
+        cpu: 50m
+        memory: 200Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+  - name: init-memory-missing
+    image: init:v1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 64Mi
+      requests:
+        cpu: 100m
+        memory: 64Mi
+  - name: init-high-limits
+    image: init:v1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 200Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi
+  containers:
+  - name: app-all
+    image: app:v1
+    resources:
+      limits:
+        cpu: 50m
+        memory: 64Mi
+      requests:
+        cpu: 50m
+        memory: 64Mi
+  - name: app-cpu-missing
+    image: app:v1
+    resources:
+      limits:
+        cpu: 50m
+        memory: 200Mi
+      requests:
+        cpu: 50m
+        memory: 100Mi
+  - name: app-memory-missing
+    image: app:v1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 64Mi
+      requests:
+        cpu: 100m
+        memory: 64Mi
+  - name: app-high-limits
+    image: app:v1
+    resources:
+      limits:
+        cpu: 200m
+        memory: 200Mi
+      requests:
+        cpu: 100m
+        memory: 100Mi

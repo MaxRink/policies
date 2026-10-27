@@ -22,13 +22,26 @@ kind: Pod
 metadata:
   name: pod02
 spec:
+  initContainers:
+  - name: init
+    image: nginx:latest
+    resources:
+      limits:
+        cpu: 50m
+        memory: 64Mi
+      requests:
+        memory: 64Mi
+        cpu: 50m
   containers:
   - name: pod02-01
     image: nginx:latest
     resources:
       requests:
-        memory: "100Mi"
-        cpu: "100m"
+        memory: 64Mi
+        cpu: 50m
+      limits:
+        cpu: 50m
+        memory: 64Mi
   - name: pod02-02
     image: nginx:latest
     resources:
