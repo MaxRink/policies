@@ -1,0 +1,75 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-devicetaintrule-empty-selector
+spec:
+  steps:
+    - name: apply-policy
+      try:
+        - apply:
+            file: ../restrict-devicetaintrule-empty-selector.yaml
+        - patch:
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              metadata:
+                name: restrict-devicetaintrule-empty-selector
+              spec:
+                validationActions:
+                  - Deny
+        - assert:
+            file: policy-ready.yaml
+    - name: test-when-dra-device-taint-rule-api-is-enabled
+      try:
+        - script:
+            content: |
+              set -eu
+              if kubectl get --raw /apis/resource.k8s.io/v1/devicetaintrules >/dev/null 2>&1; then
+                api_version=v1
+              elif kubectl get --raw /apis/resource.k8s.io/v1beta2/devicetaintrules >/dev/null 2>&1; then
+                api_version=v1beta2
+              elif kubectl get --raw /apis/resource.k8s.io/v1alpha3/devicetaintrules >/dev/null 2>&1; then
+                api_version=v1alpha3
+              else
+                echo "SKIP: DeviceTaintRule API is unavailable; enable the DRADeviceTaints and, where supported, DRADeviceTaintRules feature gates to run this admission test."
+                exit 0
+              fi
+              kubectl delete devicetaintrules chainsaw-empty-selector chainsaw-scoped-selector --wait=true --ignore-not-found
+              if output=$(kubectl create -f - 2>&1 <<YAML
+              apiVersion: resource.k8s.io/$api_version
+              kind: DeviceTaintRule
+              metadata:
+                name: chainsaw-empty-selector
+              spec:
+                deviceSelector: {}
+                taint:
+                  key: test.example.com/empty-selector
+                  effect: NoSchedule
+              YAML
+              ); then
+                printf '%s\n' "$output"
+                echo "expected an empty DeviceTaintRule selector to be denied"
+                exit 1
+              else
+                printf '%s\n' "$output"
+                printf '%s\n' "$output" | grep -q restrict-devicetaintrule-empty-selector
+              fi
+              kubectl create -f - <<YAML
+              apiVersion: resource.k8s.io/$api_version
+              kind: DeviceTaintRule
+              metadata:
+                name: chainsaw-scoped-selector
+              spec:
+                deviceSelector:
+                  driver: gpu.example.com
+                taint:
+                  key: test.example.com/scoped-selector
+                  effect: NoSchedule
+              YAML
+  finally:
+    - script:
+        content: |
+          if kubectl get --raw /apis/resource.k8s.io/v1/devicetaintrules >/dev/null 2>&1 || kubectl get --raw /apis/resource.k8s.io/v1beta2/devicetaintrules >/dev/null 2>&1 || kubectl get --raw /apis/resource.k8s.io/v1alpha3/devicetaintrules >/dev/null 2>&1; then
+            kubectl delete devicetaintrules chainsaw-empty-selector chainsaw-scoped-selector --wait=true --ignore-not-found
+          fi
+          kubectl delete validatingpolicy restrict-devicetaintrule-empty-selector --ignore-not-found
