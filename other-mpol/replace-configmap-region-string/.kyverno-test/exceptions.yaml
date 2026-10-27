@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: skip-region-rewrite
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - name: replace-configmap-region-string
+    kind: MutatingPolicy
+  allowedValues:
+  - configmap-data-region-rewrite
+  matchConditions:
+  - name: target-configmap
+    expression: object.metadata.namespace == 'default' && object.metadata.name == 'exception-config'

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rewrite-config
+  namespace: default
+data:
+  endpoint: https://s3.ap-south-1.amazonaws.com
+  multiline: |
+    primary=ap-south-1
+    backup=ap-south-1
+  quoted: 'O''Reilly uses ap-south-1 and says "hello"'
+  json: '{"region":"ap-south-1","backup":"ap-south-1"}'
+  unchanged: keep-me
+binaryData:
+  archive: YXAtc291dGgtMQ==

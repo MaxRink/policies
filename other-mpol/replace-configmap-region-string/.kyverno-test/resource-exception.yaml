@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: exception-config
+  namespace: default
+data:
+  endpoint: https://s3.ap-south-1.amazonaws.com

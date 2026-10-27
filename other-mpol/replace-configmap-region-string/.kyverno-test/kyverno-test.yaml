@@ -1,0 +1,50 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: replace-configmap-region-string
+policies:
+- ../replace-configmap-region-string.yaml
+resources:
+- resource-rewrite.yaml
+- resource-absent-data.yaml
+- resource-empty-data.yaml
+- resource-idempotent.yaml
+- resource-exception.yaml
+exceptions:
+- exceptions.yaml
+results:
+- kind: ConfigMap
+  patchedResources: patched-rewrite.yaml
+  policy: replace-configmap-region-string
+  resources:
+  - default/rewrite-config
+  result: pass
+  isMutatingPolicy: true
+- kind: ConfigMap
+  patchedResources: resource-absent-data.yaml
+  policy: replace-configmap-region-string
+  resources:
+  - default/absent-data
+  result: pass
+  isMutatingPolicy: true
+- kind: ConfigMap
+  patchedResources: resource-empty-data.yaml
+  policy: replace-configmap-region-string
+  resources:
+  - default/empty-data
+  result: pass
+  isMutatingPolicy: true
+- kind: ConfigMap
+  patchedResources: resource-idempotent.yaml
+  policy: replace-configmap-region-string
+  resources:
+  - default/already-rewritten
+  result: pass
+  isMutatingPolicy: true
+- kind: ConfigMap
+  patchedResources: resource-exception.yaml
+  policy: replace-configmap-region-string
+  resources:
+  - default/exception-config
+  result: pass
+  isMutatingPolicy: true
