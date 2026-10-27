@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-ephemeral-bad
+  namespace: default
+spec:
+  containers:
+  - name: app
+    image: docker.io/redis:latest
+  ephemeralContainers:
+  - name: debug
+    image: docker.io/redis:6.0.0-buster

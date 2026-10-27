@@ -13,6 +13,7 @@ keywords:
   - ValidatingPolicy
 readme: |
   Blocks container images older than the configured age while allowing images without creation metadata.
+  Background reporting for `pods/ephemeralcontainers` requires granting Kyverno's reports controller `get/list/watch` on that subresource; see the [sample ClusterRole](https://github.com/kyverno/policies/blob/main/other-vpol/block-stale-images/.chainsaw-test/ephemeral-rbac.yaml).
 
   ### Fine-grained PolicyException use
 
@@ -30,5 +31,5 @@ annotations:
   kyverno/category: "Best Practices"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 5cb98600ba2da5e1d3acbf40aeab3c3dc159f75673eca0821eed8c01576c3746
+digest: 99e48b43da8beea73335d65a8a99652f11183e5bea61d992ebabe22574bfd3ea
 createdAt: "2026-10-06T00:00:00Z"

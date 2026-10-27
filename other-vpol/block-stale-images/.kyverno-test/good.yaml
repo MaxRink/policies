@@ -6,4 +6,12 @@ spec:
   containers:
     - name: redis
       image: docker.io/redis:latest
-
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-no-created-time
+spec:
+  containers:
+  - name: redis
+    image: docker.io/redis:no-created

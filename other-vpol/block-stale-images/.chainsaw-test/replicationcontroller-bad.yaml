@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: stale-rc
+  namespace: block-staleimg-ns
+spec:
+  replicas: 1
+  selector:
+    app: stale-rc
+  template:
+    metadata:
+      labels:
+        app: stale-rc
+    spec:
+      containers:
+      - name: app
+        image: docker.io/redis:6.0.0-buster

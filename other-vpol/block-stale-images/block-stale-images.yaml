@@ -22,6 +22,45 @@ spec:
           - UPDATE
         resources:
           - pods
+      - apiGroups:
+          - ''
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - replicationcontrollers
+      - apiGroups:
+          - apps
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - deployments
+          - daemonsets
+          - statefulsets
+          - replicasets
+      - apiGroups:
+          - batch
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+          - UPDATE
+        resources:
+          - jobs
+          - cronjobs
+      - apiGroups:
+          - ''
+        apiVersions:
+          - v1
+        operations:
+          - UPDATE
+        resources:
+          - pods/ephemeralcontainers
   webhookConfiguration:
     timeoutSeconds: 20
   validationActions:
@@ -41,8 +80,12 @@ spec:
         variables.cutoffTime).map(container, container.image).join(', ')
   variables:
     - expression: >-
-        object.spec.containers + object.spec.?initContainers.orValue([]) +
-        object.spec.?ephemeralContainers.orValue([])
+        object.spec.?jobTemplate.?spec.?template.?spec.orValue(
+        object.spec.?template.?spec.orValue(object.spec))
+      name: podSpec
+    - expression: >-
+        variables.podSpec.containers + variables.podSpec.?initContainers.orValue([]) +
+        variables.podSpec.?ephemeralContainers.orValue([])
       name: allContainers
     - expression: '4380'
       name: maxAgeHours

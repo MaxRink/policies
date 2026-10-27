@@ -6,4 +6,15 @@ spec:
   containers:
     - name: redis
       image: docker.io/redis:6.0.0-buster
-
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-init-bad
+spec:
+  initContainers:
+  - name: init
+    image: docker.io/redis:6.0.0-buster
+  containers:
+  - name: app
+    image: docker.io/redis:latest
