@@ -226,3 +226,18 @@ spec:
       containers:
       - name: app
         image: ghcr.io/kyverno/test-busybox:1.35
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: baddeployment01
+spec:
+  selector:
+    matchLabels: {app: baddeployment01}
+  template:
+    metadata:
+      labels: {app: baddeployment01}
+    spec:
+      containers:
+      - name: app
+        image: ghcr.io/kyverno/test-busybox:1.35

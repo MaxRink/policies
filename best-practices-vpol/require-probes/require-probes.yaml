@@ -13,13 +13,14 @@ metadata:
       when to restart containers, while readiness probes help Services and Deployments
       determine when Pods are ready to receive traffic. Startup probes provide additional
       control during container startup. This policy validates that all containers have
-      at least one of livenessProbe, readinessProbe, or startupProbe defined.      
+      at least one of livenessProbe, readinessProbe, or startupProbe defined in Pods and
+      supported Pod controllers.
     policies.kyverno.io/minversion: 1.19.1
 spec:
   validationActions: ["Deny"]
   autogen:
     podControllers:
-      controllers: ["Deployment", "StatefulSet", "DaemonSet", "Job", "CronJob", "ReplicaSet", "ReplicationController"]
+      controllers: ["deployments", "statefulsets", "daemonsets", "jobs", "cronjobs", "replicasets", "replicationcontrollers"]
   matchConstraints:
     resourceRules:
     - apiGroups: [""]
