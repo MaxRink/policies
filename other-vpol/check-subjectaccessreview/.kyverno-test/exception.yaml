@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: cli-subjectaccessreview-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - kind: ValidatingPolicy
+    name: check-subjectaccessreview
+  matchConditions:
+  - name: exact-resource
+    expression: object.metadata.name == 'cli-excepted-configmap'
+  allowedValues:
+  - cli-exception-user
