@@ -7,6 +7,7 @@ policies:
 resources:
 - resources.yaml
 - replicationcontroller-bad.yaml
+- null-sysctls-pod.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -26,4 +27,5 @@ results:
   resources:
   - pod-sysctl-good
   - pod-no-sysctl
+  - null-sysctls-pod
   result: pass
