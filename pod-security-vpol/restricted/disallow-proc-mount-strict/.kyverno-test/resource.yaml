@@ -5,6 +5,7 @@ kind: Pod
 metadata:
   name: badpod01
 spec:
+  hostUsers: false
   containers:
   - name: container01
     image: dummyimagename
@@ -16,6 +17,7 @@ kind: Pod
 metadata:
   name: badpod02
 spec:
+  hostUsers: false
   containers:
   - name: container01
     image: dummyimagename
@@ -29,6 +31,7 @@ kind: Pod
 metadata:
   name: badpod03
 spec:
+  hostUsers: false
   initContainers:
   - name: initcontainer01
     image: dummyimagename
@@ -43,6 +46,7 @@ kind: Pod
 metadata:
   name: badpod04
 spec:
+  hostUsers: false
   initContainers:
   - name: initcontainer01
     image: dummyimagename
@@ -59,6 +63,7 @@ kind: Pod
 metadata:
   name: badpod05
 spec:
+  hostUsers: false
   initContainers:
   - name: initcontainer01
     image: dummyimagename
@@ -165,6 +170,7 @@ spec:
       labels:
         app: app
     spec:
+      hostUsers: false
       containers:
       - name: container01
         image: dummyimagename
@@ -185,6 +191,7 @@ spec:
       labels:
         app: app
     spec:
+      hostUsers: false
       containers:
       - name: container01
         image: dummyimagename
@@ -207,6 +214,7 @@ spec:
       labels:
         app: app
     spec:
+      hostUsers: false
       initContainers:
       - name: initcontainer01
         image: dummyimagename
@@ -230,6 +238,7 @@ spec:
       labels:
         app: app
     spec:
+      hostUsers: false
       initContainers:
       - name: initcontainer01
         image: dummyimagename
@@ -255,6 +264,7 @@ spec:
       labels:
         app: app
     spec:
+      hostUsers: false
       initContainers:
       - name: initcontainer01
         image: dummyimagename
@@ -412,6 +422,7 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          hostUsers: false
           containers:
           - name: container01
             image: dummyimagename
@@ -429,6 +440,7 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          hostUsers: false
           containers:
           - name: container01
             image: dummyimagename
@@ -448,6 +460,7 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          hostUsers: false
           initContainers:
           - name: initcontainer01
             image: dummyimagename
@@ -468,6 +481,7 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          hostUsers: false
           initContainers:
           - name: initcontainer01
             image: dummyimagename
@@ -490,6 +504,7 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          hostUsers: false
           initContainers:
           - name: initcontainer01
             image: dummyimagename
@@ -618,20 +633,20 @@ spec:
               procMount: Default
 ###### User namespace (spec.hostUsers) cases
 ---
-# hostUsers true keeps procMount strict
+# hostUsers false keeps procMount strict under Restricted
 apiVersion: v1
 kind: Pod
 metadata:
   name: badpod06
 spec:
-  hostUsers: true
+  hostUsers: false
   containers:
   - name: container01
     image: dummyimagename
     securityContext:
       procMount: Unmasked
 ---
-# hostUsers true keeps procMount strict
+# hostUsers false keeps procMount strict under Restricted
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -646,14 +661,14 @@ spec:
       labels:
         app: app
     spec:
-      hostUsers: true
+      hostUsers: false
       containers:
       - name: container01
         image: dummyimagename
         securityContext:
           procMount: Unmasked
 ---
-# hostUsers true keeps procMount strict
+# hostUsers false keeps procMount strict under Restricted
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -665,7 +680,7 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
-          hostUsers: true
+          hostUsers: false
           containers:
           - name: container01
             image: dummyimagename
