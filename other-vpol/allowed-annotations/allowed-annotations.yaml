@@ -26,9 +26,23 @@ spec:
     - apiGroups:   [""]
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
-      resources:   ["pods"]
+      resources:   ["pods", "replicationcontrollers"]
+    - apiGroups: ["apps"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["deployments", "daemonsets", "statefulsets", "replicasets"]
+    - apiGroups: ["batch"]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["jobs", "cronjobs"]
+  variables:
+    - name: podAnnotations
+      expression: >-
+        object.kind == "Pod" ? object.metadata.?annotations.orValue({}) :
+        object.kind == "CronJob" ? object.spec.jobTemplate.spec.template.metadata.?annotations.orValue({}) :
+        object.spec.template.metadata.?annotations.orValue({})
   validations:
     - expression: >-
-        object.metadata.?annotations.orValue([]).all(annotation, !annotation.contains('fluxcd.io/') || annotation in ['fluxcd.io/cow', 'fluxcd.io/dog'] || annotation in exceptions.allowedValues)
+        variables.podAnnotations.all(annotation, !annotation.contains('fluxcd.io/') || annotation in ['fluxcd.io/cow', 'fluxcd.io/dog'] || annotation in exceptions.allowedValues)
       message: The only approved FluxCD annotations are `fluxcd.io/cow` and `fluxcd.io/dog`.
       

@@ -6,6 +6,7 @@ policies:
 - ../allowed-annotations.yaml
 resources:
 - resource.yaml
+- replicationcontrollers.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -18,4 +19,16 @@ results:
   policy: allowed-annotations
   resources:
   - goodpod01
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: allowed-annotations
+  resources:
+  - default/bad-annotations-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: allowed-annotations
+  resources:
+  - default/allowed-annotations-rc
   result: pass
