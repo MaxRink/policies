@@ -39,3 +39,9 @@ results:
   - exception-rootfs
   result: pass
   isValidatingPolicy: true
+- kind: ReplicationController
+  policy: require-ro-rootfs
+  resources:
+  - badrc-rootfs
+  result: fail
+  isValidatingPolicy: true
