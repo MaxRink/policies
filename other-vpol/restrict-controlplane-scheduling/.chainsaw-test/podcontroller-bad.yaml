@@ -23,6 +23,26 @@ spec:
       - name: busybox
         image: ghcr.io/kyverno/test-busybox:1.35
 ---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: badrc
+spec:
+  replicas: 1
+  selector:
+    app: badrc
+  template:
+    metadata:
+      labels:
+        app: badrc
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+      containers:
+      - name: busybox
+        image: ghcr.io/kyverno/test-busybox:1.35
+---
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -44,4 +64,3 @@ spec:
           containers:
           - name: busybox
             image: ghcr.io/kyverno/test-busybox:1.35
-

@@ -27,3 +27,15 @@ results:
   - default/goodpod-no-tolerations
   - default/exception-controlplane
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-controlplane-scheduling
+  resources:
+  - default/badrc
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-controlplane-scheduling
+  resources:
+  - default/goodrc
+  result: pass
