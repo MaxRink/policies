@@ -11,8 +11,6 @@ spec:
         file: ephemeral-rbac.yaml
     - apply:
         file: ../check-ingress-nginx-controller-version-and-annotation-policy.yaml
-  - name: step-02
-    try:
     - patch:
         resource:
           apiVersion: policies.kyverno.io/v1
@@ -20,8 +18,9 @@ spec:
           metadata:
             name: check-ingress-nginx-controller-version-and-annotation-policy
           spec:
-            validationActions:
-             - Deny
+            validationActions: [Deny]
+  - name: step-02
+    try:
     - assert:
         file: policy-ready.yaml
   - name: step-03
@@ -64,3 +63,29 @@ spec:
     finally:
     - script:
         content: kubectl delete pod ingress-ephemeral -n default --ignore-not-found
+  - name: step-07
+    try:
+    - apply:
+        file: configmap-good.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'allow-snippet-annotations must be set to false')): true
+        file: configmap-bad-update.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'allow-snippet-annotations must be set to false')): true
+        file: configmap-bad-create.yaml
+    - apply:
+        file: ingress-good.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'ingress-nginx custom snippets are not allowed')): true
+        file: ingress-bad-update.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'ingress-nginx custom snippets are not allowed')): true
+        file: ingress-bad-create.yaml
