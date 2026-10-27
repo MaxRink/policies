@@ -80,3 +80,11 @@ spec:
             name: test
             port:
               number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: null-rules
+  namespace: test
+spec:
+  rules: null
