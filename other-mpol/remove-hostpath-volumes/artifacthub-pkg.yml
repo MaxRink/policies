@@ -30,4 +30,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.25"
   kyverno/subject: "Pod,Volume"
-digest: e4aa33e644363c5a1f03e6d72702e32e4d3ad5fa2547aa19a61a2d8c70698b30
+digest: 9027f8fed707fb1bb41d51dd609d7f2f834bd7bf1b9f1e85257e112ad9526481
