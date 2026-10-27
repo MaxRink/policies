@@ -6,6 +6,8 @@ policies:
 - ../restrict-sa-automount-sa-token.yaml
 resources:
 - resource.yaml
+- sa-absent-token.yaml
+- sa-null-token.yaml
 results:
 - isValidatingPolicy: true
   kind: ServiceAccount
@@ -19,3 +21,10 @@ results:
   resources:
   - good-svc
   result: pass
+- isValidatingPolicy: true
+  kind: ServiceAccount
+  policy: restrict-sa-automount-sa-token
+  resources:
+  - no-automount-setting
+  - null-automount-setting
+  result: fail
