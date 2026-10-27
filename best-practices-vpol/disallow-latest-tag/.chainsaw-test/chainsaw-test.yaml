@@ -62,7 +62,18 @@ spec:
             (contains($error, 'Policy disallow-latest-tag failed')): true
         file: bad-pod-no-tag.yaml
     - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy disallow-latest-tag failed')): true
+        file: bad-pod-invalid-sha512-digest.yaml
+    - apply:
         file: registry-port-pod.yaml
+    - apply:
+        file: good-pod-digest-sha384.yaml
+    - apply:
+        file: good-pod-digest-sha512.yaml
+    - apply:
+        file: good-pod-latest-sha512-digest.yaml
     - apply:
         expect:
         - check:
@@ -70,6 +81,14 @@ spec:
         file: init-latest-pod.yaml
   - name: step-98
     try:
+    - delete:
+        file: good-pod-digest-sha384.yaml
+    - delete:
+        file: good-pod-digest-sha512.yaml
+    - delete:
+        file: good-pod-latest-sha512-digest.yaml
+    - delete:
+        file: bad-pod-invalid-sha512-digest.yaml
     - delete:
         file: rbac-ephemeralcontainers.yaml
     - delete:
