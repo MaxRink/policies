@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - null-fields.yaml
+- init-ephemeral.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -98,3 +99,9 @@ results:
   resources:
   - null-seccomp
   result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-seccomp
+  resources:
+  - init-ephemeral-seccomp
+  result: fail
