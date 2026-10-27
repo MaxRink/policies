@@ -8,12 +8,66 @@ spec:
   steps:
   - name: step-01
     try:
+    - script:
+        shell: bash
+        shellArgs: ["-c"]
+        content: |
+          set -euo pipefail
+          labels=$(kubectl get namespaces -l mykey -o go-template='{{range .items}}{{.metadata.name}}={{index .metadata.labels "mykey"}};{{end}}')
+          kubectl create configmap label-existing-namespaces-label-backup \
+            --namespace "$NAMESPACE" \
+            --from-literal=labels="$labels"
     - apply:
         file: crb.yaml
     - apply:
         file: ns.yaml
     - assert:
         file: ns.yaml
+    cleanup:
+    - script:
+        shell: bash
+        shellArgs: ["-c"]
+        content: |
+          set -euo pipefail
+          backup=$(kubectl get configmap label-existing-namespaces-label-backup --namespace "$NAMESPACE" -o go-template='{{index .data "labels"}}')
+          kubectl delete mutatingpolicy label-existing-namespaces --ignore-not-found --wait=true
+          namespaces=$(kubectl get namespaces -o jsonpath='{.items[*].metadata.name}')
+          errors=0
+          restore_label() {
+            key=$1
+            snapshot=$2
+            found=false
+            previous=
+            for entry in $(printf '%s' "$snapshot" | tr ';' ' '); do
+              if [ "${entry%%=*}" = "$namespace" ]; then
+                found=true
+                previous=${entry#*=}
+                break
+              fi
+            done
+            if [ "$found" = true ]; then
+              kubectl label namespace "$namespace" "$key=$previous" --overwrite || errors=$((errors + 1))
+            else
+              kubectl label namespace "$namespace" "$key-" || errors=$((errors + 1))
+            fi
+          }
+          for namespace in $namespaces; do
+            restore_label mykey "$backup"
+          done
+          expected=$(printf '%s' "$backup" | tr ';' '\n' | sed '/^$/d' | sort)
+          if ! actual=$(kubectl get namespaces -l mykey -o go-template='{{range .items}}{{.metadata.name}}={{index .metadata.labels "mykey"}};{{end}}'); then
+            errors=$((errors + 1))
+            actual=
+          fi
+          actual=$(printf '%s' "$actual" | tr ';' '\n' | sed '/^$/d' | sort)
+          if [ "$expected" != "$actual" ]; then
+            errors=$((errors + 1))
+          fi
+          if [ "$errors" -ne 0 ]; then
+            echo "Failed to restore mykey on $errors namespace(s)" >&2
+            exit 1
+          fi
+          kubectl delete configmap label-existing-namespaces-label-backup --namespace "$NAMESPACE" --ignore-not-found
   - name: step-02
     try:
     - apply:
