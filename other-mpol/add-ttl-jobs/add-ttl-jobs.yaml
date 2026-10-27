@@ -25,12 +25,12 @@ spec:
         resources: ["jobs"]
   matchConditions:
     - name: Check if ttlSecondsAfterFinished is missing and ownerReferences is empty
-      expression: "object.metadata.?ownerReferences.orValue([]).size() == 0 && !has(object.spec.ttlSecondsAfterFinished) && !exceptions.allowedValues.exists(value, value == 'ttlSecondsAfterFinished')"
+      expression: "object.metadata.?ownerReferences.orValue([]).size() == 0 && (!has(object.spec.ttlSecondsAfterFinished) || object.spec.ttlSecondsAfterFinished == null) && !exceptions.allowedValues.exists(value, value == 'ttlSecondsAfterFinished')"
   mutations:
     - patchType: JSONPatch
       jsonPatch:
         expression: |
-          !has(object.spec.ttlSecondsAfterFinished) ?
+          (!has(object.spec.ttlSecondsAfterFinished) || object.spec.ttlSecondsAfterFinished == null) ?
             [
               JSONPatch{
                 op: "add",

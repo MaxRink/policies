@@ -33,4 +33,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.23"
   kyverno/subject: "Job"
-digest: 9977c0ac9ff83b8ec09630596cc118c83e9d15d12c63e4c2b9c40707d9c2bc83
+digest: ad2e0d48bd112ce45c49b656f35de579f3d673116a967fde4fd3951838a3535a

@@ -6,10 +6,17 @@ policies:
 - ../add-ttl-jobs.yaml
 resources:
 - resource.yaml
+- null-resource.yaml
 - exception-resource.yaml
 exceptions:
 - exception.yaml
 results:
+- kind: Job
+  patchedResources: null-patched.yaml
+  policy: add-ttl-jobs
+  resources: [null-ttl]
+  result: pass
+  isMutatingPolicy: true
 - kind: Job
   patchedResources: patched01.yaml
   policy: add-ttl-jobs
