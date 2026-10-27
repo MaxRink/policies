@@ -1,0 +1,40 @@
+name: restart-deployment-on-secret-change
+version: 1.0.0
+displayName: Restart Deployment on Secret Change
+createdAt: "2023-04-10T20:30:06.000Z"
+description: >-
+  When mysecret or myothersecret is updated, this policy writes its resourceVersion
+  to a distinct Pod template annotation on the busybox Deployment in the same namespace,
+  triggering a rollout. Kyverno needs permission to update Deployments.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-mpol/restart-deployment-on-secret-change/restart-deployment-on-secret-change.yaml
+  ```
+keywords:
+  - kyverno
+  - other
+readme: |
+  When either `mysecret` or `myothersecret` is updated, this policy writes that Secret's
+  resourceVersion to a distinct annotation on the Pod template of the `busybox` Deployment
+  in the same namespace. Changing the template annotation triggers a rollout, allowing
+  workloads that cannot refresh mounted Secret data to pick up the change. Kyverno needs
+  permission to update Deployments.
+
+  The two Secrets use independent annotation keys, so an update to one does not overwrite
+  the value recorded for the other. Add more triggers with a unique annotation key for each.
+
+  ### Fine-grained PolicyException use
+
+  To skip restarts for `mysecret` while keeping the `myothersecret` trigger active, create
+  a PolicyException referencing the `restart-deployment-on-secret-change` MutatingPolicy.
+  Match both the `busybox` target Deployment and the `mysecret` trigger, then set the exact
+  `allowedValues` token `secret:mysecret`. The tested example is in
+  [the Chainsaw test](https://github.com/kyverno/policies/blob/main/other-mpol/restart-deployment-on-secret-change/.chainsaw-test/exception.yaml).
+  Without a matching exception, the policy keeps its normal behavior.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "Other"
+  kyverno/kubernetesVersion: "1.23"
+  kyverno/subject: "Deployment"
+digest: 10db4f1854476d0cb893c516713f583aa5e618c6d72f6a1143702936edb528e5
