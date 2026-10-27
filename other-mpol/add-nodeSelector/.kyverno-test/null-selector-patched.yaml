@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-selector
+spec:
+  nodeSelector:
+    foo: bar
+    color: orange
+  containers:
+  - name: app
+    image: app:v1

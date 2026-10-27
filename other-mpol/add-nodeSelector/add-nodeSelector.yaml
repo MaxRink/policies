@@ -32,52 +32,40 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        !has(object.spec.nodeSelector) ?
-        [
-          JSONPatch{
-            op: "add",
-            path: "/spec/nodeSelector",
-            value: dyn({"foo": "bar", "color": "orange"})
-          }
-        ] : 
-        [
-          JSONPatch{
-            op: "add",
-            path: "/spec/nodeSelector/foo",
-            value: "bar"
-          },
-          JSONPatch{
-            op: "add",
-            path: "/spec/nodeSelector/color",
-            value: "orange"
-          }
-        ]
+        object.kind == "Pod" ?
+        (
+          (!has(object.spec.nodeSelector) || object.spec.nodeSelector == null) ?
+          [
+            JSONPatch{
+              op: "add",
+              path: "/spec/nodeSelector",
+              value: dyn({"foo": "bar", "color": "orange"})
+            }
+          ] :
+          ((!("foo" in object.spec.nodeSelector) ?
+            [JSONPatch{op: "add", path: "/spec/nodeSelector/foo", value: "bar"}] : []) +
+           (!("color" in object.spec.nodeSelector) ?
+            [JSONPatch{op: "add", path: "/spec/nodeSelector/color", value: "orange"}] : []))
+        ) : []
 
   # ===== DEPLOYMENTS, DAEMONSETS, STATEFULSETS =====
   - patchType: JSONPatch
     jsonPatch:
       expression: |
         has(object.spec.template) ?
-        (!has(object.spec.template.spec.nodeSelector) ?
+        (
+        (!has(object.spec.template.spec.nodeSelector) || object.spec.template.spec.nodeSelector == null) ?
           [
             JSONPatch{
               op: "add",
               path: "/spec/template/spec/nodeSelector",
               value: dyn({"foo": "bar", "color": "orange"})
             }
-          ] : 
-          [
-            JSONPatch{
-              op: "add",
-              path: "/spec/template/spec/nodeSelector/foo",
-              value: "bar"
-            },
-            JSONPatch{
-              op: "add",
-              path: "/spec/template/spec/nodeSelector/color",
-              value: "orange"
-            }
-          ]
+          ] :
+          ((!("foo" in object.spec.template.spec.nodeSelector) ?
+            [JSONPatch{op: "add", path: "/spec/template/spec/nodeSelector/foo", value: "bar"}] : []) +
+           (!("color" in object.spec.template.spec.nodeSelector) ?
+            [JSONPatch{op: "add", path: "/spec/template/spec/nodeSelector/color", value: "orange"}] : []))
         ) : []
 
   # ===== CRONJOBS =====
@@ -85,24 +73,17 @@ spec:
     jsonPatch:
       expression: |
         has(object.spec.jobTemplate) ?
-        (!has(object.spec.jobTemplate.spec.template.spec.nodeSelector) ?
+        (
+        (!has(object.spec.jobTemplate.spec.template.spec.nodeSelector) || object.spec.jobTemplate.spec.template.spec.nodeSelector == null) ?
           [
             JSONPatch{
               op: "add",
               path: "/spec/jobTemplate/spec/template/spec/nodeSelector",
               value: dyn({"foo": "bar", "color": "orange"})
             }
-          ] : 
-          [
-            JSONPatch{
-              op: "add",
-              path: "/spec/jobTemplate/spec/template/spec/nodeSelector/foo",
-              value: "bar"
-            },
-            JSONPatch{
-              op: "add",
-              path: "/spec/jobTemplate/spec/template/spec/nodeSelector/color",
-              value: "orange"
-            }
-          ]
+          ] :
+          ((!("foo" in object.spec.jobTemplate.spec.template.spec.nodeSelector) ?
+            [JSONPatch{op: "add", path: "/spec/jobTemplate/spec/template/spec/nodeSelector/foo", value: "bar"}] : []) +
+           (!("color" in object.spec.jobTemplate.spec.template.spec.nodeSelector) ?
+            [JSONPatch{op: "add", path: "/spec/jobTemplate/spec/template/spec/nodeSelector/color", value: "orange"}] : []))
         ) : []
