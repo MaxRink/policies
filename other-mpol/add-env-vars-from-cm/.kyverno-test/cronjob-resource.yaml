@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cronjob-envfrom
+spec:
+  schedule: "* * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          initContainers:
+          - name: init
+            image: init:v1
+          containers:
+          - name: app
+            image: app:v1
+            envFrom:
+            - secretRef:
+                name: app-secret
+          restartPolicy: OnFailure

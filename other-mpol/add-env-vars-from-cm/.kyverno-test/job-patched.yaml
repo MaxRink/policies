@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: job-envfrom
+spec:
+  template:
+    spec:
+      containers:
+      - name: app
+        image: app:v1
+        envFrom:
+        - configMapRef:
+            name: nsenvvars
+      restartPolicy: Never
