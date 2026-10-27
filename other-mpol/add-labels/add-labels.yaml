@@ -24,12 +24,9 @@ spec:
   - patchType: ApplyConfiguration
     applyConfiguration:
       expression: |
-        exceptions.allowedValues.exists(value, value == "label:foo") ?
+        (exceptions.allowedValues.exists(value, value == "label:foo") ||
+         "foo" in object.metadata.?labels.orValue({})) ?
         Object{} :
-        Object{
-          metadata: Object.metadata{
-            labels: Object.metadata.labels{
-              foo: "bar"
-            }
-          }
-        }
+        Object{metadata: Object.metadata{
+          labels: Object.metadata.labels{foo: "bar"}
+        }}
