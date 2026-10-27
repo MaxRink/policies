@@ -6,6 +6,7 @@ policies:
 - ../set-karpenter-non-cpu-limits.yaml
 resources:
 - resources.yaml
+- many-containers.yaml
 results:
 - kind: Pod
   patchedResources: pod-ephemeral-storage-patched1.yaml
@@ -55,4 +56,11 @@ results:
   resources:
   - test/test4
   result: skip
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: many-containers-patched.yaml
+  policy: set-karpenter-non-cpu-limits
+  resources:
+  - test/many-containers
+  result: pass
   isMutatingPolicy: true
