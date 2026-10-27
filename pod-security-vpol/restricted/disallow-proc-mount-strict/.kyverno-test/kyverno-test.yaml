@@ -6,9 +6,18 @@ policies:
 - ../disallow-proc-mount-strict.yaml
 resources:
 - resource.yaml
+- null-procmount.yaml
 - replicationcontroller-unmasked.yaml
 - ephemeralcontainer-unmasked.yaml
 results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-proc-mount-strict
+  resources:
+  - null-procmount-container
+  - null-procmount-init
+  - null-procmount-ephemeral
+  result: pass
 - isValidatingPolicy: true
   kind: Pod
   policy: disallow-proc-mount-strict
