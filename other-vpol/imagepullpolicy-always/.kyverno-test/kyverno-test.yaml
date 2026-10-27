@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - immutable-or-tagged.yaml
+- ephemeral-latest.yaml
 - replicationcontroller.yaml
 results:
 - isValidatingPolicy: true
@@ -47,3 +48,9 @@ results:
   resources:
   - immutable-or-tagged
   result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: imagepullpolicy-always
+  resources:
+  - ephemeral-latest
+  result: fail

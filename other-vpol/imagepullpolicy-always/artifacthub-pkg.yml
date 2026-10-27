@@ -24,6 +24,8 @@ readme: |
   CEL reads these references through `exceptions.allowedImages`; `variables.allContainers`
   includes regular, init, and ephemeral containers.
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-vpol/imagepullpolicy-always/.kyverno-test/exceptions.yaml).
+  Background reporting for `pods/ephemeralcontainers` requires `get/list/watch`
+  permissions for Kyverno's reports controller; see the [sample ClusterRoles](https://github.com/kyverno/policies/blob/main/other-vpol/imagepullpolicy-always/.chainsaw-test/ephemeral-rbac.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal enforcement behavior.
 
@@ -32,7 +34,7 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 858fdbbc01280adc42af5bf8e2f825f6dafda7db4c6949928015f82766fb479c
+digest: 2c4acc720ef9ebee1e42adcc99050b3d38e7f1381efb1f31b6ed75b2439d07bc
 
 
 createdAt: "2025-05-11T17:46:11Z"
