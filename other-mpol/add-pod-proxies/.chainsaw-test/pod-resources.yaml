@@ -31,3 +31,13 @@ spec:
       value: http://proxy.kyverno.org:8080
     - name: FOO
       value: bar
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod03
+spec:
+  containers:
+  - name: app
+    image: ghcr.io/kyverno/test-busybox:1.35
+    env: null
