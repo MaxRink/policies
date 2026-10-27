@@ -19,3 +19,22 @@ spec:
   containers:
   - name: pod
     image: busybox
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: bad-controller
+  namespace: restrict-sa-ns
+spec:
+  replicas: 1
+  selector:
+    app: bad-controller
+  template:
+    metadata:
+      labels:
+        app: bad-controller
+    spec:
+      serviceAccountName: serviceaccount02
+      containers:
+      - name: app
+        image: busybox

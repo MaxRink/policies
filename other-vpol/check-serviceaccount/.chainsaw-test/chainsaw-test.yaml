@@ -60,6 +60,15 @@ spec:
           if kubectl apply -f pod-bad.yaml; then exit 1; else echo "badpod01 failed to create"; fi
           kubectl apply -f podcontroller-good.yaml
           if kubectl apply -f podcontroller-bad.yaml; then exit 1; else echo "badpodcontrollers failed to create"; fi
+          trap 'rm -f replicationcontroller-error.txt' EXIT
+          if kubectl apply -f replicationcontroller-bad.yaml 2>replicationcontroller-error.txt; then
+            echo 'bad replicationcontroller unexpectedly created'
+            exit 1
+          fi
+          if ! grep -F 'The ServiceAccount used to create this Pod is confined to using the same account when running the Pod.' replicationcontroller-error.txt >/dev/null; then
+            cat replicationcontroller-error.txt
+            exit 1
+          fi
     finally:
     - script:
         content: |
@@ -77,3 +86,7 @@ spec:
         content: |
           set -e
           kubectl delete -f podcontroller-bad.yaml --ignore-not-found
+    - script:
+        content: |
+          set -e
+          kubectl delete -f replicationcontroller-bad.yaml --ignore-not-found
