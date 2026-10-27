@@ -54,3 +54,8 @@ results:
   resources:
   - badrc01
   result: fail
+- kind: Deployment
+  policy: require-pod-probes
+  resources:
+  - baddeployment01
+  result: fail
