@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: image-exemption
+  namespace: default
+spec:
+  initContainers:
+  - name: exempt-init
+    image: registry.invalid/exempt:1
+    command: ["/bin/sh"]
+    args: ["echo exempt init"]
+  - name: normal-init
+    image: busybox:1.36
+  containers:
+  - name: app
+    image: alpine:3.20
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: image-exemption-rc
+  namespace: default
+spec:
+  selector:
+    app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+      - name: exempt
+        image: registry.invalid/exempt:1
+        command: ["/bin/sh"]
+        args: ["echo exempt controller"]
+      - name: app
+        image: busybox:1.36
