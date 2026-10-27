@@ -1,0 +1,64 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-dra-adminaccess-label
+spec:
+  steps:
+    - name: apply-policy
+      try:
+        - apply:
+            file: ../restrict-dra-adminaccess-label.yaml
+        - patch:
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              metadata:
+                name: restrict-dra-adminaccess-label
+              spec:
+                validationActions:
+                  - Deny
+        - assert:
+            file: policy-ready.yaml
+        - script:
+            content: |
+              set -eu
+              kubectl apply -f - <<'YAML'
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: ClusterRole
+              metadata:
+                name: dra-label-test-updater
+              rules:
+                - apiGroups: [""]
+                  resources: ["namespaces"]
+                  verbs: ["get", "patch", "update"]
+              ---
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: ClusterRoleBinding
+              metadata:
+                name: dra-label-test-updater
+              subjects:
+                - kind: User
+                  name: dra-label-test-user
+              roleRef:
+                kind: ClusterRole
+                name: dra-label-test-updater
+                apiGroup: rbac.authorization.k8s.io
+              YAML
+              kubectl label namespace "$NAMESPACE" resource.kubernetes.io/admin-access=true --overwrite
+              kubectl -n "$NAMESPACE" get serviceaccount default
+              kubectl patch namespace "$NAMESPACE" --type=merge -p '{"metadata":{"labels":{"team":"updated"}}}' --as=dra-label-test-user
+              kubectl label namespace "$NAMESPACE" resource.kubernetes.io/admin-access=false --overwrite
+              if output=$(kubectl label namespace "$NAMESPACE" resource.kubernetes.io/admin-access=true --overwrite --as=dra-label-test-user 2>&1); then
+                printf '%s\n' "$output"
+                echo "expected an unauthorized label change to be denied"
+                exit 1
+              else
+                printf '%s\n' "$output"
+                printf '%s\n' "$output" | grep -q restrict-dra-adminaccess-label
+              fi
+  finally:
+    - script:
+        content: |
+          kubectl delete clusterrolebinding dra-label-test-updater --ignore-not-found
+          kubectl delete clusterrole dra-label-test-updater --ignore-not-found
+          kubectl delete validatingpolicy restrict-dra-adminaccess-label --ignore-not-found
