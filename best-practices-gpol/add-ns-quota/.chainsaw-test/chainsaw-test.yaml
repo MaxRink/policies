@@ -8,6 +8,11 @@ spec:
   steps:
   - name: step-01
     try:
+    - script:
+        content: |
+          set -eu
+          kubectl delete generatingpolicies.policies.kyverno.io add-ns-quota --wait=true --ignore-not-found
+          kubectl delete namespace hello-world-namespace --wait=true --ignore-not-found
     - apply:
         file: old-resource.yaml
     - assert:
@@ -18,6 +23,16 @@ spec:
         file: ../add-ns-quota.yaml
     - assert:
         file: policy-ready.yaml
+  - name: update-existing-namespace
+    try:
+    - apply:
+        file: old-resource-update.yaml
+    - sleep:
+        duration: 10s
+    - assert:
+        file: ../.kyverno-test/generatedResourceQuota.yaml
+    - assert:
+        file: ../.kyverno-test/generatedLimitRange.yaml
   - name: step-03
     try:
     - delete:
@@ -81,3 +96,10 @@ spec:
         file: exception-generated-limitrange.yaml
     - assert:
         file: exception-generated-quota.yaml
+  - name: cleanup
+    try:
+    - script:
+        content: |
+          set -eu
+          kubectl delete namespace hello-world-namespace --wait=true --ignore-not-found
+          kubectl delete generatingpolicies.policies.kyverno.io add-ns-quota --wait=true --ignore-not-found

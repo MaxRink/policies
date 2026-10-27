@@ -1,0 +1,23 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: add-ns-quota-update
+policies:
+- ../add-ns-quota.yaml
+resources:
+- ../.kyverno-test/resource.yaml
+values:
+  globalValues:
+    request.operation: UPDATE
+results:
+- isGeneratingPolicy: true
+  kind: Namespace
+  policy: add-ns-quota
+  resources:
+  - hello-world-namespace
+  operation: UPDATE
+  generatedResources:
+  - ../.kyverno-test/generatedResourceQuota.yaml
+  - ../.kyverno-test/generatedLimitRange.yaml
+  failOnMissingResources: true
+  result: pass
