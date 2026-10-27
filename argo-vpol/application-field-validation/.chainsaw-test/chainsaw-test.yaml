@@ -36,3 +36,16 @@ spec:
              - check:
                  ($error != null): true
            file: bad-application.yaml
+    - name: scoped-exception
+      try:
+        - apply:
+            file: exception-namespace.yaml
+        - apply:
+            file: exception.yaml
+        - apply:
+            file: exception-application.yaml
+        - apply:
+            expect:
+              - check:
+                  ($error != null): true
+            file: bad-application.yaml

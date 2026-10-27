@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: application-field-validation-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - name: application-field-validation
+      kind: ValidatingPolicy
+  matchConditions:
+    - name: exact-application
+      expression: object.metadata.namespace == 'default' && object.metadata.name == 'exceptionapp'
