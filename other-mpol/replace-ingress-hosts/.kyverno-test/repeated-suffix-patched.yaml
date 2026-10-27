@@ -1,0 +1,14 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: repeated-suffix-ingress
+  namespace: team-a
+spec:
+  rules:
+  - host: app.old.com.new.com
+    http:
+      paths: []
+  tls:
+  - hosts:
+    - app.old.com.new.com
+    secretName: app-tls
