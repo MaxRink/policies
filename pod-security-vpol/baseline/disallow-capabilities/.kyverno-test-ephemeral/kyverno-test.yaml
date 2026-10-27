@@ -1,0 +1,40 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: disallow-capabilities-ephemeral-exception-sibling
+policies:
+- ../disallow-capabilities.yaml
+resources:
+- resource.yaml
+- single-exempt.yaml
+exceptions:
+- exceptions.yaml
+values:
+  globalValues:
+    request.operation: UPDATE
+  subresources:
+  - subresource:
+      group: ""
+      version: v1
+      kind: Pod
+      name: pods/ephemeralcontainers
+    parentResource:
+      group: ""
+      version: v1
+      kind: Pod
+      name: pods
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-capabilities
+  resources:
+  - ephemeral-image-sibling
+  operation: UPDATE
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-capabilities
+  resources:
+  - ephemeral-image-only
+  operation: UPDATE
+  result: pass

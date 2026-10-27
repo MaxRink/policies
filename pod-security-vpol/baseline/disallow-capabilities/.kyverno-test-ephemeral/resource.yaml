@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ephemeral-image-sibling
+  namespace: default
+spec:
+  containers:
+  - name: app
+    image: test:latest
+  ephemeralContainers:
+  - name: exempt
+    image: exempt.example/app:1
+    securityContext:
+      capabilities:
+        add:
+        - SYS_PTRACE
+  - name: unapproved
+    image: nginx:1.27
+    securityContext:
+      capabilities:
+        add:
+        - SYS_PTRACE

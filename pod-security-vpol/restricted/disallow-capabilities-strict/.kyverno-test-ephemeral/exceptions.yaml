@@ -1,0 +1,14 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: exempt-one-ephemeral-image
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - name: disallow-capabilities-strict
+    kind: ValidatingPolicy
+  images:
+  - exempt.example/app:1
+  matchConditions:
+  - name: exact-resource
+    expression: object.metadata.namespace == 'default' && object.metadata.name in ['ephemeral-image-sibling', 'ephemeral-image-only']

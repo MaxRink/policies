@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ephemeral-image-sibling
+  namespace: default
+spec:
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+  ephemeralContainers:
+  - name: exempt
+    image: exempt.example/app:1
+    securityContext:
+      seccompProfile:
+        type: Unconfined
+  - name: unapproved
+    image: nginx:1.27
+    securityContext:
+      seccompProfile:
+        type: Unconfined
