@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: large-proxy-chain
+spec:
+  initContainers:
+  - name: init-0
+    image: example/init:0
+  containers:
+  - name: app-0
+    image: example/app:0
+    env:
+    - name: KEEP
+      value: 'yes'
+  - name: app-1
+    image: example/app:1
+    env:
+    - name: HTTP_PROXY
+      value: old
+    - name: KEEP
+      value: 'yes'
+  - name: app-2
+    image: example/app:2
+  - name: app-3
+    image: example/app:3
+  - name: app-4
+    image: example/app:4
+  - name: app-5
+    image: example/app:5
+  - name: app-6
+    image: example/app:6
+  - name: app-7
+    image: example/app:7
+  - name: app-8
+    image: example/app:8
+  - name: app-9
+    image: example/app:9

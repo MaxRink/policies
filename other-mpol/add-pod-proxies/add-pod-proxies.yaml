@@ -31,107 +31,41 @@ spec:
         operations: ["CREATE", "UPDATE"]
         resources: ["jobs", "cronjobs"]
 
+  variables:
+  - name: podSpec
+    expression: >-
+      object.kind == "Pod" ? object.spec :
+      object.kind == "CronJob" ? object.spec.?jobTemplate.?spec.?template.?spec.orValue({}) :
+      object.spec.?template.?spec.orValue({})
+  - name: podSpecPath
+    expression: >-
+      object.kind == "Pod" ? "/spec" :
+      object.kind == "CronJob" ? "/spec/jobTemplate/spec/template/spec" :
+      "/spec/template/spec"
+  - name: containers
+    expression: variables.podSpec.containers
+  - name: proxyEnv
+    expression: >-
+      [
+        {"name": "HTTP_PROXY", "value": "http://proxy.corp.domain:8080"},
+        {"name": "HTTPS_PROXY", "value": "https://secureproxy.corp.domain:8080"},
+        {"name": "NO_PROXY", "value": "localhost,*.example.com"}
+      ]
   mutations:
-    # ===== PODS =====
-    - patchType: JSONPatch
-      jsonPatch:
-        expression: |
-          object.kind == "Pod" ?
-          object.spec.containers.filter(container, !exceptions.allowedImages.exists(image, image == container.image)).map(container,
-            object.spec.containers.indexOf(container)
-          ).map(idx,
-            JSONPatch{
-              op: has(object.spec.containers[idx].env) && object.spec.containers[idx].env != null ? "replace" : "add",
-              path: "/spec/containers/" + string(idx) + "/env",
-              value: [
-                {"name": "HTTP_PROXY", "value": "http://proxy.corp.domain:8080"},
-                {"name": "HTTPS_PROXY", "value": "https://secureproxy.corp.domain:8080"},
-                {"name": "NO_PROXY", "value": "localhost,*.example.com"}
-              ] + (has(object.spec.containers[idx].env) && object.spec.containers[idx].env != null ?
-                object.spec.containers[idx].env.filter(e, 
-                  e.name != "HTTP_PROXY" && 
-                  e.name != "HTTPS_PROXY" && 
-                  e.name != "NO_PROXY"
-                ) :
-                []
-              )
-            }
-          ) : []
-
-    # ===== DEPLOYMENTS, DAEMONSETS, STATEFULSETS =====
-    - patchType: JSONPatch
-      jsonPatch:
-        expression: |
-          object.kind in ["Deployment", "DaemonSet", "StatefulSet"] ?
-          object.spec.template.spec.containers.filter(container, !exceptions.allowedImages.exists(image, image == container.image)).map(container,
-            object.spec.template.spec.containers.indexOf(container)
-          ).map(idx,
-            JSONPatch{
-              op: has(object.spec.template.spec.containers[idx].env) && object.spec.template.spec.containers[idx].env != null ? "replace" : "add",
-              path: "/spec/template/spec/containers/" + string(idx) + "/env",
-              value: [
-                {"name": "HTTP_PROXY", "value": "http://proxy.corp.domain:8080"},
-                {"name": "HTTPS_PROXY", "value": "https://secureproxy.corp.domain:8080"},
-                {"name": "NO_PROXY", "value": "localhost,*.example.com"}
-              ] + (has(object.spec.template.spec.containers[idx].env) && object.spec.template.spec.containers[idx].env != null ?
-                object.spec.template.spec.containers[idx].env.filter(e, 
-                  e.name != "HTTP_PROXY" && 
-                  e.name != "HTTPS_PROXY" && 
-                  e.name != "NO_PROXY"
-                ) :
-                []
-              )
-            }
-          ) : []
-
-    # ===== JOBS =====
-    - patchType: JSONPatch
-      jsonPatch:
-        expression: |
-          object.kind == "Job" ?
-          object.spec.template.spec.containers.filter(container, !exceptions.allowedImages.exists(image, image == container.image)).map(container,
-            object.spec.template.spec.containers.indexOf(container)
-          ).map(idx,
-            JSONPatch{
-              op: has(object.spec.template.spec.containers[idx].env) && object.spec.template.spec.containers[idx].env != null ? "replace" : "add",
-              path: "/spec/template/spec/containers/" + string(idx) + "/env",
-              value: [
-                {"name": "HTTP_PROXY", "value": "http://proxy.corp.domain:8080"},
-                {"name": "HTTPS_PROXY", "value": "https://secureproxy.corp.domain:8080"},
-                {"name": "NO_PROXY", "value": "localhost,*.example.com"}
-              ] + (has(object.spec.template.spec.containers[idx].env) && object.spec.template.spec.containers[idx].env != null ?
-                object.spec.template.spec.containers[idx].env.filter(e, 
-                  e.name != "HTTP_PROXY" && 
-                  e.name != "HTTPS_PROXY" && 
-                  e.name != "NO_PROXY"
-                ) :
-                []
-              )
-            }
-          ) : []
-
-    # ===== CRONJOBS =====
-    - patchType: JSONPatch
-      jsonPatch:
-        expression: |
-          object.kind == "CronJob" ?
-          object.spec.jobTemplate.spec.template.spec.containers.filter(container, !exceptions.allowedImages.exists(image, image == container.image)).map(container,
-            object.spec.jobTemplate.spec.template.spec.containers.indexOf(container)
-          ).map(idx,
-            JSONPatch{
-              op: has(object.spec.jobTemplate.spec.template.spec.containers[idx].env) && object.spec.jobTemplate.spec.template.spec.containers[idx].env != null ? "replace" : "add",
-              path: "/spec/jobTemplate/spec/template/spec/containers/" + string(idx) + "/env",
-              value: [
-                {"name": "HTTP_PROXY", "value": "http://proxy.corp.domain:8080"},
-                {"name": "HTTPS_PROXY", "value": "https://secureproxy.corp.domain:8080"},
-                {"name": "NO_PROXY", "value": "localhost,*.example.com"}
-              ] + (has(object.spec.jobTemplate.spec.template.spec.containers[idx].env) && object.spec.jobTemplate.spec.template.spec.containers[idx].env != null ?
-                object.spec.jobTemplate.spec.template.spec.containers[idx].env.filter(e, 
-                  e.name != "HTTP_PROXY" && 
-                  e.name != "HTTPS_PROXY" && 
-                  e.name != "NO_PROXY"
-                ) :
-                []
-              )
-            }
-          ) : []
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        lists.range(variables.containers.size()).filter(i,
+          !exceptions.allowedImages.exists(image, image == variables.containers[i].image)
+        ).map(i,
+          JSONPatch{
+            op: has(variables.containers[i].env) && variables.containers[i].env != null ? "replace" : "add",
+            path: variables.podSpecPath + "/containers/" + string(i) + "/env",
+            value: variables.proxyEnv + (has(variables.containers[i].env) && variables.containers[i].env != null ?
+              variables.containers[i].env.filter(e,
+                e.name != "HTTP_PROXY" &&
+                e.name != "HTTPS_PROXY" &&
+                e.name != "NO_PROXY"
+              ) : [])
+          }
+        )

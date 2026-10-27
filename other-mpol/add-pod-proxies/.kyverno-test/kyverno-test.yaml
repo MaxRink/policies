@@ -7,10 +7,17 @@ policies:
 resources:
 - resource.yaml
 - null-resource.yaml
+- large-resource.yaml
 - resource-exception.yaml
 exceptions:
 - exceptions.yaml
 results:
+- kind: Pod
+  patchedResources: large-patched.yaml
+  policy: add-pod-proxies
+  resources: [large-proxy]
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: null-patched.yaml
   policy: add-pod-proxies
