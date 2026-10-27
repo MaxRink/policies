@@ -7,3 +7,9 @@ namespaceSelector:
 - labels:
     env: production
   name: bar
+policies:
+- name: backup-all-volumes
+  resources:
+  - name: update-new-pvc
+    values:
+      request.operation: UPDATE

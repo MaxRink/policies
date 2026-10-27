@@ -34,3 +34,9 @@ spec:
         file: cronjob-patched.yaml
     - error:
         file: pod-not-patched02.yaml
+  - name: update-adds-pvc-volume
+    try:
+    - apply:
+        file: deployment-update.yaml
+    - assert:
+        file: deploy-update-patched.yaml

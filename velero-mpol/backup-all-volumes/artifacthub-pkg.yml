@@ -9,7 +9,8 @@ description: >-
       value being a comma-separated list of the volumes mounted to that Pod. This policy
       automatically annotates Pods (and Pod controllers) which refer to a PVC so that
       all volumes are listed in the aforementioned annotation if a Namespace with the label
-      `velero-backup-pvc=true`.
+      `velero-backup-pvc=true`. It merges current PVC volume names with existing annotation
+      entries, preserving user selections and including PVCs added on later updates.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/velero-mpol/backup-all-volumes/backup-all-volumes.yaml
@@ -41,4 +42,4 @@ annotations:
   kyverno/category: "Velero"
   kyverno/kubernetesVersion: "1.25"
   kyverno/subject: "Pod, Annotation"
-digest: fec1e945b842574446142b507fabe9b46b1c2685165a261b16a32121caf663fc
+digest: 5eea10e9f358613122494048c7f4292a462d0e157fd76767b968a804ae3c0941
