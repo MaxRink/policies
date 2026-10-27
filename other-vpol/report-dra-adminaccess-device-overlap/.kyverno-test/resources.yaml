@@ -1,0 +1,208 @@
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: admin-overlap
+  namespace: team-a
+  uid: admin-overlap-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: example.com/gpu
+          adminAccess: true
+status:
+  allocation:
+    devices:
+      results:
+        - request: device
+          driver: gpu.example.com
+          pool: worker-a
+          device: gpu-0
+          adminAccess: true
+        - request: second-device
+          driver: gpu.example.com
+          pool: worker-b
+          device: gpu-1
+          adminAccess: true
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: ordinary-overlap
+  namespace: team-b
+  uid: ordinary-overlap-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: example.com/gpu
+status:
+  allocation:
+    devices:
+      results:
+        - request: device
+          driver: gpu.example.com
+          pool: worker-a
+          device: gpu-0
+          adminAccess: false
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: pending-admin
+  namespace: team-c
+  uid: pending-admin-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: example.com/gpu
+          adminAccess: true
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: admin-no-overlap
+  namespace: team-d
+  uid: admin-no-overlap-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: example.com/gpu
+          adminAccess: true
+status:
+  allocation:
+    devices:
+      results:
+        - request: device
+          driver: gpu.example.com
+          pool: worker-c
+          device: gpu-2
+          adminAccess: true
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: admin-shared-only
+  namespace: team-e
+  uid: admin-shared-only-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: example.com/gpu
+          adminAccess: true
+status:
+  allocation:
+    devices:
+      results:
+        - request: device
+          driver: gpu.example.com
+          pool: worker-d
+          device: gpu-3
+          adminAccess: true
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: admin-shared-only-peer
+  namespace: team-f
+  uid: admin-shared-only-peer-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: example.com/gpu
+          adminAccess: true
+status:
+  allocation:
+    devices:
+      results:
+        - request: device
+          driver: gpu.example.com
+          pool: worker-d
+          device: gpu-3
+          adminAccess: true
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: admin-different-device
+  namespace: team-g
+  uid: admin-different-device-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: example.com/gpu
+          adminAccess: true
+status:
+  allocation:
+    devices:
+      results:
+        - request: device
+          driver: gpu.example.com
+          pool: worker-e
+          device: gpu-4
+          adminAccess: true
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: ordinary-different-device
+  namespace: team-h
+  uid: ordinary-different-device-uid
+spec:
+  devices:
+    requests:
+      - name: device
+        exactly:
+          deviceClassName: example.com/gpu
+status:
+  allocation:
+    devices:
+      results:
+        - request: device
+          driver: gpu.example.com
+          pool: worker-e
+          device: gpu-5
+          adminAccess: false
+---
+apiVersion: resource.k8s.io/v1
+kind: ResourceClaim
+metadata:
+  name: admin-self-sharing
+  namespace: team-i
+  uid: admin-self-sharing-uid
+spec:
+  devices:
+    requests:
+      - name: admin-device
+        exactly:
+          deviceClassName: example.com/gpu
+          adminAccess: true
+      - name: ordinary-device
+        exactly:
+          deviceClassName: example.com/gpu
+status:
+  allocation:
+    devices:
+      results:
+        - request: admin-device
+          driver: gpu.example.com
+          pool: worker-f
+          device: gpu-6
+          adminAccess: true
+        - request: ordinary-device
+          driver: gpu.example.com
+          pool: worker-f
+          device: gpu-6
+          adminAccess: false

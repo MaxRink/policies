@@ -1,0 +1,62 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: report-dra-adminaccess-device-overlap
+spec:
+  steps:
+    - name: apply-policy
+      try:
+        - apply:
+            file: ../report-dra-adminaccess-device-overlap.yaml
+        - assert:
+            file: policy-ready.yaml
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" delete resourceclaims chainsaw-admin-overlap --ignore-not-found
+              kubectl delete namespace dra-overlap-peer --wait=true --ignore-not-found
+              kubectl create namespace dra-overlap-peer
+              kubectl -n "$NAMESPACE" create -f - <<'YAML'
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: chainsaw-admin-overlap
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: example.com/gpu
+                        adminAccess: true
+              YAML
+              kubectl -n dra-overlap-peer create -f - <<'YAML'
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: chainsaw-ordinary-overlap
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: example.com/gpu
+              YAML
+              kubectl -n "$NAMESPACE" patch resourceclaim chainsaw-admin-overlap --subresource=status --type=merge -p '{"status":{"allocation":{"devices":{"results":[{"request":"device","driver":"gpu.example.com","pool":"worker-a","device":"gpu-0","adminAccess":true}]}}}}'
+              kubectl -n dra-overlap-peer patch resourceclaim chainsaw-ordinary-overlap --subresource=status --type=merge -p '{"status":{"allocation":{"devices":{"results":[{"request":"device","driver":"gpu.example.com","pool":"worker-a","device":"gpu-0","adminAccess":false}]}}}}'
+              for attempt in $(seq 1 60); do
+                report=$(kubectl -n "$NAMESPACE" get policyreport -o jsonpath='{range .items[*].results[*]}{.policy}:{.result}{"\n"}{end}' 2>/dev/null || true)
+                if printf '%s\n' "$report" | grep -q '^report-dra-adminaccess-device-overlap:fail$'; then
+                  printf '%s\n' "$report"
+                  exit 0
+                fi
+                sleep 2
+              done
+              printf '%s\n' "$report"
+              echo "timed out waiting for the adminAccess device overlap report"
+              exit 1
+  finally:
+    - script:
+        content: |
+          kubectl delete namespace dra-overlap-peer --wait=true --ignore-not-found
+          kubectl -n "$NAMESPACE" delete resourceclaims chainsaw-admin-overlap --ignore-not-found
+          kubectl delete validatingpolicy report-dra-adminaccess-device-overlap --ignore-not-found

@@ -1,0 +1,40 @@
+name: report-dra-adminaccess-device-overlap-vpol
+version: 1.0.0
+displayName: Report DRA AdminAccess Device Overlap
+description: >-
+  Report a ResourceClaim when an allocated adminAccess device is also allocated
+  without adminAccess to a different claim. Device sharing is permitted by DRA;
+  this audit policy provides operator visibility and never blocks a claim.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/report-dra-adminaccess-device-overlap/report-dra-adminaccess-device-overlap.yaml
+  ```
+keywords:
+  - kyverno
+  - Other
+  - ValidatingPolicy
+  - Dynamic Resource Allocation
+readme: |
+  This policy runs in background mode and compares allocated devices in a
+  ResourceClaim that requested `adminAccess` with all other ResourceClaims in
+  the cluster. It reports a claim when the same `driver`, `pool`, and `device`
+  tuple is allocated to another claim without `adminAccess`. Claims with no
+  allocated adminAccess devices are not evaluated.
+
+  DRA permits this device sharing, so the policy is audit-only and never blocks
+  admission. It performs one cluster-wide ResourceClaim list for each claim
+  with an allocated adminAccess device; clusters with many such allocations
+  should account for the background list/correlation cost.
+
+  This sample uses the built-in `resource.k8s.io/v1` API, available alongside
+  `v1beta2` on Kubernetes 1.34 through 1.37. DynamicResourceAllocation is GA
+  and enabled by default from 1.34. DRAAdminAccess is beta and enabled by
+  default in 1.34 and 1.35, then GA from 1.36.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "Other"
+  kyverno/kubernetesVersion: "1.34"
+  kyverno/subject: "ResourceClaim"
+digest: f388df42b989ff71fad4d7a64dcfbe05494b350ae23bbb0021a24d50de7a85ff
+createdAt: "2026-10-27T17:49:00Z"
