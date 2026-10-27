@@ -7,6 +7,7 @@ policies:
 resources:
 - ../.chainsaw-test/deployment.yaml
 - ../.chainsaw-test/cronjob.yaml
+- controller-updates.yaml
 variables: values.yaml
 results:
 - isValidatingPolicy: true
@@ -20,4 +21,34 @@ results:
   policy: restrict-pod-controller-serviceaccount-updates
   resources:
   - cronjob01
+  result: pass
+- isValidatingPolicy: true
+  kind: DaemonSet
+  policy: restrict-pod-controller-serviceaccount-updates
+  resources:
+  - restrict-sa-ns/unchanged-daemonset
+  result: pass
+- isValidatingPolicy: true
+  kind: Job
+  policy: restrict-pod-controller-serviceaccount-updates
+  resources:
+  - restrict-sa-ns/unchanged-job
+  result: pass
+- isValidatingPolicy: true
+  kind: StatefulSet
+  policy: restrict-pod-controller-serviceaccount-updates
+  resources:
+  - restrict-sa-ns/unchanged-statefulset
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicaSet
+  policy: restrict-pod-controller-serviceaccount-updates
+  resources:
+  - restrict-sa-ns/unchanged-replicaset
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-pod-controller-serviceaccount-updates
+  resources:
+  - restrict-sa-ns/unchanged-replicationcontroller
   result: pass

@@ -28,6 +28,11 @@ spec:
              - Deny
     - assert:
         file: policy-ready.yaml
+  - name: reset-restrict-sa-ns
+    try:
+    - script:
+        content: |
+          kubectl delete namespace restrict-sa-ns --wait=true --ignore-not-found --timeout=60s
   - name: step-02
     try:
     - apply:
@@ -40,6 +45,8 @@ spec:
         file: deployment.yaml
     - apply:
         file: cronjob.yaml
+    - apply:
+        file: controller-updates.yaml
   - name: step-03
     try:
     - apply:
@@ -53,6 +60,13 @@ spec:
             ($error != null): true
         file: deploy-bad-update.yaml
     - apply:
+        expect:
+        - check:
+            (contains($error, 'The serviceAccountName field may not be changed once created.')): true
+        file: controller-bad-update.yaml
+    - apply:
         file: cronjob-good-update.yaml
     - apply:
         file: deploy-good-update.yaml
+    - apply:
+        file: controller-good-update.yaml
