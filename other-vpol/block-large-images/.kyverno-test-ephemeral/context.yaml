@@ -1,0 +1,14 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Context
+metadata:
+  name: context
+spec:
+  images:
+  - image: test.example/large:v1
+    manifest:
+      layers:
+      - size: 2147483649
+  - image: test.example/small:v1
+    manifest:
+      layers:
+      - size: 1

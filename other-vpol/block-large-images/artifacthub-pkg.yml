@@ -13,6 +13,8 @@ keywords:
   - ValidatingPolicy
 readme: |
   Pods which run containers of very large image size take longer to pull and require more space to store. A user may either inadvertently or purposefully name an image which is unusually large to disrupt operations. This policy checks the size of every container image and blocks if it is over 2 Gibibytes.
+
+  Background reporting for `pods/ephemeralcontainers` requires granting Kyverno's reports controller `get/list/watch` on that subresource; see the [sample aggregated ClusterRoles](https://github.com/kyverno/policies/blob/main/other-vpol/block-large-images/.chainsaw-test/ephemeral-rbac.yaml).
   
   ### Fine-grained PolicyException use
 
@@ -31,5 +33,5 @@ annotations:
   kyverno/category: "Other in ValidatingPolicy"
   kyverno/kubernetesVersion: "1.23"
   kyverno/subject: "Pod"
-digest: 0a581dba8c23ae992332fec6cd5b68386de1db0e2b6e08bae9bfc9e9a91306ba
+digest: 21decfbf6973a132ee7a838baf4274cff305ad07f83a8826d96cf27052b30ff3
 createdAt: "2025-11-27T18:39:22Z"

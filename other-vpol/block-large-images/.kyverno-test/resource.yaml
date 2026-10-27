@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: large-image
+spec:
+  containers:
+  - name: app
+    image: test.example/large:v1
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: small-image
+spec:
+  containers:
+  - name: app
+    image: test.example/small:v1
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: large-image-rc
+spec:
+  selector:
+    app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+      - name: app
+        image: test.example/large:v1
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: small-image-rc
+spec:
+  selector:
+    app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+      - name: app
+        image: test.example/small:v1
