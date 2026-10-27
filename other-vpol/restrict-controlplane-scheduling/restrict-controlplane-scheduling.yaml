@@ -9,11 +9,9 @@ metadata:
     policies.kyverno.io/minversion: 1.19.1
     kyverno.io/kubernetes-version: "1.30"
     policies.kyverno.io/description: >-
-      Scheduling non-system Pods to control plane nodes (which run kubelet) is often undesirable
-      because it takes away resources from the control plane components and can represent
-      a possible security threat vector. This policy prevents users from setting a toleration
-      in a Pod spec which allows running on control plane nodes
-      with the taint key `node-role.kubernetes.io/master`.
+      This policy blocks Pod and pod-controller specs from tolerating the control-plane taints
+      `node-role.kubernetes.io/master` and `node-role.kubernetes.io/control-plane`. Empty or
+      keyless tolerations are also rejected because they can match every taint.
 spec:
   validationActions: 
     - Audit
