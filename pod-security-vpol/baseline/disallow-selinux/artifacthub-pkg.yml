@@ -2,7 +2,7 @@ name: disallow-selinux-vpol
 version: 1.0.0
 displayName: Disallow SELinux in ValidatingPolicy
 description: >-
-  SELinux options can be used to escalate privileges and should not be allowed. This policy ensures that the `seLinuxOptions` field is undefined.
+  SELinux user and role are forbidden. The SELinux type must be unset or one of the baseline allowed values for the target Kubernetes version: container_t, container_init_t, container_kvm_t, or container_engine_t.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/pod-security-vpol/baseline/disallow-selinux/disallow-selinux.yaml
@@ -12,7 +12,11 @@ keywords:
   - Pod Security Standards (Baseline)
   - ValidatingPolicy
 readme: |
-  SELinux options can be used to escalate privileges and should not be allowed. This policy ensures that the `seLinuxOptions` field is undefined.
+  SELinux user and role are forbidden. The SELinux type must be unset or one of the baseline allowed values for the target Kubernetes version: container_t, container_init_t, container_kvm_t, or container_engine_t.
+
+  This sample preserves pinned legacy field-presence semantics: explicit empty and null
+  values are rejected rather than treated as unset. This is stricter than current PSS
+  handling of those values.
   
   ### Fine-grained PolicyException use
 
@@ -20,8 +24,10 @@ readme: |
   `disallow-selinux` in `spec.policyRefs`, and narrow the exception with
   `spec.matchConditions` using the exact request identity.
   Use `type:<value>`, `user:<value>`, or `role:<value>` in `spec.allowedValues` for the
-  exact container SELinux field, or `spec.images` for matching containers. Pod-level
-  checks remain enforced by `variables.hasValidSELinuxType` and `hasValidSELinuxUserRole`;
+  exact container SELinux field, or `spec.images` for matching containers. Container-level
+  explicit empty or null values are present fields and are rejected unless matched by an
+  exact token or image exception. Pod-level checks remain enforced by
+  `variables.hasValidSELinuxType` and `hasValidSELinuxUserRole`;
   `seLinuxTypes` holds the normal type allowlist. `variables.podSpec` selects the Pod spec
   directly or from the workload template. `variables.allContainerTypes` includes regular,
   init, and ephemeral containers. CEL reads images through `exceptions.allowedImages` and
@@ -35,5 +41,5 @@ annotations:
   kyverno/category: "Pod Security Standards (Baseline) in ValidatingPolicy"
   kyverno/kubernetesVersion: "1.31+"
   kyverno/subject: "Pod"
-digest: da8ba9aca09a4d62496c9f48f735f3dc929209917a743fa83f4bdc0161ce6e49
+digest: 15b9e2850176175d0026f85ef499d4dce052e8000f4adc5ee9da98ecfda1b317
 createdAt: "2025-03-13T23:26:58Z"

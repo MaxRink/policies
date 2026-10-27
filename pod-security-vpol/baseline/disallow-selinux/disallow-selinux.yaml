@@ -11,8 +11,8 @@ metadata:
     kyverno.io/kyverno-version: 1.14.0
     kyverno.io/kubernetes-version: "1.31+"
     policies.kyverno.io/description: >-
-      SELinux options can be used to escalate privileges and should not be allowed. This policy
-      ensures that the `seLinuxOptions` field is undefined.
+      SELinux user and role are forbidden. The SELinux type must be unset or one of the baseline
+      allowed values for the target Kubernetes version.
 spec:
   validationActions:
      - Audit
@@ -51,37 +51,39 @@ spec:
       expression: "['container_t', 'container_init_t', 'container_kvm_t', 'container_engine_t']"
     - name: hasValidSELinuxType
       expression: >-
-        variables.podSpec.?securityContext.?seLinuxOptions.?type.orValue('') == null ||
-        variables.podSpec.?securityContext.?seLinuxOptions.?type.orValue('') == '' ||
+        !has(variables.podSpec.securityContext) ||
+        !has(variables.podSpec.securityContext.seLinuxOptions) ||
+        !has(variables.podSpec.securityContext.seLinuxOptions.type) ||
         variables.seLinuxTypes.exists(type, type == variables.podSpec.securityContext.seLinuxOptions.type)
     - name: hasValidSELinuxUserRole
       expression: >-
-        (variables.podSpec.?securityContext.?seLinuxOptions.?user.orValue('') == null ||
-        variables.podSpec.?securityContext.?seLinuxOptions.?user.orValue('') == '') &&
-        (variables.podSpec.?securityContext.?seLinuxOptions.?role.orValue('') == null ||
-        variables.podSpec.?securityContext.?seLinuxOptions.?role.orValue('') == '')
+        !has(variables.podSpec.securityContext) ||
+        !has(variables.podSpec.securityContext.seLinuxOptions) ||
+        (!has(variables.podSpec.securityContext.seLinuxOptions.user) &&
+        !has(variables.podSpec.securityContext.seLinuxOptions.role))
   validations:
     - expression: >-
         variables.hasValidSELinuxType &&
         variables.allContainerTypes.all(container,
           container.image in exceptions.allowedImages ||
-          container.?securityContext.?seLinuxOptions.?type.orValue('') == null ||
-          container.?securityContext.?seLinuxOptions.?type.orValue('') == '' ||
+          !has(container.securityContext) ||
+          !has(container.securityContext.seLinuxOptions) ||
+          !has(container.securityContext.seLinuxOptions.type) ||
           variables.seLinuxTypes.exists(type, type == container.securityContext.seLinuxOptions.type) ||
           ('type:' + container.?securityContext.?seLinuxOptions.?type.orValue('')) in exceptions.allowedValues)
       message: >-
         Setting the SELinux type is restricted. The field securityContext.seLinuxOptions.type
-        must be unset, empty, or set to one of the allowed values (container_t, container_init_t,
+        must be unset or set to one of the allowed values (container_t, container_init_t,
         container_kvm_t, or container_engine_t).
     - expression: >-
         variables.hasValidSELinuxUserRole &&
         variables.allContainerTypes.all(container,
           container.image in exceptions.allowedImages ||
-          (container.?securityContext.?seLinuxOptions.?user.orValue('') == null ||
-          container.?securityContext.?seLinuxOptions.?user.orValue('') == '' ||
+          !has(container.securityContext) ||
+          !has(container.securityContext.seLinuxOptions) ||
+          ((!has(container.securityContext.seLinuxOptions.user) ||
           ('user:' + container.?securityContext.?seLinuxOptions.?user.orValue('')) in exceptions.allowedValues) &&
-          (container.?securityContext.?seLinuxOptions.?role.orValue('') == null ||
-          container.?securityContext.?seLinuxOptions.?role.orValue('') == '' ||
-          ('role:' + container.?securityContext.?seLinuxOptions.?role.orValue('')) in exceptions.allowedValues))
+          (!has(container.securityContext.seLinuxOptions.role) ||
+          ('role:' + container.?securityContext.?seLinuxOptions.?role.orValue('')) in exceptions.allowedValues)))
       message: >-
-        Setting the SELinux user or role is forbidden. The fields seLinuxOptions.user and seLinuxOptions.role must be unset or empty.
+        Setting the SELinux user or role is forbidden. The fields seLinuxOptions.user and seLinuxOptions.role must be unset.
