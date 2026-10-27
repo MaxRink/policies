@@ -30,7 +30,7 @@ annotations:
   kyverno/category: "Other in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Ingress"
-digest: 18c93de2e6f769bc18086b8b086a5a1e909bc59fb1534a9ea08d1d210dc894e4
+digest: 7b4212b364ac6e5457b33e4232047745d382c8297c424f449cc775f0ff179e2d
 
 
 createdAt: "2025-05-11T17:46:11Z"

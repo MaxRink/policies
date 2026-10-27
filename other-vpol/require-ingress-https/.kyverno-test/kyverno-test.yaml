@@ -8,6 +8,7 @@ resources:
 - resource.yaml
 - partial-tls-ingress.yaml
 - null-ingress-fields.yaml
+- null-rules-ingress.yaml
 results:
 - isValidatingPolicy: true
   kind: Ingress
@@ -15,6 +16,7 @@ results:
   resources:
   - goodingress01
   - goodingress02
+  - null-rules-ingress
   result: pass
 - isValidatingPolicy: true
   kind: Ingress

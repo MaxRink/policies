@@ -34,7 +34,7 @@ spec:
     - expression: "object.spec.?tls.orValue([]).size() > 0"
       message: "TLS must be defined."
     - expression: >-
-        object.spec.?rules.orValue([]).all(rule,
+        (object.spec.?rules.orValue([]) == null ? [] : object.spec.?rules.orValue([])).all(rule,
           !rule.?host.hasValue() || rule.host == '' ||
           object.spec.?tls.orValue([]).exists(tls,
             !tls.?hosts.hasValue() || tls.?hosts.orValue([]).size() == 0 || rule.host in tls.hosts))
