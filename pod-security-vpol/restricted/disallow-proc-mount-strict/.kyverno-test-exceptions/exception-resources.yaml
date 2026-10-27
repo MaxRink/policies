@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exception-partial
+  namespace: default
+spec:
+  hostUsers: false
+  containers:
+  - name: app
+    image: nginx:1.27
+    securityContext:
+      procMount: Unmasked
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exception-token-wrong
+  namespace: default
+spec:
+  hostUsers: false
+  containers:
+  - name: app
+    image: nginx:1.27
+    securityContext:
+      procMount: Other
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exception-sibling
+  namespace: default
+spec:
+  hostUsers: false
+  containers:
+  - name: exempt
+    image: nginx:1.27
+    securityContext:
+      procMount: Unmasked
+  - name: app
+    image: nginx:1.27
+    securityContext:
+      procMount: Other
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exception-identity-wrong
+  namespace: default
+spec:
+  hostUsers: false
+  containers:
+  - name: app
+    image: nginx:1.27
+    securityContext:
+      procMount: Unmasked
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: exception-whole
+  namespace: default
+spec:
+  hostUsers: false
+  containers:
+  - name: app
+    image: nginx:1.27
+    securityContext:
+      procMount: Unmasked

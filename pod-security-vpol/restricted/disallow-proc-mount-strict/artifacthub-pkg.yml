@@ -14,10 +14,23 @@ keywords:
 readme: |
   The default /proc masks are set up to reduce attack surface and should be required. This policy ensures nothing but the default procMount can be specified, including for Pods that run in a user namespace. It implements the Restricted procMount check of Pod Security Standards v1.35 and later, which overrides the user namespace exemption in the Baseline `disallow-proc-mount` policy.
 
+  ### Fine-grained PolicyException use
+
+  Enable PolicyException support in Kyverno, reference the `ValidatingPolicy` named
+  `disallow-proc-mount-strict` in `spec.policyRefs`, and narrow the exception with
+  `spec.matchConditions` using the exact request identity.
+  Add the exact token `procMount:Unmasked` to `spec.allowedValues` to permit only that
+  procMount value for matching Pods or containers. `variables.podSpec` selects the Pod spec
+  from the Pod or workload template, and `variables.allContainers` includes regular, init,
+  and ephemeral containers.
+  See the [tested example](https://github.com/kyverno/policies/blob/main/pod-security-vpol/restricted/disallow-proc-mount-strict/.kyverno-test-exceptions/exceptions.yaml).
+  With PolicyException support disabled, or when no exception matches, the
+  policy keeps its normal enforcement behavior.
+
   Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
 annotations:
   kyverno/category: "Pod Security Standards (Restricted)"
   kyverno/kubernetesVersion: "1.35+"
   kyverno/subject: "Pod"
-digest: 0b8d73736a429ddc030c114ee3725e3e0b48ff8205942fd45ab3d412e81106f9
+digest: 231051828590936852e6a1662c0e0f6a86a77ddf6221c0ec5d3dafd8707e1b02
 createdAt: "2026-09-30T15:16:17Z"
