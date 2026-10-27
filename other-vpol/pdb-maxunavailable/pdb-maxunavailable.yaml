@@ -26,6 +26,9 @@ spec:
         apiVersions: ["v1"]
         operations:  ["CREATE", "UPDATE"]
         resources:   ["poddisruptionbudgets"]
+  variables:
+    - name: maxUnavailable
+      expression: "string(object.spec.?maxUnavailable.orValue(1))"
   validations:
-    - expression: "int(object.spec.?maxUnavailable.orValue(1)) > 0 || exceptions.allowedValues.exists(value, value == 'maxUnavailable:' + string(object.spec.?maxUnavailable.orValue(1)))"
+    - expression: "int(variables.maxUnavailable.replace('%', '')) > 0 || exceptions.allowedValues.exists(value, value == 'maxUnavailable:' + variables.maxUnavailable)"
       message: "The value of maxUnavailable must be greater than zero."
