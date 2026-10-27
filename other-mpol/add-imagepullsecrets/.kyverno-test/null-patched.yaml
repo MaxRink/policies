@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-image-pull-secrets
+spec:
+  imagePullSecrets:
+  - name: my-secret
+  containers:
+  - name: app
+    image: corp.reg.com/app:v1

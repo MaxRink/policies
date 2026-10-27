@@ -6,10 +6,17 @@ policies:
 - ../add-imagepullsecrets.yaml
 resources:
 - resource.yaml
+- null-resource.yaml
 - resource-exception.yaml
 exceptions:
 - exceptions.yaml
 results:
+- kind: Pod
+  patchedResources: null-patched.yaml
+  policy: add-imagepullsecrets
+  resources: [null-image-pull-secrets]
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: patchedResource1.yaml
   policy: add-imagepullsecrets
