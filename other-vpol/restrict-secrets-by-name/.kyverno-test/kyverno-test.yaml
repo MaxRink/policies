@@ -9,6 +9,7 @@ resources:
 - ../.chainsaw-test/podcontroller-bad.yaml
 - ../.chainsaw-test/podcontroller-good.yaml
 - replicationcontroller-unsafe-secret.yaml
+- ephemeral-container-secret.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -63,6 +64,12 @@ results:
   policy: restrict-secrets-by-name
   resources:
   - unsafe-secret-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: restrict-secrets-by-name
+  resources:
+  - ephemeral-container-secret
   result: fail
 - isValidatingPolicy: true
   kind: Deployment
