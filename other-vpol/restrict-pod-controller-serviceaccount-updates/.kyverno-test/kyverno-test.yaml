@@ -1,0 +1,23 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-pod-controller-serviceaccount-updates
+policies:
+- ../restrict-pod-controller-serviceaccount-updates.yaml
+resources:
+- ../.chainsaw-test/deployment.yaml
+- ../.chainsaw-test/cronjob.yaml
+variables: values.yaml
+results:
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: restrict-pod-controller-serviceaccount-updates
+  resources:
+  - deployment01
+  result: pass
+- isValidatingPolicy: true
+  kind: CronJob
+  policy: restrict-pod-controller-serviceaccount-updates
+  resources:
+  - cronjob01
+  result: pass
