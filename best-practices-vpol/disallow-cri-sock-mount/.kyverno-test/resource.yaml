@@ -107,3 +107,20 @@ spec:
   - name: dot
     hostPath:
       path: /var/run/./docker.sock
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: badrc-sock-mount
+spec:
+  selector: {app: badrc-sock-mount}
+  template:
+    metadata: {labels: {app: badrc-sock-mount}}
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.27
+      volumes:
+      - name: socket
+        hostPath:
+          path: /var/run/docker.sock

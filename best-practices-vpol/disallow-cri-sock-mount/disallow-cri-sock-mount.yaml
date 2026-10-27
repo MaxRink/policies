@@ -26,12 +26,24 @@ spec:
           - apiGroups: ['']
             apiVersions: [v1]
             operations: [CREATE, UPDATE]
-            resources: [pods]
+            resources: [pods, replicationcontrollers]
+          - apiGroups: [apps]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [deployments, daemonsets, statefulsets, replicasets]
+          - apiGroups: [batch]
+            apiVersions: [v1]
+            operations: [CREATE, UPDATE]
+            resources: [jobs, cronjobs]
   variables:
+          - name: podSpec
+            expression: >-
+              object.spec.?jobTemplate.?spec.?template.?spec.orValue(
+              object.spec.?template.?spec.orValue(object.spec))
           - name: hasVolumes
-            expression: "!has(object.spec.volumes)"
+            expression: "!has(variables.podSpec.volumes)"
           - name: volumes
-            expression: "object.spec.volumes"
+            expression: "variables.podSpec.?volumes.orValue([])"
           - name: volumesWithHostPath
             expression: "variables.volumes.filter(volume, has(volume.hostPath))"
           # Normalize away empty and '.' segments so aliases such as /var/run/./docker.sock
