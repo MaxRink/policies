@@ -6,6 +6,7 @@ policies:
 - ../disallow-host-ports.yaml
 resources:
 - resource.yaml
+- null-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -96,4 +97,11 @@ results:
   - goodpod08
   - goodpod09
   - goodpod10
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-host-ports
+  resources:
+  - null-ports
+  - null-hostport
   result: pass
