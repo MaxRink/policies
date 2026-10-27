@@ -7,6 +7,7 @@ policies:
 resources:
 - resource.yaml
 - null-resources-pod.yaml
+- null-cpu-pod.yaml
 - replicationcontroller-bad.yaml
 exceptions:
 - exceptions.yaml
@@ -21,6 +22,7 @@ results:
   - badpod04-zero
   - badpod05-init
   - null-resources-pod
+  - null-cpu-pod
   result: fail
 - isValidatingPolicy: true
   kind: ReplicationController
