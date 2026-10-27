@@ -30,3 +30,21 @@ spec:
   containers:
   - name: controller
     image: registry.k8s.io/ingress-nginx/controller:v1.11.2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metallb-controller
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: metallb-controller
+  template:
+    metadata:
+      labels:
+        app: metallb-controller
+    spec:
+      containers:
+      - name: controller
+        image: quay.io/metallb/controller:v0.14.9

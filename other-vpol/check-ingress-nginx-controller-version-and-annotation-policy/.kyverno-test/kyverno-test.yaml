@@ -49,3 +49,58 @@ results:
   - bad-controller-rc
   kind: ReplicationController
   result: fail
+- isValidatingPolicy: true
+  policy: check-ingress-nginx-controller-version-and-annotation-policy
+  resources:
+  - config-map-true
+  kind: ConfigMap
+  result: fail
+- isValidatingPolicy: true
+  policy: check-ingress-nginx-controller-version-and-annotation-policy
+  resources:
+  - config-map-false
+  - config-map-other
+  - config-map-empty
+  - config-map-null-data
+  kind: ConfigMap
+  result: pass
+- isValidatingPolicy: true
+  policy: check-ingress-nginx-controller-version-and-annotation-policy
+  resources:
+  - config-map-empty-value
+  kind: ConfigMap
+  result: fail
+- isValidatingPolicy: true
+  policy: check-ingress-nginx-controller-version-and-annotation-policy
+  resources:
+  - snippet-ingress
+  - empty-snippet-ingress
+  kind: Ingress
+  result: fail
+- isValidatingPolicy: true
+  policy: check-ingress-nginx-controller-version-and-annotation-policy
+  resources:
+  - similar-suffix-ingress
+  - null-annotations-ingress
+  kind: Ingress
+  result: pass
+- isValidatingPolicy: true
+  policy: check-ingress-nginx-controller-version-and-annotation-policy
+  resources:
+  - config-map-true
+  kind: ConfigMap
+  operation: UPDATE
+  result: fail
+- isValidatingPolicy: true
+  policy: check-ingress-nginx-controller-version-and-annotation-policy
+  resources:
+  - snippet-ingress
+  kind: Ingress
+  operation: UPDATE
+  result: fail
+- isValidatingPolicy: true
+  policy: check-ingress-nginx-controller-version-and-annotation-policy
+  resources:
+  - metallb-controller
+  kind: Deployment
+  result: pass
