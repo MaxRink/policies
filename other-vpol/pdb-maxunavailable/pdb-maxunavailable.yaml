@@ -28,7 +28,7 @@ spec:
         resources:   ["poddisruptionbudgets"]
   variables:
     - name: maxUnavailable
-      expression: "string(object.spec.?maxUnavailable.orValue(1))"
+      expression: "string(has(object.spec.maxUnavailable) && object.spec.maxUnavailable != null ? object.spec.maxUnavailable : 1)"
   validations:
     - expression: "int(variables.maxUnavailable.replace('%', '')) > 0 || exceptions.allowedValues.exists(value, value == 'maxUnavailable:' + variables.maxUnavailable)"
       message: "The value of maxUnavailable must be greater than zero."
