@@ -11,6 +11,7 @@ apiVersion: v1
 kind: Pod
 metadata:
   labels:
+    foo: custom
     bar: foo
   name: pod02
 spec:

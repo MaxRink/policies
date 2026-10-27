@@ -21,8 +21,9 @@ readme: |
   `spec.matchConditions` using the exact request identity.
   Put the exact control token `label:foo` in `spec.allowedValues`, which Kyverno
   exposes as `exceptions.allowedValues`, to skip adding or overwriting `foo=bar`
-  on the matched resource. This names the label operation, not a label value;
-  other resources still receive the normal mutation.
+  on the matched resource. Existing `foo` labels are preserved; this names the
+  label operation, not a label value, and other resources still receive the
+  normal mutation.
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-mpol/add-labels/.kyverno-test/exceptions.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal mutation behavior.
@@ -31,4 +32,4 @@ readme: |
 annotations:
   kyverno/category: "Sample"
   kyverno/subject: "Label"
-digest: f3f92ae485d576d309aeb96f2139fb2cfa3684f0f82a2137c9bc5f3d64058b76
+digest: e553749eded6bd663dd51c43f036b61e9167724fbb92062317d2b92ac822a4b9
