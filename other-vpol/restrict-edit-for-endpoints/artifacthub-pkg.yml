@@ -2,7 +2,7 @@ name: restrict-edit-for-endpoints-vpol
 version: 1.0.0
 displayName: Restrict Edit for Endpoints CVE-2021-25740 in ValidatingPolicy
 description: >-
-  Clusters not initially installed with Kubernetes 1.22 may be vulnerable to an issue defined in CVE-2021-25740 which could enable users to send network traffic to locations they would otherwise not have access to via a confused deputy attack. This was due to the system:aggregate-to-edit ClusterRole having edit permission of Endpoints. This policy, intended to run in background mode, checks if your cluster is vulnerable to CVE-2021-25740 by ensuring the system:aggregate-to-edit ClusterRole does not have the edit permission of Endpoints.
+  Clusters not initially installed with Kubernetes 1.22 may be vulnerable to an issue   defined in CVE-2021-25740 which could enable users to send network traffic to locations they would otherwise not have access to via a confused deputy attack. This was due to the system:aggregate-to-edit ClusterRole having edit permission of Endpoints. This policy, intended to run in background mode, checks if your cluster is vulnerable to CVE-2021-25740 by ensuring the system:aggregate-to-edit ClusterRole does not have write permissions on Endpoints or Endpoints subresources.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-edit-for-endpoints/restrict-edit-for-endpoints.yaml
@@ -12,7 +12,7 @@ keywords:
   - Security
   - ValidatingPolicy
 readme: |
-  Clusters not initially installed with Kubernetes 1.22 may be vulnerable to an issue defined in CVE-2021-25740 which could enable users to send network traffic to locations they would otherwise not have access to via a confused deputy attack. This was due to the system:aggregate-to-edit ClusterRole having edit permission of Endpoints. This policy, intended to run in background mode, checks if your cluster is vulnerable to CVE-2021-25740 by ensuring the system:aggregate-to-edit ClusterRole does not have the edit permission of Endpoints.
+  Clusters not initially installed with Kubernetes 1.22 may be vulnerable to an issue   defined in CVE-2021-25740 which could enable users to send network traffic to locations they would otherwise not have access to via a confused deputy attack. This was due to the system:aggregate-to-edit ClusterRole having edit permission of Endpoints. This policy, intended to run in background mode, checks if your cluster is vulnerable to CVE-2021-25740 by ensuring the system:aggregate-to-edit ClusterRole does not have write permissions on Endpoints or Endpoints subresources.
   
   ### Fine-grained PolicyException use
 
@@ -32,6 +32,6 @@ annotations:
   kyverno/category: "Security in vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "ClusterRole"
-digest: 805aaa6817a071fc9866118b38deffaa17b6ff53bd1793e7c965ed8c081d921f
+digest: e2323e5b49bf40062952c06a90fc6964f89a006f695da0617a4b9033e16ccc5f
 
 createdAt: "2025-05-11T17:46:12Z"
