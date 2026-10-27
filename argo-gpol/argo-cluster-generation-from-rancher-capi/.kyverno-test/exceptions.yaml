@@ -1,0 +1,12 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: argo-excepted-cluster
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - name: argo-cluster-generation-from-rancher-capi
+      kind: GeneratingPolicy
+  matchConditions:
+    - name: exact-cluster
+      expression: object.metadata.namespace == 'argo-rancher-cluster-ns' && object.metadata.name == 'excepted-cluster'

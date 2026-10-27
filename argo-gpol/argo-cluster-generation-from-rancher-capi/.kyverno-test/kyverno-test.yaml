@@ -1,0 +1,25 @@
+apiVersion: cli.kyverno.io/v1alpha1
+context: context.yaml
+kind: Test
+metadata:
+  name: argo-cluster-generation-from-rancher-capi
+policies:
+  - ../argo-cluster-generation-from-rancher-capi.yaml
+resources:
+  - cluster.yaml
+exceptions:
+  - exceptions.yaml
+results:
+  - generatedResource: generatedResource.yaml
+    kind: Cluster
+    policy: argo-cluster-generation-from-rancher-capi
+    resources:
+      - sample-cluster
+    result: pass
+    isGeneratingPolicy: true
+  - kind: Cluster
+    policy: argo-cluster-generation-from-rancher-capi
+    resources:
+      - excepted-cluster
+    result: skip
+    isGeneratingPolicy: true
