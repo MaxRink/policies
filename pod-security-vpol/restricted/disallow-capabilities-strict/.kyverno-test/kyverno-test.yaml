@@ -7,6 +7,7 @@ policies:
 - ./adding-capabilities-strict.yaml
 resources:
 - resource.yaml
+- null-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -110,6 +111,18 @@ results:
   - addcap-goodpod12
   - addcap-goodpod13
   result: pass 
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-capabilities-strict
+  resources:
+  - null-added-capabilities
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-capabilities-strict
+  resources:
+  - null-drop-capabilities
+  result: fail
 - isValidatingPolicy: true
   kind: CronJob
   policy: disallow-capabilities-strict
@@ -239,4 +252,3 @@ results:
   - addcap-goodpod12
   - addcap-goodpod13
   result: pass
-
