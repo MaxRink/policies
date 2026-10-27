@@ -25,6 +25,7 @@ results:
   policy: block-large-images
   resources:
   - default/large-image-rc
+  - default/large-init-image-rc
   result: fail
 - isValidatingPolicy: true
   kind: ReplicationController
