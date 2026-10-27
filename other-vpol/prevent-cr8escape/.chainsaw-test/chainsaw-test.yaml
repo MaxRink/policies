@@ -40,3 +40,8 @@ spec:
         - check:
             (contains($error, `"characters '+' or '=' are not allowed in sysctls values"`)): true
         file: podcontroller-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, `"characters '+' or '=' are not allowed in sysctls values"`)): true
+        file: ../.kyverno-test/replicationcontroller-bad.yaml
