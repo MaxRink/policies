@@ -28,3 +28,9 @@ results:
   resources:
   - ingress-wildcard-host
   result: pass
+- kind: Ingress
+  isValidatingPolicy: true
+  policy: disallow-empty-ingress-host
+  resources:
+  - null-rules
+  result: pass
