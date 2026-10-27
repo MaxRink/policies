@@ -6,6 +6,9 @@ policies:
 - ../restrict-usergroup-fsgroup-id.yaml
 resources:
 - resource.yaml
+- ../.chainsaw-test/podcontroller-bad.yaml
+- ../.chainsaw-test/podcontroller-good.yaml
+- replicationcontroller-bad-ids.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -22,3 +25,34 @@ results:
   - badpod03
   - badpod04
   result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: validate-userid-groupid-fsgroup
+  resources:
+  - bad-ids-rc
+  result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: validate-userid-groupid-fsgroup
+  resources:
+  - baddeployment01
+  - baddeployment02
+  result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: validate-userid-groupid-fsgroup
+  resources:
+  - gooddeployment01
+  result: pass
+- isValidatingPolicy: true
+  kind: CronJob
+  policy: validate-userid-groupid-fsgroup
+  resources:
+  - badcronjob01
+  result: fail
+- isValidatingPolicy: true
+  kind: CronJob
+  policy: validate-userid-groupid-fsgroup
+  resources:
+  - goodcronjob01
+  result: pass
