@@ -30,5 +30,6 @@ spec:
   validations:
     - expression: >-
         'externalIPs' in exceptions.allowedValues ||
-        !has(object.spec.externalIPs) || size(object.spec.externalIPs) == 0
+        !has(object.spec.externalIPs) || object.spec.externalIPs == null ||
+        size(object.spec.externalIPs) == 0
       message: externalIPs are not allowed.
