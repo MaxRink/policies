@@ -31,6 +31,7 @@ results:
   resources:
   - goodpod01
   - goodpod02
+  - ephemeral-without-resources
   result: pass
   isValidatingPolicy: true
 - kind: Pod

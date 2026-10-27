@@ -94,3 +94,18 @@ spec:
         cpu: "0.5"
       limits:
         memory: "256Mi"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ephemeral-without-resources
+spec:
+  containers:
+  - name: app
+    image: nginx:1.27
+    resources:
+      requests: {cpu: "100m", memory: "64Mi"}
+      limits: {memory: "128Mi"}
+  ephemeralContainers:
+  - name: debugger
+    image: busybox:1.36
