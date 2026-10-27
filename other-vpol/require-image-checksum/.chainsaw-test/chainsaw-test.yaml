@@ -51,3 +51,9 @@ spec:
         - check:
             ($error != null): true
         file: ../.kyverno-test/invalid-digest-pod.yaml
+    - apply:
+        file: ephemeral-pod.yaml
+    - script:
+        content: |
+          output="$(kubectl patch pod ephemeral-checksum -n default --subresource=ephemeralcontainers --type=strategic --patch='{"spec":{"ephemeralContainers":[{"name":"debug","image":"nginx:1.25","targetContainerName":"app"}]}}' 2>&1)" && { echo "$output"; exit 1; }
+          echo "$output" | grep -q 'Images must use checksums rather than tags.'
