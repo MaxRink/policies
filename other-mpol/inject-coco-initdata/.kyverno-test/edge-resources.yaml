@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: no-label-pod
+  namespace: default
+  annotations:
+    coco.io/initdata-configmap: initdata
+spec:
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: no-annotation-pod
+  namespace: default
+  labels:
+    coco: enabled
+spec:
+  containers:
+  - name: app
+    image: nginx:1.27
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: empty-config-pod
+  namespace: default
+  labels:
+    coco: enabled
+  annotations:
+    coco.io/initdata-configmap: empty-initdata
+spec:
+  containers:
+  - name: app
+    image: nginx:1.27

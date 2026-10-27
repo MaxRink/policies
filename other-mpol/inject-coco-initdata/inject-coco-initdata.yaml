@@ -3,9 +3,9 @@ kind: MutatingPolicy
 metadata:
   annotations:
     policies.kyverno.io/category: Confidential Computing
-    policies.kyverno.io/description: Injects the CoCo initdata annotation into pods with
-      the label 'coco=enabled' and reference to an initdata ConfigMap. Retrieves initdata
-      from the specified ConfigMap and injects it as the 'io.katacontainers.config.runtime.cc_init_data'
+    policies.kyverno.io/description: Injects gzip-compressed, base64-encoded CoCo Init-Data
+      into pods with the label 'coco=enabled' and reference to an Init-Data ConfigMap.
+      Injects it as the 'io.katacontainers.config.hypervisor.cc_init_data'
       annotation.
     policies.kyverno.io/severity: medium
     policies.kyverno.io/subject: Pod
@@ -37,11 +37,28 @@ spec:
       resources:
       - pods
   mutations:
-  - applyConfiguration:
-      expression: 'variables.initData != "" ? Object{metadata: Object.metadata{annotations: {"io.katacontainers.config.runtime.cc_init_data": variables.initData}}} : Object{}'
-    patchType: ApplyConfiguration
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        variables.initData != "" ? [
+          JSONPatch{
+            op: "add",
+            path: variables.podMetadataPath + "/annotations/io.katacontainers.config.hypervisor.cc_init_data",
+            value: variables.initData
+          }
+        ] : []
   variables:
-  - expression: "has(object.metadata.annotations) && 'coco.io/initdata-configmap' in object.metadata.annotations ? object.metadata.annotations['coco.io/initdata-configmap'] : object.spec.template.metadata.annotations['coco.io/initdata-configmap']"
+  - expression: |
+      object.kind == "Pod" ? "/metadata" :
+      object.kind == "CronJob" ? "/spec/jobTemplate/spec/template/metadata" :
+      "/spec/template/metadata"
+    name: podMetadataPath
+  - expression: |
+      request.object.kind == "Pod" ?
+      request.object.metadata.annotations['coco.io/initdata-configmap'] :
+      request.object.kind == "CronJob" ?
+      request.object.spec.jobTemplate.spec.template.metadata.annotations['coco.io/initdata-configmap'] :
+      request.object.spec.template.metadata.annotations['coco.io/initdata-configmap']
     name: configMapName
   - expression: "has(object.metadata.namespace) ? object.metadata.namespace : 'default'"
     name: configMapNamespace
