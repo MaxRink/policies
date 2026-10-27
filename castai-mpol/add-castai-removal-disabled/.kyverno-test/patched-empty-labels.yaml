@@ -1,0 +1,16 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: kyverno
+  name: empty-labels-job
+spec:
+  template:
+    metadata:
+      labels:
+        autoscaling.cast.ai/removal-disabled: "true"
+    spec:
+      containers:
+      - name: app
+        image: busybox
+      restartPolicy: Never

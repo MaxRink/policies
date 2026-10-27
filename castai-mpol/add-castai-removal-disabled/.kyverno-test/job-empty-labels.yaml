@@ -1,0 +1,13 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: empty-labels-job
+spec:
+  template:
+    metadata:
+      labels: {}
+    spec:
+      containers:
+      - name: app
+        image: busybox
+      restartPolicy: Never

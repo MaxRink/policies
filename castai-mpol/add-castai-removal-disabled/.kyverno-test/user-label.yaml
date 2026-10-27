@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: user-label
+spec:
+  template:
+    metadata:
+      labels:
+        autoscaling.cast.ai/removal-disabled: "false"
+    spec:
+      containers:
+      - name: pi
+        image: perl
+      restartPolicy: Never
