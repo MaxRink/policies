@@ -1,0 +1,138 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/chainsaw/main/.schemas/json/test-chainsaw-v1alpha1.json
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  creationTimestamp: null
+  name: restart-deployment-on-secret-change
+spec:
+  steps:
+    - name: shared-exception-namespace
+      skipDelete: true
+      try:
+        - apply:
+            resource:
+              apiVersion: v1
+              kind: Namespace
+              metadata:
+                name: policy-exceptions
+    - name: multiple-secret-updates
+      try:
+        - script:
+            content: |
+              set -eu
+              kubectl delete mutatingpolicy restart-deployment-on-secret-change --ignore-not-found --wait
+              kubectl delete policyexceptions.policies.kyverno.io skip-mysecret-restart -n policy-exceptions --ignore-not-found --wait
+              kubectl delete clusterrole kyverno:reports-controller:restart-deployment-on-secret-change --ignore-not-found --wait
+              kubectl delete clusterrole kyverno:background-controller:restart-deployment-on-secret-change --ignore-not-found --wait
+              kubectl delete deployment/busybox secret/mysecret secret/myothersecret -n "$NAMESPACE" --ignore-not-found --wait
+        - apply:
+            file: rbac-reporting.yaml
+        - apply:
+            file: cluster-role.yaml
+        - script:
+            content: |
+              set -eu
+              for attempt in $(seq 1 30); do
+                ready=true
+                for verb in get list watch; do
+                  result="$(kubectl auth can-i "$verb" secrets --as=system:serviceaccount:kyverno:kyverno-reports-controller 2>&1)"
+                  echo "reports-controller $verb secrets: $result"
+                  if [ "$result" != "yes" ]; then
+                    ready=false
+                  fi
+                done
+                for verb in get list update; do
+                  result="$(kubectl auth can-i "$verb" deployments.apps --as=system:serviceaccount:kyverno:kyverno-background-controller 2>&1)"
+                  echo "background-controller $verb deployments.apps: $result"
+                  if [ "$result" != "yes" ]; then
+                    ready=false
+                  fi
+                done
+                if [ "$ready" = true ]; then
+                  exit 0
+                fi
+                sleep 1
+              done
+              echo "Required MutatingPolicy RBAC was not aggregated for the reports and background controllers"
+              exit 1
+        - apply:
+            file: ../restart-deployment-on-secret-change.yaml
+        - assert:
+            file: policy-ready.yaml
+        - apply:
+            file: deployment.yaml
+        - apply:
+            file: secrets.yaml
+        - apply:
+            file: exception.yaml
+        - script:
+            content: |
+              set -eu
+              get_annotation() {
+                case "$1" in
+                  ops.corp.com/triggerrestart)
+                    kubectl -n "$NAMESPACE" get deployment busybox -o jsonpath='{.spec.template.metadata.annotations.ops\.corp\.com/triggerrestart}'
+                    ;;
+                  ops.corp.com/triggerrestart-othersecret)
+                    kubectl -n "$NAMESPACE" get deployment busybox -o jsonpath='{.spec.template.metadata.annotations.ops\.corp\.com/triggerrestart-othersecret}'
+                    ;;
+                  *)
+                    echo "unexpected annotation key: $1" >&2
+                    return 1
+                    ;;
+                esac
+              }
+
+              update_and_check() {
+                secret="$1"
+                annotation="$2"
+                value="$3"
+                other_annotation="$4"
+                other_expected="$5"
+
+                kubectl -n "$NAMESPACE" patch secret "$secret" --type merge -p "{\"data\":{\"key\":\"$value\"}}"
+                expected="$(kubectl -n "$NAMESPACE" get secret "$secret" -o json | python3 -c 'import hashlib,json,sys; print(hashlib.sha256(json.dumps(json.load(sys.stdin).get("data") or {}, sort_keys=True, separators=(",", ":")).encode()).hexdigest())')"
+                actual=""
+                for attempt in $(seq 1 30); do
+                  actual="$(get_annotation "$annotation")"
+                  if [ "$actual" = "$expected" ]; then
+                    break
+                  fi
+                  sleep 1
+                done
+                other_actual="$(get_annotation "$other_annotation")"
+                echo "$secret: expected data hash $annotation=$expected, got $actual; expected $other_annotation=$other_expected, got $other_actual"
+                [ "$actual" = "$expected" ]
+                [ "$other_actual" = "$other_expected" ]
+                LAST_HASH="$expected"
+              }
+
+              kubectl -n "$NAMESPACE" patch secret mysecret --type merge -p '{"data":{"key":"Ng=="}}'
+              sleep 5
+              exempted_annotation="$(kubectl -n "$NAMESPACE" get deployment busybox -o jsonpath='{.spec.template.metadata.annotations.ops\.corp\.com/triggerrestart}')"
+              echo "mysecret exception: expected no annotation, got $exempted_annotation"
+              [ -z "$exempted_annotation" ]
+
+              update_and_check myothersecret ops.corp.com/triggerrestart-othersecret Mg== ops.corp.com/triggerrestart ""
+              other_secret_hash="$LAST_HASH"
+              kubectl delete policyexceptions.policies.kyverno.io skip-mysecret-restart -n policy-exceptions --wait
+
+              update_and_check mysecret ops.corp.com/triggerrestart MQ== ops.corp.com/triggerrestart-othersecret "$other_secret_hash"
+              secret_hash="$LAST_HASH"
+              update_and_check myothersecret ops.corp.com/triggerrestart-othersecret Mw== ops.corp.com/triggerrestart "$secret_hash"
+              other_secret_hash="$LAST_HASH"
+              update_and_check mysecret ops.corp.com/triggerrestart NA== ops.corp.com/triggerrestart-othersecret "$other_secret_hash"
+              secret_hash="$LAST_HASH"
+              update_and_check myothersecret ops.corp.com/triggerrestart-othersecret NQ== ops.corp.com/triggerrestart "$secret_hash"
+              other_secret_hash="$LAST_HASH"
+
+              echo "Repeated updates preserved independent data hashes: $secret_hash/$other_secret_hash"
+      cleanup:
+        - script:
+            content: |
+              set -eu
+              kubectl delete mutatingpolicy restart-deployment-on-secret-change --ignore-not-found --wait
+              kubectl delete policyexceptions.policies.kyverno.io skip-mysecret-restart -n policy-exceptions --ignore-not-found --wait
+              kubectl delete clusterrole kyverno:reports-controller:restart-deployment-on-secret-change --ignore-not-found --wait
+              kubectl delete clusterrole kyverno:background-controller:restart-deployment-on-secret-change --ignore-not-found --wait
+              kubectl delete deployment/busybox secret/mysecret secret/myothersecret -n "$NAMESPACE" --ignore-not-found --wait

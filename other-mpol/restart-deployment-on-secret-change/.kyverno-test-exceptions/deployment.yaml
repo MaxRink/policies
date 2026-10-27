@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox
+  template:
+    metadata:
+      labels:
+        app: busybox
+      annotations:
+        ops.corp.com/triggerrestart-othersecret: "40"
+    spec:
+      containers:
+        - name: busybox
+          image: busybox:1.36

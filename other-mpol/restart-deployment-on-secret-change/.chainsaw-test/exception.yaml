@@ -1,0 +1,17 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: skip-mysecret-restart
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+    - kind: MutatingPolicy
+      name: restart-deployment-on-secret-change
+  allowedValues:
+    - secret:mysecret
+  matchConditions:
+    - name: exact-trigger-and-target
+      expression: >-
+        object.metadata.name == 'busybox' &&
+        object.metadata.namespace == request.object.metadata.namespace &&
+        request.object.metadata.name == 'mysecret'

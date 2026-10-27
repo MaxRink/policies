@@ -1,0 +1,16 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restart-deployment-ignores-other-secrets
+policies:
+  - ../restart-deployment-on-secret-change.yaml
+resources:
+  - unwatched-secret.yaml
+variables: values.yaml
+results:
+  - kind: Secret
+    policy: restart-deployment-on-secret-change
+    resources:
+      - default/unwatched
+    result: skip
+    isMutatingPolicy: true
