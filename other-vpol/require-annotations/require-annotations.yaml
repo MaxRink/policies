@@ -40,7 +40,9 @@ spec:
       expression: >-
         object.spec.?jobTemplate.?spec.?template.?metadata.orValue(
         object.spec.?template.?metadata.orValue(object.metadata))
+    - name: department
+      expression: "variables.podMetadata.?annotations[?'corp.org/department'].orValue('')"
   validations:
     - expression: >-
-        variables.podMetadata.?annotations[?'corp.org/department'].orValue('') != '' || 'missing-annotation:corp.org/department' in exceptions.allowedValues
+        variables.department != null && variables.department != '' || 'missing-annotation:corp.org/department' in exceptions.allowedValues
       message: "The annotation `corp.org/department` is required."

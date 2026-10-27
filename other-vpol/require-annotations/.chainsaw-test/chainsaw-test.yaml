@@ -44,3 +44,8 @@ spec:
         - check:
             (contains($error, 'Policy require-annotations failed')): true
         file: ../.kyverno-test/replicationcontroller-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Policy require-annotations failed')): true
+        file: ../.kyverno-test/null-department-pod.yaml
