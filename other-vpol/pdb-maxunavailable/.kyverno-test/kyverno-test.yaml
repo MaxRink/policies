@@ -8,6 +8,7 @@ resources:
 - resource.yaml
 - pdb-percentage.yaml
 - pdb-zero-percent.yaml
+- pdb-null-maxunavailable.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -27,4 +28,5 @@ results:
   - kube-system/good-pdb-none
   - kube-system/exception-pdb-zero
   - default/percentage-pdb
+  - kube-system/null-maxunavailable-pdb
   result: pass
