@@ -44,8 +44,8 @@ spec:
         object.spec.?template.?spec.orValue(object.spec))
   validations:
     - expression: >-
-        variables.podSpec.?volumes.orValue([]).all(volume,
-        !has(volume.hostPath) ||
-        string(volume.hostPath.path) in exceptions.allowedValues)
+        (variables.podSpec.?volumes.orValue([]) == null ? [] : variables.podSpec.?volumes.orValue([])).all(volume,
+        !has(volume.hostPath) || volume.hostPath == null ||
+        (has(volume.hostPath.path) && string(volume.hostPath.path) in exceptions.allowedValues))
       message: >-
         HostPath volumes are forbidden. The field spec.volumes[*].hostPath must be unset
