@@ -2,7 +2,7 @@ name: restrict-controlplane-scheduling-vpol
 version: 1.0.0
 displayName: Restrict control plane scheduling in ValidatingPolicy
 description: >-
-  Scheduling non-system Pods to control plane nodes (which run kubelet) is often undesirable because it takes away resources from the control plane components and can represent a possible security threat vector. This policy prevents users from setting a toleration in a Pod spec which allows running on control plane nodes with the taint key `node-role.kubernetes.io/master`.
+  This policy blocks Pod and pod-controller specs from tolerating the control-plane taints `node-role.kubernetes.io/master` and `node-role.kubernetes.io/control-plane`. Empty or keyless tolerations are also rejected because they can match every taint.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-controlplane-scheduling/restrict-controlplane-scheduling.yaml
@@ -12,7 +12,7 @@ keywords:
   - Sample
   - ValidatingPolicy
 readme: |
-  Scheduling non-system Pods to control plane nodes (which run kubelet) is often undesirable because it takes away resources from the control plane components and can represent a possible security threat vector. This policy prevents users from setting a toleration in a Pod spec which allows running on control plane nodes with the taint key `node-role.kubernetes.io/master`.
+  This policy blocks Pod and pod-controller specs from tolerating the control-plane taints `node-role.kubernetes.io/master` and `node-role.kubernetes.io/control-plane`. Empty or keyless tolerations are also rejected because they can match every taint.
   
   ### Fine-grained PolicyException use
 
@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 67d707ab5fc747dd54da7fb7ba7518cadffbf81d8719736b803cb0979fad8a88
+digest: 0a0493d7c8921109a07df2c55a970a66025fd5b74ed3caa99db0db08a38c9909
 
 
 createdAt: "2025-05-11T17:46:11Z"
