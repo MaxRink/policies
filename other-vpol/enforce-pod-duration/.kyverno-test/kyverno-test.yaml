@@ -6,6 +6,7 @@ policies:
 - ../enforce-pod-duration.yaml
 resources:
 - resources.yaml
+- replicationcontroller.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -24,3 +25,9 @@ results:
   - test-lifetime-micro-sign-microsecond
   - test-lifetime-greek-mu-microsecond
   result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: pod-lifetime
+  resources:
+  - lifetime-bad-rc
+  result: fail

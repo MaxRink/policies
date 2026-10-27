@@ -23,12 +23,14 @@ spec:
     - apiGroups:   [""]
       apiVersions: ["v1"]
       operations:  ["CREATE", "UPDATE"]
-      resources:   ["pods"]
+      resources:   ["pods", "replicationcontrollers"]
   variables:
+    - name: podMetadata
+      expression: "object.spec.?jobTemplate.?spec.?template.?metadata.orValue(object.spec.?template.?metadata.orValue(object.metadata))"
     - name: hasLifetimeAnnotation
-      expression: "object.metadata.?annotations[?'pod.kubernetes.io/lifetime'].hasValue()"
+      expression: "variables.podMetadata.?annotations[?'pod.kubernetes.io/lifetime'].hasValue()"
     - name: lifetimeAnnotationValue
-      expression: "variables.hasLifetimeAnnotation ? object.metadata.annotations['pod.kubernetes.io/lifetime'] : '0s'"
+      expression: "variables.hasLifetimeAnnotation ? variables.podMetadata.annotations['pod.kubernetes.io/lifetime'] : '0s'"
   validations:
     - expression: >-
         (variables.lifetimeAnnotationValue.matches('^(0|[+-]?(([0-9]+(\\.[0-9]*)?|\\.[0-9]+)(ns|us|µs|μs|ms|s|m|h))+)$') &&
