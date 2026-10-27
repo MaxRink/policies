@@ -9,6 +9,7 @@ resources:
 - ../.chainsaw-test/pod-good.yaml
 - ../.chainsaw-test/podcontroller-bad.yaml
 - ../.chainsaw-test/podcontroller-good.yaml
+- replicationcontroller-bad.yaml
 results:
 - isValidatingPolicy: true
   kind: Pod
@@ -17,6 +18,12 @@ results:
   - badpod01
   - badpod02
   - badpod03
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: require-container-port-names
+  resources:
+  - unnamed-port-rc
   result: fail
 - isValidatingPolicy: true
   kind: Pod

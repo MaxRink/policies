@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: unnamed-port-rc
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    app: unnamed-port
+  template:
+    metadata:
+      labels:
+        app: unnamed-port
+    spec:
+      containers:
+        - name: app
+          image: nginx:1.25
+          ports:
+            - containerPort: 8080
