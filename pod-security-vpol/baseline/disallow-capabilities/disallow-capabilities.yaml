@@ -45,18 +45,18 @@ spec:
         ['AUDIT_WRITE','CHOWN','DAC_OVERRIDE','FOWNER','FSETID','KILL','MKNOD','NET_BIND_SERVICE','SETFCAP','SETGID','SETPCAP','SETUID','SYS_CHROOT']
     - name: allContainers
       expression: >-
-        (object.spec.?containers.orValue([]) +
-        object.spec.?template.?spec.?containers.orValue([]) +
-        object.spec.?jobTemplate.?spec.?template.?spec.?containers.orValue([]) +
-        object.spec.?initContainers.orValue([]) +
-        object.spec.?template.?spec.?initContainers.orValue([]) +
-        object.spec.?jobTemplate.?spec.?template.?spec.?initContainers.orValue([]) +
-        object.spec.?ephemeralContainers.orValue([]))
+        (object.spec.?containers.orValue([]) == null ? [] : object.spec.?containers.orValue([])) +
+        (object.spec.?template.?spec.?containers.orValue([]) == null ? [] : object.spec.?template.?spec.?containers.orValue([])) +
+        (object.spec.?jobTemplate.?spec.?template.?spec.?containers.orValue([]) == null ? [] : object.spec.?jobTemplate.?spec.?template.?spec.?containers.orValue([])) +
+        (object.spec.?initContainers.orValue([]) == null ? [] : object.spec.?initContainers.orValue([])) +
+        (object.spec.?template.?spec.?initContainers.orValue([]) == null ? [] : object.spec.?template.?spec.?initContainers.orValue([])) +
+        (object.spec.?jobTemplate.?spec.?template.?spec.?initContainers.orValue([]) == null ? [] : object.spec.?jobTemplate.?spec.?template.?spec.?initContainers.orValue([])) +
+        (object.spec.?ephemeralContainers.orValue([]) == null ? [] : object.spec.?ephemeralContainers.orValue([]))
   validations:
     - expression: >-
         variables.allContainers.all(container,
           container.image in exceptions.allowedImages ||
-          container.?securityContext.?capabilities.?add.orValue([]).all(capability,
+          (container.?securityContext.?capabilities.?add.orValue([]) == null ? [] : container.?securityContext.?capabilities.?add.orValue([])).all(capability,
             capability in variables.allowedCapabilities || capability in exceptions.allowedValues))
       message: >-
         Any capabilities added beyond the allowed list (AUDIT_WRITE, CHOWN, DAC_OVERRIDE, FOWNER,

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-capabilities
+spec:
+  containers:
+  - name: app
+    image: test:latest
+    securityContext:
+      capabilities:
+        add: null
