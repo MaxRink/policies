@@ -6,7 +6,15 @@ policies:
 - ../restrict-apparmor-profiles.yaml
 resources:
 - resource.yaml
+- replicationcontrollers.yaml
+- top-level-annotations.yaml
 results:
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-apparmor-profiles
+  resources:
+  - badreplicationcontroller
+  result: fail
 - isValidatingPolicy: true
   kind: CronJob
   policy: restrict-apparmor-profiles
@@ -75,4 +83,22 @@ results:
   - goodpod08
   - goodpod09
   - goodpod10
+  result: pass
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: restrict-apparmor-profiles
+  resources:
+  - goodreplicationcontroller
+  result: pass
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: restrict-apparmor-profiles
+  resources:
+  - gooddeployment-top-level-annotation
+  result: pass
+- isValidatingPolicy: true
+  kind: CronJob
+  policy: restrict-apparmor-profiles
+  resources:
+  - goodcronjob-top-level-annotation
   result: pass
