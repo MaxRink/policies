@@ -11,6 +11,7 @@ resources:
 - replicationcontroller-bad.yaml
 - no-resources-pod.yaml
 - null-volume-mounts-pod.yaml
+- null-size-limit-pod.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -21,6 +22,7 @@ results:
   - fail-pod
   - pod-no-resources
   - pod-null-resources
+  - null-size-limit-pod
   - exception-emptydir-wrong-token
   - exception-emptydir-sibling-name
   - exception-emptydir-sibling-volume
