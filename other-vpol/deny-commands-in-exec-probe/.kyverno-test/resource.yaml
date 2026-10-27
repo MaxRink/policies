@@ -88,3 +88,45 @@ spec:
         - env
   - name: container05
     image: czjunkfoo
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: bad-controller
+spec:
+  replicas: 1
+  selector:
+    app: bad-controller
+  template:
+    metadata:
+      labels:
+        app: bad-controller
+    spec:
+      containers:
+      - name: app
+        image: busybox
+        livenessProbe:
+          exec:
+            command:
+            - /bin/sh
+            - -c
+            - jcmd | grep Main
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-native-sidecar-probe
+spec:
+  initContainers:
+  - name: sidecar
+    image: busybox
+    restartPolicy: Always
+    livenessProbe:
+      exec:
+        command:
+        - /bin/sh
+        - -c
+        - jcmd | grep Main
+  containers:
+  - name: app
+    image: busybox

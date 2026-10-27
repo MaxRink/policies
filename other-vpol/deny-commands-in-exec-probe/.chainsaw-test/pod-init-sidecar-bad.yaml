@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: bad-native-sidecar-probe
+spec:
+  initContainers:
+  - name: sidecar
+    image: ghcr.io/kyverno/test-busybox:1.35
+    restartPolicy: Always
+    livenessProbe:
+      exec:
+        command:
+        - /bin/sh
+        - -c
+        - jcmd | grep Main
+  containers:
+  - name: app
+    image: ghcr.io/kyverno/test-busybox:1.35
