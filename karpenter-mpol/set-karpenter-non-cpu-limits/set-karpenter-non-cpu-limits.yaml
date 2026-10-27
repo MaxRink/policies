@@ -61,7 +61,7 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        variables.containers.map(c, variables.containers.indexOf(c)).map(idx,
+        lists.range(variables.containers.size()).map(idx,
           has(variables.containers[idx].resources) && 
           !has(variables.containers[idx].resources.limits) &&
           has(variables.containers[idx].resources.requests) &&
@@ -76,7 +76,7 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        variables.containers.map(c, variables.containers.indexOf(c)).map(idx,
+        lists.range(variables.containers.size()).map(idx,
           has(variables.containers[idx].resources) && 
           !has(variables.containers[idx].resources.requests) &&
           has(variables.containers[idx].resources.limits) &&
@@ -91,7 +91,7 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        variables.containers.map(c, variables.containers.indexOf(c)).map(idx,
+        lists.range(variables.containers.size()).map(idx,
           has(variables.containers[idx].resources) &&
           (
             (has(variables.containers[idx].resources.limits) && "ephemeral-storage" in variables.containers[idx].resources.limits) ||
@@ -128,7 +128,7 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        variables.containers.map(c, variables.containers.indexOf(c)).map(idx,
+        lists.range(variables.containers.size()).map(idx,
           has(variables.containers[idx].resources) &&
           (
             (has(variables.containers[idx].resources.limits) && "memory" in variables.containers[idx].resources.limits) ||
