@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress01
+  namespace: unique-ingress-paths-ns
+  annotations:
+    audit-test: update-with-unchanged-paths
+spec:
+  rules:
+  - host: foo
+    http:
+      paths:
+      - backend:
+          service:
+            name: demo-svc
+            port:
+              number: 8081
+        path: /foo
+        pathType: Prefix
+  - host: bar
+    http:
+      paths:
+      - backend:
+          service:
+            name: demo-svc
+            port:
+              number: 8080
+        path: /bar
+        pathType: Prefix

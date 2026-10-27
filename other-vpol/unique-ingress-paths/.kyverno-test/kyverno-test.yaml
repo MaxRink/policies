@@ -1,0 +1,17 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: unique-ingress-path
+policies:
+- ../unique-ingress-paths.yaml
+resources:
+- ingress-no-rules.yaml
+- ingress-null-rules.yaml
+results:
+- isValidatingPolicy: true
+  kind: Ingress
+  policy: unique-ingress-path
+  resources:
+  - default-backend-ingress
+  - null-rules-ingress
+  result: pass
