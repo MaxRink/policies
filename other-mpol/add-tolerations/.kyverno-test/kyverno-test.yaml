@@ -6,10 +6,41 @@ policies:
 - ../add-tolerations.yaml
 resources:
 - resource.yaml
+- rc-resource.yaml
+- controller-resource.yaml
+- cronjob-resource.yaml
+- null-resource.yaml
 - exception-resource.yaml
 exceptions:
 - exceptions.yaml
 results:
+- kind: Pod
+  patchedResources: null-patched.yaml
+  policy: add-tolerations
+  resources: [null-tolerations]
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: cronjob-patched.yaml
+  policy: add-tolerations
+  resources:
+  - cronjob-tolerations
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: controller-patched.yaml
+  policy: add-tolerations
+  resources:
+  - controller-tolerations
+  result: pass
+  isMutatingPolicy: true
+- kind: ReplicationController
+  patchedResources: rc-patched.yaml
+  policy: add-tolerations
+  resources:
+  - rc-tolerations
+  result: pass
+  isMutatingPolicy: true
 - kind: Pod
   patchedResources: patched01.yaml
   policy: add-tolerations

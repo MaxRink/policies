@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc-tolerations
+  namespace: add-tolerations
+spec:
+  selector:
+    app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      containers:
+      - name: app
+        image: nginx:latest

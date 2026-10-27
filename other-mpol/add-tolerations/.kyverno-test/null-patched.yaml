@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: null-tolerations
+spec:
+  tolerations:
+  - key: org.com/role
+    operator: Equal
+    value: service
+    effect: NoSchedule
+  containers:
+  - name: app
+    image: app:v1

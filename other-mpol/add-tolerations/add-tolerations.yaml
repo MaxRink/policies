@@ -20,22 +20,38 @@ spec:
       - apiGroups: [""]
         apiVersions: ["v1"]
         operations: ["CREATE", "UPDATE"]
-        resources: ["pods"]
+        resources: ["pods", "replicationcontrollers"]
+      - apiGroups: ["apps"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["deployments", "statefulsets", "daemonsets", "replicasets"]
+      - apiGroups: ["batch"]
+        apiVersions: ["v1"]
+        operations: ["CREATE", "UPDATE"]
+        resources: ["jobs", "cronjobs"]
+  variables:
+  - name: podSpec
+    expression: object.spec.?jobTemplate.?spec.?template.?spec.orValue(object.spec.?template.?spec.orValue(object.spec))
+  - name: tolerationsPath
+    expression: >-
+      object.kind == "Pod" ? "/spec/tolerations" :
+      object.kind == "CronJob" ? "/spec/jobTemplate/spec/template/spec/tolerations" :
+      "/spec/template/spec/tolerations"
   matchConditions:
     - name: skip-if-toleration-exists
       expression: |
-        !has(object.spec.tolerations) || 
-        object.spec.tolerations == null || 
-        !object.spec.tolerations.exists(t, t.key == "org.com/role")
+        !has(variables.podSpec.tolerations) ||
+        variables.podSpec.tolerations == null ||
+        !variables.podSpec.tolerations.exists(t, t.key == "org.com/role")
   mutations:
     - patchType: JSONPatch
       jsonPatch:
         expression: |
-          (!has(object.spec.tolerations) || object.spec.tolerations == null) ?
+          (!has(variables.podSpec.tolerations) || variables.podSpec.tolerations == null) ?
             [
               JSONPatch{
                 op: "add",
-                path: "/spec/tolerations",
+                path: variables.tolerationsPath,
                 value: [dyn({
                   "key": "org.com/role",
                   "operator": "Equal",
@@ -47,7 +63,7 @@ spec:
             [
               JSONPatch{
                 op: "add",
-                path: "/spec/tolerations/-",
+                path: variables.tolerationsPath + "/-",
                 value: dyn({
                   "key": "org.com/role",
                   "operator": "Equal",
