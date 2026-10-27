@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gooddeployment-top-level-annotation
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/app: unconfined
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app
+  template:
+    metadata:
+      labels:
+        app: app
+    spec:
+      containers:
+      - name: app
+        image: dummyimagename
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: goodcronjob-top-level-annotation
+  annotations:
+    container.apparmor.security.beta.kubernetes.io/app: unconfined
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: app
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: app
+            image: dummyimagename

@@ -11,6 +11,19 @@ spec:
   - name: step-01
     try:
     - apply:
+        file: ephemeral-rbac.yaml
+    - script:
+        content: |
+          set -eu
+          for attempt in $(seq 1 120); do
+            if kubectl auth can-i update pods --subresource=ephemeralcontainers -n "$NAMESPACE" --as=system:serviceaccount:kyverno:kyverno-admission-controller | grep -qx yes; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "admission controller lacks pods/ephemeralcontainers update permission" >&2
+          exit 1
+    - apply:
         file: ../restrict-apparmor-profiles.yaml
     - patch:
         resource:
@@ -41,3 +54,32 @@ spec:
         - check:
             ($error != null): true
         file: podcontroller-bad.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'AppArmor profiles must be restricted')): true
+        file: replicationcontroller-bad.yaml
+  - name: step-03-ephemeralcontainers
+    try:
+    - script:
+        content: |
+          set -eu
+          kubectl delete pod apparmor-ephemeral-live -n "$NAMESPACE" --ignore-not-found --wait=true
+          kubectl apply -n "$NAMESPACE" -f - <<'YAML'
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: apparmor-ephemeral-live
+          spec:
+            containers:
+            - name: app
+              image: ghcr.io/kyverno/test-busybox:1.35
+              command: ["sleep", "3600"]
+          YAML
+          kubectl wait -n "$NAMESPACE" --for=condition=Ready pod/apparmor-ephemeral-live --timeout=120s
+          set +e
+          output=$(kubectl -n "$NAMESPACE" patch pod apparmor-ephemeral-live --subresource=ephemeralcontainers --type=merge --patch '{"spec":{"ephemeralContainers":[{"name":"debug","image":"ghcr.io/kyverno/test-busybox:1.35","securityContext":{"appArmorProfile":{"type":"Unconfined"}}}]}}' 2>&1)
+          code=$?
+          set -e
+          test "$code" -ne 0
+          printf '%s' "$output" | grep -F "AppArmor profiles must be restricted"
