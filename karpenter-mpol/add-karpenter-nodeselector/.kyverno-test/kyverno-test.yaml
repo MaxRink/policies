@@ -6,6 +6,9 @@ policies:
 - ../add-karpenter-nodeselector.yaml
 resources:
 - ../.chainsaw-test/resource.yaml
+- replicationcontroller.yaml
+- deployment.yaml
+- cronjob.yaml
 variables: values.yaml
 results:
 - kind: Pod
@@ -29,4 +32,25 @@ results:
   resources:
   - kp-small-ns/pod-sm01
   result: skip
+  isMutatingPolicy: true
+- kind: ReplicationController
+  patchedResources: patched-replicationcontroller.yaml
+  policy: add-karpenter-nodeselector
+  resources:
+  - kp-med-ns/rc01
+  result: pass
+  isMutatingPolicy: true
+- kind: Deployment
+  patchedResources: patched-deployment.yaml
+  policy: add-karpenter-nodeselector
+  resources:
+  - kp-med-ns/deploy01
+  result: pass
+  isMutatingPolicy: true
+- kind: CronJob
+  patchedResources: patched-cronjob.yaml
+  policy: add-karpenter-nodeselector
+  resources:
+  - kp-lg-ns/cron01
+  result: pass
   isMutatingPolicy: true

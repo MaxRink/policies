@@ -31,4 +31,4 @@ annotations:
   kyverno/category: "Karpenter, EKS Best Practices"
   kyverno/kubernetesVersion: "1.23"
   kyverno/subject: "Pod"
-digest: 52cd8000b35f2b58cb4d3d97466abad428d6449f21841540cbdb0342b95ee763
+digest: 1484a1baaefcd24cee68ca1239c86027338a1b9bf6b31f50a135c74dc612b74a
