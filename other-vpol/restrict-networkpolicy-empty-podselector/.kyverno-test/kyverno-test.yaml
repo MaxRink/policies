@@ -12,6 +12,8 @@ results:
   policy: restrict-networkpolicy-empty-podselector
   resources:
   - badnetworkpolicy
+  - bademptylabels
+  - bademptyexpressions
   result: fail
 - isValidatingPolicy: true
   kind: NetworkPolicy

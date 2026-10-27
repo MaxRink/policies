@@ -33,5 +33,8 @@ spec:
         resources: ["networkpolicies"]
         resourceNames: ["default-deny"]
   validations:
-    - expression: "size(object.spec.podSelector) != 0 || 'podSelector:empty' in exceptions.allowedValues"
+    - expression: >-
+        size(object.spec.podSelector.?matchLabels.orValue({})) != 0 ||
+        size(object.spec.podSelector.?matchExpressions.orValue([])) != 0 ||
+        'podSelector:empty' in exceptions.allowedValues
       message: "NetworkPolicies must not use an empty podSelector."
