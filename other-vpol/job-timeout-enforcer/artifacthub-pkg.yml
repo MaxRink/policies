@@ -1,0 +1,45 @@
+---
+name: job-timeout-enforcer
+version: 1.0.0
+displayName: Enforce Job Timeouts
+createdAt: "2024-03-20T00:00:00.000Z"
+description: >-
+  Jobs without timeouts can run indefinitely, consuming cluster resources and potentially
+  indicating stuck workloads. This policy ensures all Jobs, including the Jobs created by
+  CronJobs, have an activeDeadlineSeconds set between 1 hour and 24 hours.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/job-timeout-enforcer/job-timeout-enforcer.yaml
+  ```
+keywords:
+  - kyverno
+  - Resource Management
+  - job
+  - timeout
+  - cronjob
+readme: |
+  # Enforce Job Timeouts
+  
+  Jobs without timeouts can run indefinitely, consuming cluster resources and potentially
+  indicating stuck workloads. This policy ensures all Jobs, including the Jobs created by
+  CronJobs, have an activeDeadlineSeconds set between 1 hour and 24 hours.
+
+  ### Fine-grained PolicyException use
+
+  Enable PolicyException support in Kyverno, reference the `ValidatingPolicy` named
+  `job-timeout-enforcer` in `spec.policyRefs`, and narrow the exception with
+  `spec.matchConditions` using the exact request identity. Put the exact
+  `activeDeadlineSeconds` value as a string in `spec.allowedValues` (for example `"172800"`
+  for 48 hours) to exempt only Jobs or CronJob jobTemplates with that timeout. A missing
+  timeout is never exempted by `allowedValues`.
+  See the [tested example](https://github.com/kyverno/policies/blob/main/other-vpol/job-timeout-enforcer/.kyverno-test-exceptions/exceptions.yaml).
+  With PolicyException support disabled, or when no exception matches, the policy keeps
+  its normal enforcement behavior.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: Resource Management
+  kyverno/severity: medium
+  kyverno/subject: Job, CronJob
+  kyverno/kubernetesVersion: "1.30+"
+digest: a48e1d9351bee21cb760c77b2eeeb46e595169f5b1dfb943c2f7fad3b39bc0ed
