@@ -13,6 +13,7 @@ results:
   resources:
   - badingress01
   - badingress02
+  - no-tls
   result: fail
 - isValidatingPolicy: true
   kind: Ingress
