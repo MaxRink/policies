@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: explicit-false-pod
+  labels:
+    autoscaling.cast.ai/removal-disabled: "false"
+spec:
+  containers:
+  - name: app
+    image: busybox

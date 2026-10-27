@@ -6,6 +6,9 @@ policies:
 - ../add-castai-removal-disabled.yaml
 resources:
 - resources.yaml
+- pod-false-label.yaml
+- job-empty-labels.yaml
+- user-label.yaml
 - exception-resource.yaml
 - exception-sibling-resource.yaml
 exceptions:
@@ -37,4 +40,24 @@ results:
   resources:
   - addjob01
   result: pass
+  isMutatingPolicy: true
+- kind: Job
+  patchedResources: patched-empty-labels.yaml
+  policy: add-castai-removal-disabled
+  resources:
+  - empty-labels-job
+  result: pass
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: pod-false-label.yaml
+  policy: add-castai-removal-disabled
+  resources:
+  - explicit-false-pod
+  result: skip
+  isMutatingPolicy: true
+- kind: Job
+  policy: add-castai-removal-disabled
+  resources:
+  - user-label
+  result: skip
   isMutatingPolicy: true
