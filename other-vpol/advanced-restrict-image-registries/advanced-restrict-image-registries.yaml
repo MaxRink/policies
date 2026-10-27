@@ -38,7 +38,7 @@ spec:
         .orValue("") .split(",").filter(reg, reg != "")
     - name: cmRegistries
       expression: >-
-        variables.cm.data[?'registries'].orValue("").split(",").filter(reg, reg != "")
+        variables.cm.?data[?'registries'].orValue("").split(",").filter(reg, reg != "")
   validations:
     - expression: >-
         variables.allContainers.all(container,

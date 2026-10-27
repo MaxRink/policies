@@ -1,0 +1,15 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: advanced-restrict-image-registries-no-configmap
+policies:
+- ../advanced-restrict-image-registries.yaml
+resources:
+- ../.kyverno-test/prefix-bypass.yaml
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  policy: advanced-restrict-image-registries
+  resources:
+  - default/prefix-bypass
+  result: fail
