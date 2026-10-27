@@ -33,5 +33,10 @@ spec:
     - name: "has-host-path-volume"
       expression: "object.spec.?volumes.orValue([]).exists(volume, has(volume.hostPath))"
   validations:
-    - expression: "object.spec.volumes.all(volume, !has(volume.hostPath) || volume.hostPath.path.split('/')[1] == 'data' || volume.hostPath.path in exceptions.allowedValues)"
+    - expression: >-
+        object.spec.volumes.all(volume, !has(volume.hostPath) ||
+        volume.hostPath.path == '/data' ||
+        (volume.hostPath.path.startsWith('/data/') &&
+        !volume.hostPath.path.split('/').exists(segment, segment == '..')) ||
+        volume.hostPath.path in exceptions.allowedValues)
       message: hostPath volumes are confined to /data.
