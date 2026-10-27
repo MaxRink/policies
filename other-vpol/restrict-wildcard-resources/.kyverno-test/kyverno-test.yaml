@@ -25,6 +25,8 @@ results:
   - goodcr04
   - goodcr05
   - default-rules
+  - no-rules
+  - nonresource-only
   result: pass
 - policy: restrict-wildcard-resources
   isValidatingPolicy: true
