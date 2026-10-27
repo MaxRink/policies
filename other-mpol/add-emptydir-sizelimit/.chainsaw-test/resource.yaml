@@ -81,3 +81,14 @@ spec:
       path: /opt/baz
   - name: bar
     emptyDir: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod05
+  namespace: add-emptydir-sizelimit
+spec:
+  automountServiceAccountToken: false
+  containers:
+  - name: busybox
+    image: zfmvbxzmhvc:1.35

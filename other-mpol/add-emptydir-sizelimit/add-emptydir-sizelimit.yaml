@@ -27,21 +27,17 @@ spec:
   - patchType: ApplyConfiguration
     applyConfiguration:
       expression: >-
-          Object{
-            spec: Object.spec{
-              volumes: (
-                has(object.spec.volumes)
-                ? object.spec.volumes.map(v,
-                    has(v.emptyDir)
-                    ? Object.spec.volumes{
-                        name: v.name,
-                        emptyDir: Object.spec.volumes.emptyDir{
-                          sizeLimit: has(v.emptyDir.sizeLimit) ? v.emptyDir.sizeLimit : "100Mi"
-                        }
-                      }
-                    : v
-                  )
-                : object.spec.volumes
-              )
-            }
+        has(object.spec.volumes) && object.spec.volumes != null ?
+        Object{
+          spec: Object.spec{
+            volumes: object.spec.volumes.map(v,
+              has(v.emptyDir) ?
+              Object.spec.volumes{
+                name: v.name,
+                emptyDir: Object.spec.volumes.emptyDir{
+                  sizeLimit: has(v.emptyDir.sizeLimit) ? v.emptyDir.sizeLimit : "100Mi"
+                }
+              } : v
+            )
           }
+        } : Object{}
