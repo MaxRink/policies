@@ -45,19 +45,19 @@ spec:
         object.spec.?template.?spec.orValue(object.spec))
     - name: hostNetwork
       expression: >-
-        object.spec.?hostNetwork.orValue(false) ||
-        object.spec.?template.?spec.?hostNetwork.orValue(false) ||
-        object.spec.?jobTemplate.?spec.?template.?spec.?hostNetwork.orValue(false)
+        object.spec.?hostNetwork.orValue(false) == true ||
+        object.spec.?template.?spec.?hostNetwork.orValue(false) == true ||
+        object.spec.?jobTemplate.?spec.?template.?spec.?hostNetwork.orValue(false) == true
     - name: hostIPC
       expression: >-
-        object.spec.?hostIPC.orValue(false) ||
-        object.spec.?template.?spec.?hostIPC.orValue(false) ||
-        object.spec.?jobTemplate.?spec.?template.?spec.?hostIPC.orValue(false)
+        object.spec.?hostIPC.orValue(false) == true ||
+        object.spec.?template.?spec.?hostIPC.orValue(false) == true ||
+        object.spec.?jobTemplate.?spec.?template.?spec.?hostIPC.orValue(false) == true
     - name: hostPID
       expression: >-
-        object.spec.?hostPID.orValue(false) ||
-        object.spec.?template.?spec.?hostPID.orValue(false) ||
-        object.spec.?jobTemplate.?spec.?template.?spec.?hostPID.orValue(false)
+        object.spec.?hostPID.orValue(false) == true ||
+        object.spec.?template.?spec.?hostPID.orValue(false) == true ||
+        object.spec.?jobTemplate.?spec.?template.?spec.?hostPID.orValue(false) == true
   validations:
     - expression: >-
         (!variables.hostNetwork || 'control:hostNetwork' in exceptions.allowedValues) &&
