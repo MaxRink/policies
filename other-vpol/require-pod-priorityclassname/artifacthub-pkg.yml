@@ -32,7 +32,7 @@ annotations:
   kyverno/category: "Multi-Tenancy, EKS Best Practices in vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 619f8142793001f5c40e05ccdce16f40926e88d75aa4e42e3a106fbb9a01f067
+digest: 42ba0d554d9288d8b8fe9e135ff40252189b3c6552109a72f1cd18c04d4bd06b
 
 
 createdAt: "2025-05-11T17:46:11Z"
