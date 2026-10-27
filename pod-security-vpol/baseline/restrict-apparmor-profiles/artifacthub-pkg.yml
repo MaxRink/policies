@@ -14,10 +14,22 @@ keywords:
 readme: |
   On supported hosts, the `RuntimeDefault` AppArmor profile is applied by default. The baseline policy should prevent overriding or disabling the default AppArmor profile, or restrict overrides to an allowed set of profiles. This policy ensures that the `appArmorProfile.type` fields are unset, `RuntimeDefault`, or `Localhost`, and that the deprecated `container.apparmor.security.beta.kubernetes.io/*` annotations are empty, `runtime/default`, or start with `localhost/`.
 
+  ### Fine-grained PolicyException use
+
+  Enable PolicyException support in Kyverno, reference the `ValidatingPolicy` named
+  `restrict-apparmor-profiles` in `spec.policyRefs`, and narrow the exception with
+  `spec.matchConditions` using the exact request identity. Exact `spec.images` entries exempt
+  matching containers. Use `spec.allowedValues` tokens such as
+  `appArmorProfile.type:Unconfined` or
+  `annotation:container.apparmor.security.beta.kubernetes.io/app:unconfined` to allow only
+  those exact values. See the [tested example](https://github.com/kyverno/policies/blob/main/pod-security-vpol/baseline/restrict-apparmor-profiles/.kyverno-test-exceptions/).
+  With PolicyException support disabled, or when no exception matches, the policy keeps its
+  normal enforcement behavior.
+
   Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
 annotations:
   kyverno/category: "Pod Security Standards (Baseline) in ValidatingPolicy"
   kyverno/kubernetesVersion: "1.30+"
   kyverno/subject: "Pod, Annotation"
-digest: fc25afb237eab58a9897a9940c634b3bc5a7c753f01a575b371a51ebef63a511
+digest: b7bb05036cfc6889600b4196578525465ac5b8e2bfab16cb6bb168c139346422
 createdAt: "2026-09-28T08:51:42Z"
