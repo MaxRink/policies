@@ -1,0 +1,16 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-node-label-creation
+policies:
+- ../restrict-node-label-creation.yaml
+resources:
+- resource.yaml
+variables: values.yaml
+results:
+- isValidatingPolicy: true
+  kind: Node
+  policy: restrict-node-label-creation
+  resources:
+  - node-update-without-change
+  result: skip
