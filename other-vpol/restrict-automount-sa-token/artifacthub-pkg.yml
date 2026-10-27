@@ -1,0 +1,25 @@
+name: restrict-automount-sa-token-vpol
+version: 1.0.0
+displayName: Restrict Auto-Mount of Service Account Tokens in Pods
+description: >-
+  Requires Pods and pod templates to disable ServiceAccount token automounting, except for policy-reporter workloads.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-automount-sa-token/restrict-automount-sa-token.yaml
+  ```
+keywords:
+  - kyverno
+  - Security
+  - ValidatingPolicy
+readme: |
+  Requires Pods and pod templates to set `automountServiceAccountToken: false`, except when their Pod labels include `app.kubernetes.io/part-of: policy-reporter`.
+
+  This policy checks Pods and supported controller templates, including ReplicationControllers. It is distinct from `other-vpol/restrict-sa-automount-sa-token`, which validates the `ServiceAccount` resource itself; setting the ServiceAccount default does not prevent a Pod from overriding the setting.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "Security in Vpol"
+  kyverno/kubernetesVersion: "1.30"
+  kyverno/subject: "Pod"
+digest: 8d2d3217ac6f212795a9778687c8e273361f385c76cbc57d6535b604fcec0900
+createdAt: "2026-10-27T00:00:00Z"
