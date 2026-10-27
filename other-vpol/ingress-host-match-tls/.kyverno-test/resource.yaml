@@ -167,4 +167,20 @@ spec:
   - hosts:
     - endpoint01
     - endpoint02
-
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: no-tls
+spec:
+  rules:
+  - host: endpoint01
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: demo-svc
+            port:
+              number: 8080
