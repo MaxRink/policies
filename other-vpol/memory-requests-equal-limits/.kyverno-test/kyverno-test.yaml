@@ -6,6 +6,7 @@ policies:
 - ../memory-requests-equal-limits.yaml
 resources:
 - resource.yaml
+- replicationcontroller.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -59,4 +60,10 @@ results:
   kind: Pod
   policy: memory-requests-equal-limits
   resources: [init-memory-mismatch]
+  result: fail
+- isValidatingPolicy: true
+  kind: ReplicationController
+  policy: memory-requests-equal-limits
+  resources:
+  - memory-mismatch-rc
   result: fail
