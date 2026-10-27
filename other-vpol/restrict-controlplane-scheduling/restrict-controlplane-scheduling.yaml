@@ -28,9 +28,9 @@ spec:
       resources:   ["pods"]
   validations:
     - expression: >-
-        !has(object.spec.tolerations) || 
+        !has(object.spec.tolerations) ||
         !object.spec.tolerations.exists(toleration,
-          (!has(toleration.key) ||
+          (toleration.?key.orValue('') == '' ||
           toleration.key in ['node-role.kubernetes.io/master', 'node-role.kubernetes.io/control-plane']) &&
           !exceptions.allowedValues.exists(value, value == 'toleration:' + toleration.?key.orValue('')))
       message: Pods may not use tolerations which schedule on control plane nodes.

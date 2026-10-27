@@ -48,3 +48,16 @@ spec:
   tolerations:
   - operator: Exists
     effect: NoSchedule
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: badpod-empty-key
+spec:
+  containers:
+  - name: busybox
+    image: ghcr.io/kyverno/test-busybox:1.35
+  tolerations:
+  - key: ""
+    operator: Exists
+    effect: NoSchedule
