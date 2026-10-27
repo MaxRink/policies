@@ -29,7 +29,7 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        object.spec.containers.map(c, object.spec.containers.indexOf(c)).map(idx,
+        lists.range(object.spec.containers.size()).map(idx,
           !(has(object.spec.containers[idx].securityContext) && 
             has(object.spec.containers[idx].securityContext.capabilities) && 
             has(object.spec.containers[idx].securityContext.capabilities.drop) && 
@@ -66,7 +66,7 @@ spec:
     jsonPatch:
       expression: |
         has(object.spec.initContainers) ?
-        object.spec.initContainers.map(c, object.spec.initContainers.indexOf(c)).map(idx,
+        lists.range(object.spec.initContainers.size()).map(idx,
           !(has(object.spec.initContainers[idx].securityContext) && 
             has(object.spec.initContainers[idx].securityContext.capabilities) && 
             has(object.spec.initContainers[idx].securityContext.capabilities.drop) && 
@@ -103,7 +103,7 @@ spec:
     jsonPatch:
       expression: |
         has(object.spec.ephemeralContainers) ?
-        object.spec.ephemeralContainers.map(c, object.spec.ephemeralContainers.indexOf(c)).map(idx,
+        lists.range(object.spec.ephemeralContainers.size()).map(idx,
           !(has(object.spec.ephemeralContainers[idx].securityContext) && 
             has(object.spec.ephemeralContainers[idx].securityContext.capabilities) && 
             has(object.spec.ephemeralContainers[idx].securityContext.capabilities.drop) && 
@@ -139,7 +139,7 @@ spec:
   - patchType: JSONPatch
     jsonPatch:
       expression: |
-        object.spec.containers.map(c, object.spec.containers.indexOf(c)).map(idx,
+        lists.range(object.spec.containers.size()).map(idx,
           !(has(object.spec.containers[idx].securityContext) && 
             has(object.spec.containers[idx].securityContext.capabilities) && 
             has(object.spec.containers[idx].securityContext.capabilities.drop) && 
@@ -176,7 +176,7 @@ spec:
     jsonPatch:
       expression: |
         has(object.spec.initContainers) ?
-        object.spec.initContainers.map(c, object.spec.initContainers.indexOf(c)).map(idx,
+        lists.range(object.spec.initContainers.size()).map(idx,
           !(has(object.spec.initContainers[idx].securityContext) && 
             has(object.spec.initContainers[idx].securityContext.capabilities) && 
             has(object.spec.initContainers[idx].securityContext.capabilities.drop) && 
@@ -213,7 +213,7 @@ spec:
     jsonPatch:
       expression: |
         has(object.spec.ephemeralContainers) ?
-        object.spec.ephemeralContainers.map(c, object.spec.ephemeralContainers.indexOf(c)).map(idx,
+        lists.range(object.spec.ephemeralContainers.size()).map(idx,
           !(has(object.spec.ephemeralContainers[idx].securityContext) && 
             has(object.spec.ephemeralContainers[idx].securityContext.capabilities) && 
             has(object.spec.ephemeralContainers[idx].securityContext.capabilities.drop) && 

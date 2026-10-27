@@ -6,6 +6,7 @@ policies:
 - ../add-capabilities.yaml
 resources:
 - resource.yaml
+- high-container-resource.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -28,4 +29,11 @@ results:
   resources:
   - pod03
   result: skip
+  isMutatingPolicy: true
+- kind: Pod
+  patchedResources: high-container-patched.yaml
+  policy: add-capabilities
+  resources:
+  - high-cardinality
+  result: pass
   isMutatingPolicy: true
