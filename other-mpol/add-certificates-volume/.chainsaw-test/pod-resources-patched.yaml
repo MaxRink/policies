@@ -6,6 +6,12 @@ metadata:
   name: pod01
   namespace: other-certvol-ns
 spec:
+  initContainers:
+  - name: init
+    image: nginx:latest
+    volumeMounts:
+    - name: etc-ssl-certs
+      mountPath: /etc/ssl/certs
   containers:
   - name: pod01-01
     image: nginx:latest
@@ -18,6 +24,35 @@ spec:
     - name: etc-ssl-certs
       mountPath: /etc/ssl/certs
   volumes:
+  - name: etc-ssl-certs
+    configMap:
+      name: ca-pemstore
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  annotations:
+    inject-certs: enabled
+  name: pod05
+  namespace: other-certvol-ns
+spec:
+  automountServiceAccountToken: false
+  initContainers:
+  - name: init
+    image: nginx:latest
+    volumeMounts:
+    - name: custom-ca
+      mountPath: /etc/ssl/certs
+  containers:
+  - name: app
+    image: nginx:latest
+    volumeMounts:
+    - name: custom-ca
+      mountPath: /etc/ssl/certs
+  volumes:
+  - name: custom-ca
+    configMap:
+      name: custom-ca
   - name: etc-ssl-certs
     configMap:
       name: ca-pemstore
