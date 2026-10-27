@@ -2,7 +2,7 @@ name: restrict-image-registries-VPOL
 version: 1.0.0
 displayName: Restrict Image Registries in VPOL
 description: >-
-  Images from unknown, public registries can be of dubious quality and may not be scanned and secured, representing a high degree of risk. Requiring use of known, approved registries helps reduce threat exposure by ensuring image pulls only come from them. This policy validates that container images only originate from the registry `eu.foo.io` or `bar.io`. Use of this policy requires customization to define your allowable registries.
+  Images from unknown, public registries can be of dubious quality and may not be scanned and secured, representing a high degree of risk. Requiring use of known, approved registries helps reduce threat exposure by ensuring image pulls only come from them. This policy parses image references and allows only the exact registry values `eu.foo.io` or `bar.io`; unqualified images resolve to `docker.io`, and ports are part of the registry value. Use of this policy requires customization to define your allowable registries.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/best-practices-vpol/restrict-image-registries/restrict-image-registries.yaml
@@ -13,7 +13,7 @@ keywords:
   - EKS Best Practices
   - VPOL
 readme: |
-  Images from unknown, public registries can be of dubious quality and may not be scanned and secured, representing a high degree of risk. Requiring use of known, approved registries helps reduce threat exposure by ensuring image pulls only come from them. This policy validates that container images only originate from the registry `eu.foo.io` or `bar.io`. Use of this policy requires customization to define your allowable registries.
+  Images from unknown, public registries can be of dubious quality and may not be scanned and secured, representing a high degree of risk. Requiring use of known, approved registries helps reduce threat exposure by ensuring image pulls only come from them. This policy parses image references and allows only the exact registry values `eu.foo.io` or `bar.io`; unqualified images resolve to `docker.io`, and ports are part of the registry value. Lookalike domains and missing, null, or invalid image references are denied. Use of this policy requires customization to define your allowable registries.
   
   ### Fine-grained PolicyException use
 
@@ -34,5 +34,5 @@ annotations:
   kyverno/category: "Best Practices, EKS Best Practices in VPOL"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 44cc0cdcb5945bd6917b1f57e56b60c91d830e26ab674a1ef25ff6049afecd9d
+digest: 565179d4c52d0b39936badaa824e6c049241d1b4a52222706e307d1fc772ad7d
 createdAt: "2025-05-05T13:19:12Z"

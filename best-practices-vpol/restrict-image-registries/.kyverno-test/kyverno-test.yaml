@@ -40,6 +40,8 @@ results:
   - evil-registry-prefix
   - registry-port
   - invalid-image
+  - missing-image
+  - null-image
   result: fail
 - isValidatingPolicy: true
   kind: Pod

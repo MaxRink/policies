@@ -52,7 +52,8 @@ spec:
   validations:
           - expression: >-
               variables.allContainers.all(container,
-              (has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
+              has(container.image) && container.image != null &&
+              ((has(exceptions.allowedImages) && container.image in exceptions.allowedImages) ||
               (isImage(container.image) &&
-              image(container.image).registry() in ['eu.foo.io', 'bar.io']))
+              image(container.image).registry() in ['eu.foo.io', 'bar.io'])))
             message: "Unknown image registry."
