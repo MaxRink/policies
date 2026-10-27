@@ -36,3 +36,9 @@ results:
   - goodpod01
   - docker-sock-lookalike
   result: pass
+- kind: ReplicationController
+  isValidatingPolicy: true
+  policy: disallow-container-sock-mounts
+  resources:
+  - badrc-sock-mount
+  result: fail
