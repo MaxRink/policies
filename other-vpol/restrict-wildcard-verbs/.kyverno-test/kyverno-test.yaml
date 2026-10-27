@@ -24,6 +24,8 @@ results:
   - goodcr03
   - goodcr04
   - default-rules
+  - no-rules
+  - nonresource-only
   result: pass
 - policy: restrict-wildcard-verbs
   isValidatingPolicy: true
@@ -43,4 +45,3 @@ results:
   - goodrole04
   - default-rules
   result: pass
-
