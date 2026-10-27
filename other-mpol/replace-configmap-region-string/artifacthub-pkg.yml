@@ -1,0 +1,30 @@
+name: replace-configmap-region-string
+version: 1.0.0
+displayName: Replace ConfigMap Region String
+createdAt: "2026-10-27T16:49:25.000Z"
+description: >-
+  Rewrites every occurrence of a configured source region string in each ConfigMap data value. Data keys and binaryData are unchanged.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-mpol/replace-configmap-region-string/replace-configmap-region-string.yaml
+  ```
+keywords:
+  - kyverno
+  - Sample
+readme: |
+  ConfigMap data values sometimes embed cloud region identifiers that need to be rewritten during a migration. This sample replaces every occurrence of `ap-south-1` with `ap-south-2` in each `data` value; edit the `fromRegion` and `toRegion` variables in the policy to customize the migration. It leaves data keys and `binaryData` unchanged.
+
+  ### Fine-grained PolicyException use
+
+  To skip rewriting a matched ConfigMap, reference the `MutatingPolicy` named
+  `replace-configmap-region-string` in a `PolicyException` and add the exact
+  control token `configmap-data-region-rewrite` to `spec.allowedValues`. Narrow
+  the exception with `spec.matchConditions`; see the CLI test fixture in
+  `.kyverno-test/exceptions.yaml`.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "Other"
+  kyverno/kubernetesVersion: "1.24"
+  kyverno/subject: "ConfigMap"
+digest: 022952f9651e2d8e03b5891d1d27948d98b38f5e0e6d84dcd6ff3031e0604d80
