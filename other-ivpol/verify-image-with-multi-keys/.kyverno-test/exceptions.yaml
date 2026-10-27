@@ -1,0 +1,19 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: verify-image-with-multi-keys-exception
+  namespace: policy-exceptions
+spec:
+  policyRefs:
+  - name: verify-image-with-multi-keys
+    kind: ImageValidatingPolicy
+  matchConditions:
+  - name: exact-pod
+    expression: >-
+      object.metadata.namespace == 'multi-key-signing' &&
+      object.metadata.name in ['exception-pod', 'exception-mixed-pod']
+  - name: exact-image
+    expression: >-
+      object.spec.containers.all(c, c.image == 'ghcr.io/kyverno/test-verify-image@sha256:74a98f0e4d750c9052f092a7f7a72de7b20f94f176a490088f7a744c76c53ea5') &&
+      object.spec.?initContainers.orValue([]).all(c, c.image == 'ghcr.io/kyverno/test-verify-image@sha256:74a98f0e4d750c9052f092a7f7a72de7b20f94f176a490088f7a744c76c53ea5') &&
+      object.spec.?ephemeralContainers.orValue([]).all(c, c.image == 'ghcr.io/kyverno/test-verify-image@sha256:74a98f0e4d750c9052f092a7f7a72de7b20f94f176a490088f7a744c76c53ea5')

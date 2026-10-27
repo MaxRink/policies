@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: keys
+  namespace: default
+data:
+  production: |
+    -----BEGIN PUBLIC KEY-----
+    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEvqS0EsoNEEH2yy8TfiQCbBZdWcAB
+    w9zg6NS2mSiHywHwQPwtcD6CutVUO9/dZbis3I7KBuHrMvOuIQbuIpcXxg==
+    -----END PUBLIC KEY-----
+  multi-key-signing: |
+    -----BEGIN PUBLIC KEY-----
+    MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEstG5Xl7UxkQsmLUxdmS85HLgYBFyc/P/oQ22iazkKm8P0sNlaZiaZC4TSEea3oh2Pim0+wxSubhKoK+7jq9Egg==
+    -----END PUBLIC KEY-----

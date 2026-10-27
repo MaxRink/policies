@@ -1,0 +1,120 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/kyverno/chainsaw/main/.schemas/json/test-chainsaw-v1alpha1.json
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: verify-image-with-multi-keys
+spec:
+  namespace: multi-key-signing
+  template: false
+  steps:
+  - name: setup-policy-and-test-keys
+    try:
+    - script:
+        content: kubectl delete configmap keys -n default --ignore-not-found --wait
+    - apply:
+        file: keys.yaml
+    - apply:
+        file: ../verify-image-with-multi-keys.yaml
+    - assert:
+        file: policy-ready.yaml
+    - patch:
+        resource:
+          apiVersion: policies.kyverno.io/v1
+          kind: ImageValidatingPolicy
+          metadata:
+            name: verify-image-with-multi-keys
+          spec:
+            validationActions: [Deny]
+    - assert:
+        file: policy-ready.yaml
+  - name: verify-signed-digest-and-init-images
+    try:
+    - create:
+        file: good-digest.yaml
+        timeout: 120s
+    - create:
+        file: good-init.yaml
+        timeout: 120s
+  - name: require-production-key-for-digest-reference
+    try:
+    - apply:
+        file: keys-wrong-production.yaml
+    - create:
+        file: bad-production-key.yaml
+        timeout: 120s
+        expect:
+        - check:
+            (contains($error, 'production key')): true
+    - apply:
+        file: keys.yaml
+  - name: require-both-keys-for-digest-reference
+    try:
+    - apply:
+        file: keys-wrong-namespace.yaml
+    - create:
+        file: bad-namespace-key.yaml
+        timeout: 120s
+        expect:
+        - check:
+            (contains($error, 'namespace-specific key')): true
+    - apply:
+        file: keys.yaml
+  - name: reject-unsigned-container-images
+    try:
+    - create:
+        file: bad-container.yaml
+        timeout: 120s
+        expect:
+        - check:
+            (contains($error, 'production key') || contains($error, 'namespace-specific key')): true
+  - name: reject-unsigned-init-container-images
+    try:
+    - create:
+        file: bad-init.yaml
+        timeout: 120s
+        expect:
+        - check:
+            (contains($error, 'production key') || contains($error, 'namespace-specific key')): true
+  - name: reject-unsigned-ephemeral-container-update
+    try:
+    - apply:
+        file: ephemeral-base.yaml
+    - script:
+        content: |
+          set +e
+          output=$(kubectl patch pod ephemeral-base -n "$NAMESPACE" --subresource=ephemeralcontainers --type=json --patch='[{"op":"add","path":"/spec/ephemeralContainers","value":[{"name":"debugger","image":"ghcr.io/kyverno/test-verify-image@sha256:74a98f0e4d750c9052f092a7f7a72de7b20f94f176a490088f7a744c76c53ea5","imagePullPolicy":"Always"}]}]' 2>&1)
+          status=$?
+          printf '%s\n' "$output"
+          test "$status" -ne 0
+          printf '%s\n' "$output" | grep -q 'Image is missing a valid signature'
+  - name: exact-resource-exception
+    try:
+    - apply:
+        file: exception-namespace.yaml
+    - apply:
+        file: exception.yaml
+    - create:
+        file: exception-pod.yaml
+        timeout: 120s
+    - create:
+        file: exception-sibling-pod.yaml
+        timeout: 120s
+        expect:
+        - check:
+            (contains($error, 'production key') || contains($error, 'namespace-specific key')): true
+    - create:
+        file: exception-mixed-pod.yaml
+        timeout: 120s
+        expect:
+        - check:
+            (contains($error, 'production key') || contains($error, 'namespace-specific key')): true
+  - name: cleanup
+    try:
+    - delete:
+        ref:
+          apiVersion: policies.kyverno.io/v1
+          kind: PolicyException
+          name: verify-image-with-multi-keys-exception
+          namespace: policy-exceptions
+    - script:
+        content: kubectl delete configmap keys -n default --ignore-not-found --wait

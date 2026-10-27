@@ -1,0 +1,55 @@
+apiVersion: policies.kyverno.io/v1
+kind: ImageValidatingPolicy
+metadata:
+  name: verify-image-with-multi-keys
+  annotations:
+    policies.kyverno.io/title: Verify Image with Multiple Keys
+    policies.kyverno.io/category: Software Supply Chain Security
+    policies.kyverno.io/severity: medium
+    policies.kyverno.io/subject: Pod
+    policies.kyverno.io/minversion: 1.17.0
+    policies.kyverno.io/description: >-
+      Verify matching images with both a production Cosign public key and a
+      public key configured for the workload namespace. A ConfigMap named
+      keys in the default namespace must provide both keys.
+spec:
+  validationActions: [Audit]
+  webhookConfiguration:
+    timeoutSeconds: 30
+  evaluation:
+    background:
+      enabled: false
+  matchConstraints:
+    resourceRules:
+    - apiGroups: [""]
+      apiVersions: ["v1"]
+      operations: ["CREATE", "UPDATE"]
+      resources: ["pods", "pods/ephemeralcontainers"]
+  variables:
+  - name: keys
+    expression: 'resource.Get("v1", "configmaps", "default", "keys")'
+  matchImageReferences:
+  - glob: "ghcr.io/kyverno/test-verify-image:*"
+  - glob: "ghcr.io/kyverno/test-verify-image@*"
+  attestors:
+  - name: productionKey
+    cosign:
+      key:
+        expression: "variables.keys.data.production"
+      ctlog:
+        insecureIgnoreTlog: true
+  - name: namespaceKey
+    cosign:
+      key:
+        expression: "variables.keys.data[object.metadata.namespace]"
+      ctlog:
+        insecureIgnoreTlog: true
+  validations:
+  - message: "Image is missing a valid signature from the production key."
+    expression: >-
+      (images.containers + images.initContainers + images.ephemeralContainers)
+      .all(image, verifyImageSignatures(image, [attestors.productionKey]) > 0)
+  - message: "Image is missing a valid signature from the namespace-specific key."
+    expression: >-
+      (images.containers + images.initContainers + images.ephemeralContainers)
+      .all(image, verifyImageSignatures(image, [attestors.namespaceKey]) > 0)
