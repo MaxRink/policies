@@ -31,7 +31,7 @@ annotations:
   kyverno/category: "Other in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "PersistentVolume"
-digest: 27d1f3ff975e0dfa03968815ba5b2d898e0f06e044d072f4e4e8e06fbd396e01
+digest: 589388654649e62b5427c9d9deaa3979362a806a0c0c9c708682b3881a4d7125
 
 
 createdAt: "2025-05-11T17:46:11Z"
