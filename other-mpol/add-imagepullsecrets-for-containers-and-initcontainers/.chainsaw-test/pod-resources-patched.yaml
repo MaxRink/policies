@@ -65,3 +65,17 @@ spec:
     image: ghcr.io/kyverno/test-busybox:1.35
   imagePullSecrets:
   - name: my-secret
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod07
+spec:
+  imagePullSecrets:
+  - name: my-secret
+  initContainers:
+  - name: init
+    image: corp.reg.com/init:1.0
+  containers:
+  - name: app
+    image: app:v1
