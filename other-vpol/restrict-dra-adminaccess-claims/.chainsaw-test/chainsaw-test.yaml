@@ -1,0 +1,159 @@
+apiVersion: chainsaw.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: restrict-dra-adminaccess-claims
+spec:
+  steps:
+    - name: apply-policy-and-rbac
+      try:
+        - apply:
+            file: ../restrict-dra-adminaccess-claims.yaml
+        - patch:
+            resource:
+              apiVersion: policies.kyverno.io/v1
+              kind: ValidatingPolicy
+              metadata:
+                name: restrict-dra-adminaccess-claims
+              spec:
+                validationActions:
+                  - Deny
+        - assert:
+            file: policy-ready.yaml
+        - script:
+            content: |
+              set -eu
+              kubectl -n "$NAMESPACE" apply -f - <<'YAML'
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: Role
+              metadata:
+                name: dra-claim-creators
+              rules:
+                - apiGroups: ["resource.k8s.io"]
+                  resources: ["resourceclaims", "resourceclaimtemplates"]
+                  verbs: ["create"]
+              ---
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: RoleBinding
+              metadata:
+                name: dra-claim-creators
+              subjects:
+                - kind: User
+                  name: dra-adminaccess-allowed
+                - kind: User
+                  name: dra-adminaccess-denied
+              roleRef:
+                kind: Role
+                name: dra-claim-creators
+                apiGroup: rbac.authorization.k8s.io
+              ---
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: Role
+              metadata:
+                name: dra-adminaccess-allowed
+              rules:
+                - apiGroups: ["resource.k8s.io"]
+                  resources: ["resourceclaims/adminaccess", "resourceclaimtemplates/adminaccess"]
+                  verbs: ["create"]
+              ---
+              apiVersion: rbac.authorization.k8s.io/v1
+              kind: RoleBinding
+              metadata:
+                name: dra-adminaccess-allowed
+              subjects:
+                - kind: User
+                  name: dra-adminaccess-allowed
+              roleRef:
+                kind: Role
+                name: dra-adminaccess-allowed
+                apiGroup: rbac.authorization.k8s.io
+              YAML
+              cat <<'YAML' | kubectl -n "$NAMESPACE" --as=dra-adminaccess-denied create -f -
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: ordinary-claim
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: example.com/gpu
+              YAML
+              if output=$(kubectl -n "$NAMESPACE" --as=dra-adminaccess-denied create -f - 2>&1 <<'YAML'
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: denied-admin-claim
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: example.com/gpu
+                        adminAccess: true
+              YAML
+              ); then
+                printf '%s\n' "$output"
+                echo "expected a denied SubjectAccessReview to reject the claim"
+                exit 1
+              else
+                printf '%s\n' "$output"
+              fi
+              cat <<'YAML' | kubectl -n "$NAMESPACE" --as=dra-adminaccess-allowed create -f -
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaim
+              metadata:
+                name: allowed-admin-claim
+              spec:
+                devices:
+                  requests:
+                    - name: device
+                      exactly:
+                        deviceClassName: example.com/gpu
+                        adminAccess: true
+              YAML
+              if output=$(kubectl -n "$NAMESPACE" --as=dra-adminaccess-denied create -f - 2>&1 <<'YAML'
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaimTemplate
+              metadata:
+                name: denied-admin-template
+              spec:
+                spec:
+                  devices:
+                    requests:
+                      - name: device
+                        exactly:
+                          deviceClassName: example.com/gpu
+                          adminAccess: true
+              YAML
+              ); then
+                printf '%s\n' "$output"
+                echo "expected a denied SubjectAccessReview to reject the template"
+                exit 1
+              else
+                printf '%s\n' "$output"
+              fi
+              cat <<'YAML' | kubectl -n "$NAMESPACE" --as=dra-adminaccess-allowed create -f -
+              apiVersion: resource.k8s.io/v1
+              kind: ResourceClaimTemplate
+              metadata:
+                name: allowed-admin-template
+              spec:
+                spec:
+                  devices:
+                    requests:
+                      - name: device
+                        exactly:
+                          deviceClassName: example.com/gpu
+                          adminAccess: true
+              YAML
+  finally:
+    - script:
+        content: |
+          kubectl -n "$NAMESPACE" delete rolebindings dra-claim-creators dra-adminaccess-allowed --ignore-not-found
+          kubectl -n "$NAMESPACE" delete roles dra-claim-creators dra-adminaccess-allowed --ignore-not-found
+          kubectl -n "$NAMESPACE" delete resourceclaims ordinary-claim denied-admin-claim allowed-admin-claim --ignore-not-found
+          kubectl -n "$NAMESPACE" delete resourceclaimtemplates denied-admin-template allowed-admin-template --ignore-not-found
+    - script:
+        content: |
+          kubectl delete validatingpolicy restrict-dra-adminaccess-claims --ignore-not-found

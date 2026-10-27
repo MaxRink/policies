@@ -1,0 +1,42 @@
+name: restrict-dra-adminaccess-claims-vpol
+version: 1.0.0
+displayName: Restrict DRA AdminAccess Claims
+description: >-
+  Require a dedicated RBAC permission before a ResourceClaim or
+  ResourceClaimTemplate can request DRA adminAccess. A SubjectAccessReview
+  checks the requesting identity for the synthetic resourceclaims/adminaccess
+  or resourceclaimtemplates/adminaccess create permission.
+install: |-
+  ```shell
+  kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-dra-adminaccess-claims/restrict-dra-adminaccess-claims.yaml
+  ```
+keywords:
+  - kyverno
+  - Other
+  - ValidatingPolicy
+  - Dynamic Resource Allocation
+readme: |
+  This policy checks every `ResourceClaim` and `ResourceClaimTemplate` request.
+  Requests that do not ask for `adminAccess` are unaffected. For a request that
+  does, Kyverno submits a SubjectAccessReview for
+  `resourceclaims/adminaccess:create` or
+  `resourceclaimtemplates/adminaccess:create` as the original requesting user.
+
+  Grant these synthetic RBAC permissions only to trusted identities. The
+  included `grant-dra-adminaccess-role.yaml` shows a ClusterRole and a
+  namespace-scoped RoleBinding; users also need their normal permission to
+  create the corresponding claims. These subresources are an RBAC convention
+  used by this policy, not Kubernetes API endpoints.
+
+  This policy uses the built-in `resource.k8s.io/v1` APIs, available alongside
+  `v1beta2` on Kubernetes 1.34 through 1.37. DynamicResourceAllocation is GA
+  and enabled by default from 1.34. DRAAdminAccess is beta and enabled by
+  default in 1.34 and 1.35, then GA from 1.36.
+
+  Refer to the documentation for more details on Kyverno annotations: https://artifacthub.io/docs/topics/annotations/kyverno/
+annotations:
+  kyverno/category: "Other"
+  kyverno/kubernetesVersion: "1.34"
+  kyverno/subject: "ResourceClaim, ResourceClaimTemplate"
+digest: f70cb99ffb813113c6c32925378c76a3d89a03a593dbb3b95940fb407f56856c
+createdAt: "2026-10-27T17:49:00Z"
