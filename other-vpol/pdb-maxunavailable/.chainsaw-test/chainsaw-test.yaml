@@ -30,8 +30,14 @@ spec:
     - apply:
         file: pdb-good.yaml
     - apply:
+        file: ../.kyverno-test/pdb-percentage.yaml
+    - apply:
         expect:
         - check:
             ($error != null): true
         file: pdb-bad.yaml
-
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: ../.kyverno-test/pdb-zero-percent.yaml

@@ -6,6 +6,8 @@ policies:
 - ../pdb-maxunavailable.yaml
 resources:
 - resource.yaml
+- pdb-percentage.yaml
+- pdb-zero-percent.yaml
 exceptions:
 - exceptions.yaml
 results:
@@ -15,6 +17,7 @@ results:
   resources:
   - kube-system/bad-pdb-zero
   - kube-system/bad-pdb-negative-one
+  - default/zero-percentage-pdb
   result: fail
 - isValidatingPolicy: true
   kind: PodDisruptionBudget
@@ -23,4 +26,5 @@ results:
   - kube-system/good-pdb
   - kube-system/good-pdb-none
   - kube-system/exception-pdb-zero
+  - default/percentage-pdb
   result: pass

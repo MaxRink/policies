@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: percentage-pdb
+  namespace: default
+spec:
+  maxUnavailable: "25%"
+  selector:
+    matchLabels:
+      app: test
