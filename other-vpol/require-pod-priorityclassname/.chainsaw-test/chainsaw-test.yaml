@@ -41,4 +41,8 @@ spec:
         - check:
             ($error != null): true
         file: podcontroller-bad.yaml
-
+    - apply:
+        expect:
+        - check:
+            ($error != null): true
+        file: ../.kyverno-test/replicationcontroller-bad.yaml
