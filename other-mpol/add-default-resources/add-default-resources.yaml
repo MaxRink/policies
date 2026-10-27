@@ -24,6 +24,17 @@ spec:
       apiVersions: ["v1"]
       operations: ["CREATE", "UPDATE"]
       resources: ["pods"]
+  variables:
+  - name: initContainers
+    expression: >-
+      object.kind == "Pod" ? object.spec.?initContainers.orValue([]) :
+      object.kind == "CronJob" ? object.spec.?jobTemplate.?spec.?template.?spec.?initContainers.orValue([]) :
+      object.spec.?template.?spec.?initContainers.orValue([])
+  - name: initContainersPath
+    expression: >-
+      object.kind == "Pod" ? "/spec/initContainers" :
+      object.kind == "CronJob" ? "/spec/jobTemplate/spec/template/spec/initContainers" :
+      "/spec/template/spec/initContainers"
   mutations:
   - patchType: ApplyConfiguration
     applyConfiguration:
@@ -38,13 +49,86 @@ spec:
                   requests: Object.spec.containers.resources.requests{
                     cpu: has(c.resources) && has(c.resources.requests) && has(c.resources.requests.cpu)
                          ? c.resources.requests.cpu
-                         : "100m",
+                         : (has(c.resources) && c.resources != null &&
+                            has(c.resources.limits) && c.resources.limits != null &&
+                            has(c.resources.limits.cpu) && c.resources.limits.cpu != null &&
+                            quantity(c.resources.limits.cpu).isLessThan(quantity("100m"))
+                            ? c.resources.limits.cpu
+                            : "100m"),
                     memory: has(c.resources) && has(c.resources.requests) && has(c.resources.requests.memory)
                           ? c.resources.requests.memory
-                          : "100Mi"
+                          : (has(c.resources) && c.resources != null &&
+                             has(c.resources.limits) && c.resources.limits != null &&
+                             has(c.resources.limits.memory) && c.resources.limits.memory != null &&
+                             quantity(c.resources.limits.memory).isLessThan(quantity("100Mi"))
+                             ? c.resources.limits.memory
+                             : "100Mi")
                   }
                 }
               }
             )
           }
         }
+  - patchType: JSONPatch
+    jsonPatch:
+      expression: |
+        variables.initContainers.filter(c,
+          !exceptions.allowedImages.exists(image, image == c.image) &&
+          (!has(c.resources) || c.resources == null)
+        ).map(c,
+          JSONPatch{
+            op: "add",
+            path: variables.initContainersPath + "/" + string(variables.initContainers.indexOf(c)) + "/resources",
+            value: dyn({"requests": {"cpu": "100m", "memory": "100Mi"}})
+          }
+        ) +
+        variables.initContainers.filter(c,
+          !exceptions.allowedImages.exists(image, image == c.image) &&
+          has(c.resources) && c.resources != null &&
+          (!has(c.resources.requests) || c.resources.requests == null)
+        ).map(c,
+          JSONPatch{
+            op: "add",
+            path: variables.initContainersPath + "/" + string(variables.initContainers.indexOf(c)) + "/resources/requests",
+            value: dyn({
+              "cpu": has(c.resources.limits) && c.resources.limits != null &&
+                     has(c.resources.limits.cpu) && c.resources.limits.cpu != null &&
+                     quantity(c.resources.limits.cpu).isLessThan(quantity("100m"))
+                     ? c.resources.limits.cpu : "100m",
+              "memory": has(c.resources.limits) && c.resources.limits != null &&
+                        has(c.resources.limits.memory) && c.resources.limits.memory != null &&
+                        quantity(c.resources.limits.memory).isLessThan(quantity("100Mi"))
+                        ? c.resources.limits.memory : "100Mi"
+            })
+          }
+        ) +
+        variables.initContainers.filter(c,
+          !exceptions.allowedImages.exists(image, image == c.image) &&
+          has(c.resources) && c.resources != null &&
+          has(c.resources.requests) && c.resources.requests != null &&
+          (!has(c.resources.requests.cpu) || c.resources.requests.cpu == null)
+        ).map(c,
+          JSONPatch{
+            op: "add",
+            path: variables.initContainersPath + "/" + string(variables.initContainers.indexOf(c)) + "/resources/requests/cpu",
+            value: has(c.resources.limits) && c.resources.limits != null &&
+                   has(c.resources.limits.cpu) && c.resources.limits.cpu != null &&
+                   quantity(c.resources.limits.cpu).isLessThan(quantity("100m"))
+                   ? c.resources.limits.cpu : "100m"
+          }
+        ) +
+        variables.initContainers.filter(c,
+          !exceptions.allowedImages.exists(image, image == c.image) &&
+          has(c.resources) && c.resources != null &&
+          has(c.resources.requests) && c.resources.requests != null &&
+          (!has(c.resources.requests.memory) || c.resources.requests.memory == null)
+        ).map(c,
+          JSONPatch{
+            op: "add",
+            path: variables.initContainersPath + "/" + string(variables.initContainers.indexOf(c)) + "/resources/requests/memory",
+            value: has(c.resources.limits) && c.resources.limits != null &&
+                   has(c.resources.limits.memory) && c.resources.limits.memory != null &&
+                   quantity(c.resources.limits.memory).isLessThan(quantity("100Mi"))
+                   ? c.resources.limits.memory : "100Mi"
+          }
+        )

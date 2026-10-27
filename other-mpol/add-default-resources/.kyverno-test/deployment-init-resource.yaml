@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-init-resources
+spec:
+  selector:
+    matchLabels:
+      app: test
+  template:
+    metadata:
+      labels:
+        app: test
+    spec:
+      initContainers:
+      - name: init
+        image: init:v1
+        resources:
+          limits:
+            cpu: 50m
+            memory: 64Mi
+      containers:
+      - name: app
+        image: app:v1
+        resources:
+          limits:
+            cpu: 250m
+            memory: 64Mi
+          requests:
+            cpu: 200m

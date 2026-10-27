@@ -20,8 +20,9 @@ readme: |
   `add-default-resources` in `spec.policyRefs`, and narrow the exception with
   `spec.matchConditions` using the exact request identity.
   Kyverno exposes matching exceptions' `spec.images` as `exceptions.allowedImages`.
-  Exact image matches preserve that regular container's resource configuration;
-  non-exempt containers still receive the policy's normal resource defaults.
+  Exact image matches preserve that regular or init container's resource
+  configuration; non-exempt containers still receive the policy's normal
+  resource defaults.
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-mpol/add-default-resources/.chainsaw-test/partial-exception.yaml).
   With PolicyException support disabled, or when no exception matches, the
   policy keeps its normal mutation behavior.
@@ -31,4 +32,4 @@ annotations:
   kyverno/category: "Other"
   kyverno/kubernetesVersion: "1.26"
   kyverno/subject: "Pod"
-digest: 60a4d16a134753efa35f46603e55ebef95aef6881482e662f0024d9533bcd327
+digest: 86ea36a4506c8243a3844ec2548f993a94c09deb651918359fd36544bd2973c4
