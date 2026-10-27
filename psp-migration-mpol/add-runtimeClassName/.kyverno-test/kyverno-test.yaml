@@ -6,6 +6,7 @@ policies:
 - ../add-runtimeClassName.yaml
 resources:
 - resource.yaml
+- existing-runtimeclass.yaml
 - exception-resource.yaml
 exceptions:
 - exceptions.yaml
@@ -21,5 +22,11 @@ results:
   policy: add-runtimeclassname
   resources:
   - exception-pod
+  result: skip
+  isMutatingPolicy: true
+- kind: Pod
+  policy: add-runtimeclassname
+  resources:
+  - existing-runtimeclass
   result: skip
   isMutatingPolicy: true

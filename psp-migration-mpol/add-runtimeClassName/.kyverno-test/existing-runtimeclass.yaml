@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: existing-runtimeclass
+  namespace: test
+spec:
+  runtimeClassName: custom-runtime
+  containers:
+  - name: app
+    image: busybox

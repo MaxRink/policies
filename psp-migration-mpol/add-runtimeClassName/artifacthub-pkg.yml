@@ -3,7 +3,7 @@ version: 1.0.0
 displayName: Add runtimeClassName
 createdAt: "2023-05-22T00:00:00.000Z"
 description: >-
-  In the earlier Pod Security Policy controller, it was possible to configure a policy to add a Pod's runtimeClassName. This was beneficial in that various container runtimes could be specified according to a policy. This Kyverno policies mutates Pods to add a runtimeClassName of `prodclass`.
+  This policy adds `runtimeClassName: prodclass` at Pod creation only when the field is unset. It preserves an explicitly selected runtime class and does not attempt to change the immutable field on updates.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/psp-migration-mpol/add-runtimeClassName/add-runtimeClassName.yaml
@@ -12,7 +12,7 @@ keywords:
   - kyverno
   - PSP Migration
 readme: |
-  In the earlier Pod Security Policy controller, it was possible to configure a policy to add a Pod's runtimeClassName. This was beneficial in that various container runtimes could be specified according to a policy. This Kyverno policies mutates Pods to add a runtimeClassName of `prodclass`.
+  This policy adds `runtimeClassName: prodclass` at Pod creation only when the field is unset. It preserves an explicitly selected runtime class and does not attempt to change the immutable field on updates.
   
   ### Fine-grained PolicyException use
 
@@ -30,4 +30,4 @@ annotations:
   kyverno/category: "PSP Migration"
   kyverno/kubernetesVersion: "1.24"
   kyverno/subject: "Pod"
-digest: 2cd44fe0cf4d76f49fe3376b64de266caba2c3c1e0bc7f3ea95e593161865ea3
+digest: a0638078e336a1f6dd3e7bb188265fc2728a5f8aaa40288fc7b79c1ce3c41d57
