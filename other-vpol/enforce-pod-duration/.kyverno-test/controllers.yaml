@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lifetime-bad-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lifetime-bad-deployment
+  template:
+    metadata:
+      labels:
+        app: lifetime-bad-deployment
+      annotations:
+        pod.kubernetes.io/lifetime: 24h
+    spec:
+      containers:
+      - name: app
+        image: busybox
