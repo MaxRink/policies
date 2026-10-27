@@ -6,6 +6,7 @@ policies:
 - ../disallow-proc-mount.yaml
 resources:
 - resource.yaml
+- null-fields.yaml
 results:
 - isValidatingPolicy: true
   kind: CronJob
@@ -80,4 +81,10 @@ results:
   - goodpod06
   - goodpod07
   - goodpod08
+  result: pass
+- isValidatingPolicy: true
+  kind: Pod
+  policy: disallow-proc-mount
+  resources:
+  - null-proc-mount
   result: pass

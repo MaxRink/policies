@@ -48,9 +48,9 @@ spec:
         object.spec.?template.?spec.orValue(object.spec))
     - name: allContainers
       expression: >-
-        variables.podSpec.containers +
-        variables.podSpec.?initContainers.orValue([]) +
-        variables.podSpec.?ephemeralContainers.orValue([])
+        (variables.podSpec.?containers.orValue([]) == null ? [] : variables.podSpec.?containers.orValue([])) +
+        (variables.podSpec.?initContainers.orValue([]) == null ? [] : variables.podSpec.?initContainers.orValue([])) +
+        (variables.podSpec.?ephemeralContainers.orValue([]) == null ? [] : variables.podSpec.?ephemeralContainers.orValue([]))
     - name: userNamespacePod
       expression: "variables.podSpec.?hostUsers.orValue(true) == false"
   validations:
@@ -58,6 +58,7 @@ spec:
         variables.userNamespacePod ||
         variables.allContainers.all(container,
           container.image in exceptions.allowedImages ||
+          container.?securityContext.?procMount.orValue('Default') == null ||
           container.?securityContext.?procMount.orValue('Default') == 'Default' ||
           ('procMount:' + container.?securityContext.?procMount.orValue('')) in exceptions.allowedValues)
       message: >-
