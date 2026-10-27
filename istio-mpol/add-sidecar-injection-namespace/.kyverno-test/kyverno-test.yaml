@@ -1,0 +1,29 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: add-sidecar-injection-namespace
+policies:
+- ../add-sidecar-injection-namespace.yaml
+resources:
+- resource.yaml
+results:
+- kind: Namespace
+  patchedResources: patched-sidecar.yaml
+  policy: add-sidecar-injection-namespace
+  resources:
+  - sidecar-ns
+  result: pass
+  isMutatingPolicy: true
+- kind: Namespace
+  policy: add-sidecar-injection-namespace
+  resources:
+  - ambient-ns
+  result: skip
+  isMutatingPolicy: true
+- kind: Namespace
+  patchedResources: patched-sidecar.yaml
+  policy: add-sidecar-injection-namespace
+  resources:
+  - disabled-sidecar-ns
+  result: pass
+  isMutatingPolicy: true
