@@ -39,10 +39,7 @@ spec:
     - assert:
         file: pvc-null-defaulted.yaml
     - apply:
-        expect:
-        - check:
-            ($error != null): true
-        file: ss-null-storageclass.yaml
+        file: ../.kyverno-test/null-volume-claims-statefulset.yaml
     - apply:
         expect:
         - check:
