@@ -9,6 +9,8 @@ spec:
   - name: step-01
     try:
     - apply:
+        file: ephemeral-rbac.yaml
+    - apply:
         file: ../restrict-usergroup-fsgroup-id.yaml
     - patch:
         resource:
@@ -27,6 +29,26 @@ spec:
     try:
     - apply:
         file: pod-good.yaml
+    - apply:
+        file: windows-pod.yaml
+    - apply:
+        expect:
+        - check:
+            (contains($error, 'Container User ID must be 1000 when set.')): true
+        file: pod-container-override-bad.yaml
+    - apply:
+        file: ephemeralcontainer-base.yaml
+    - script:
+        content: |
+          set -eu
+          if output=$(kubectl patch pod ephemeralcontainer-base --subresource=ephemeralcontainers --type=merge -p '{"spec":{"ephemeralContainers":[{"name":"debug","image":"busybox","targetContainerName":"app","securityContext":{"runAsUser":0,"runAsGroup":0}}]}}' 2>&1); then
+            echo "$output"
+            echo "expected the policy to reject the ephemeral container"
+            exit 1
+          fi
+          echo "$output"
+          echo "$output" | grep -F 'admission webhook "vpol.validate.kyverno.svc-fail" denied the request:'
+          echo "$output" | grep -F 'Container User ID must be 1000 when set.'
     - apply:
         expect:
         - check:

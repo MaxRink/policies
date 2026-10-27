@@ -8,6 +8,9 @@ resources:
 - resource.yaml
 - ../.chainsaw-test/podcontroller-bad.yaml
 - ../.chainsaw-test/podcontroller-good.yaml
+- pod-container-override.yaml
+- ephemeralcontainer-override.yaml
+- windows-pod.yaml
 - replicationcontroller-bad-ids.yaml
 results:
 - isValidatingPolicy: true
@@ -24,7 +27,15 @@ results:
   - badpod02
   - badpod03
   - badpod04
+  - container-security-context-override
+  - ephemeral-container-override
   result: fail
+- isValidatingPolicy: true
+  kind: Pod
+  policy: validate-userid-groupid-fsgroup
+  resources:
+  - windows-pod
+  result: pass
 - isValidatingPolicy: true
   kind: ReplicationController
   policy: validate-userid-groupid-fsgroup

@@ -2,7 +2,7 @@ name: restrict-usergroup-fsgroup-id-vpol
 version: 1.0.0
 displayName: Validate User ID, Group ID, and FS Group in ValidatingPolicy
 description: >-
-  All processes inside a Pod can be made to run with specific user and groupID by setting `runAsUser` and `runAsGroup` respectively. `fsGroup` can be specified to make sure any file created in the volume will have the specified groupID. This policy validates that these fields are set to the defined values.
+  Processes in Linux Pods can be made to run with specific user and groupID by setting `runAsUser` and `runAsGroup` respectively. `fsGroup` can be specified to make sure any file created in the volume will have the specified groupID. This policy validates Pod-level IDs and any container-level overrides; Windows Pods are excluded because these Linux IDs do not apply to them.
 install: |-
   ```shell
   kubectl apply -f https://raw.githubusercontent.com/kyverno/policies/main/other-vpol/restrict-usergroup-fsgroup-id/restrict-usergroup-fsgroup-id.yaml
@@ -12,7 +12,9 @@ keywords:
   - Sample
   - ValidatingPolicy
 readme: |
-  All processes inside a Pod can be made to run with specific user and groupID by setting `runAsUser` and `runAsGroup` respectively. `fsGroup` can be specified to make sure any file created in the volume will have the specified groupID. This policy validates that these fields are set to the defined values.
+  Processes in Linux Pods can be made to run with specific user and groupID by setting `runAsUser` and `runAsGroup` respectively. `fsGroup` can be specified to make sure any file created in the volume will have the specified groupID. This policy validates Pod-level IDs and any container-level overrides; Windows Pods are excluded because these Linux IDs do not apply to them.
+
+  Background reporting for `pods/ephemeralcontainers` requires Kyverno's reports controller to have `get/list/watch` on that subresource; see the [sample ClusterRoles](https://github.com/kyverno/policies/blob/main/other-vpol/restrict-usergroup-fsgroup-id/.chainsaw-test/ephemeral-rbac.yaml).
   
   ### Fine-grained PolicyException use
 
@@ -20,8 +22,9 @@ readme: |
   `validate-userid-groupid-fsgroup` in `spec.policyRefs`, and narrow the exception with
   `spec.matchConditions` using the exact request identity.
   Use `runAsUser:<id>`, `runAsGroup:<id>`, or `fsGroup:<id>` in `spec.allowedValues` for
-  the exact Pod security-context field and decimal ID. A missing field is compared as `1`;
-  other fields remain checked. CEL consumes `spec.allowedValues` as
+  the exact security-context field and decimal ID. A missing Pod-level field is compared as
+  `1`; absent container-level overrides inherit the Pod-level value. Other fields remain checked.
+  Windows Pods are excluded because these Linux IDs do not apply to them. CEL consumes `spec.allowedValues` as
   `exceptions.allowedValues`; unlisted values remain checked.
   See the [tested example](https://github.com/kyverno/policies/blob/main/other-vpol/restrict-usergroup-fsgroup-id/.kyverno-test-exceptions/exceptions.yaml).
   With PolicyException support disabled, or when no exception matches, the
@@ -32,7 +35,7 @@ annotations:
   kyverno/category: "Sample in Vpol"
   kyverno/kubernetesVersion: "1.30"
   kyverno/subject: "Pod"
-digest: 1f73f84b1117396082486276cd1a2e2a98f89a103189c9b54ed71925257f7985
+digest: 0fdc844e87b20024b77839e5ef40499ce19e3b7a290ab72232eb0e6698ee3196
 
 
 createdAt: "2025-05-11T17:46:11Z"
