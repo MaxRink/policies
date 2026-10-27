@@ -54,4 +54,54 @@ spec:
   - name: mysecret
     secret:
       secretName: mysecret
-
+---
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: rc-secret-env
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    app: rc-secret-env
+  template:
+    metadata:
+      labels:
+        app: rc-secret-env
+    spec:
+      containers:
+      - name: app
+        image: busybox
+        env:
+        - name: TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: credentials
+              key: token
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-secret-env-init
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: deployment-secret-env-init
+  template:
+    metadata:
+      labels:
+        app: deployment-secret-env-init
+    spec:
+      initContainers:
+      - name: init
+        image: ghcr.io/kyverno/test-busybox:1.35
+        env:
+        - name: TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: credentials
+              key: token
+      containers:
+      - name: app
+        image: ghcr.io/kyverno/test-busybox:1.35

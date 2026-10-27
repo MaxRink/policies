@@ -1,0 +1,34 @@
+apiVersion: cli.kyverno.io/v1alpha1
+kind: Test
+metadata:
+  name: secrets-from-env-vars-ephemeralcontainers
+policies:
+- ../disallow-secrets-from-env-vars.yaml
+resources:
+- resource.yaml
+values:
+  subresources:
+  - parentResource:
+      name: pods
+      singularName: pod
+      namespaced: true
+      kind: Pod
+      version: v1
+    subresource:
+      name: pods/ephemeralcontainers
+      singularName: pod
+      namespaced: true
+      kind: Pod
+      version: v1
+results:
+- isValidatingPolicy: true
+  kind: Pod
+  operation: UPDATE
+  policy: secrets-not-from-env-vars
+  resourceSpecs:
+  - group: ""
+    version: v1
+    kind: Pod
+    name: ephemeral-secret-env
+    subresource: ephemeralcontainers
+  result: fail

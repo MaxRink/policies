@@ -8,6 +8,18 @@ resources:
 - resource.yaml
 results:
 - isValidatingPolicy: true
+  kind: ReplicationController
+  policy: secrets-not-from-env-vars
+  resources:
+  - default/rc-secret-env
+  result: fail
+- isValidatingPolicy: true
+  kind: Deployment
+  policy: secrets-not-from-env-vars
+  resources:
+  - default/deployment-secret-env-init
+  result: fail
+- isValidatingPolicy: true
   kind: Pod
   policy: secrets-not-from-env-vars
   resources:
