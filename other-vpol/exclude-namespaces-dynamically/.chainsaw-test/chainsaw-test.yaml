@@ -30,31 +30,61 @@ spec:
              - Deny
     - assert:
         file: policy-ready.yaml
-    - sleep: 
-       duration: 10s
+    - script:
+        content: |
+          output=
+          for attempt in $(seq 1 30); do
+            if kubectl create --dry-run=server -f pod-good.yaml >/dev/null 2>&1; then
+              good_status=0
+            else
+              good_status=$?
+            fi
+            if output=$(kubectl create --dry-run=server -f pod-bad.yaml 2>&1); then
+              bad_status=0
+            else
+              bad_status=$?
+            fi
+            if test "$good_status" -eq 0 && test "$bad_status" -ne 0 && printf '%s' "$output" | grep -F 'Pods must have the "foo" label in metadata.labels' >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          printf '%s\n' "$output"
+          exit 1
   - name: step-02
     try:
-    - apply:
+    - create:
         file: pod-good.yaml
-    - apply:
+    - create:
         file: podcontroller-good.yaml
-    - apply:
+    - create:
         expect:
         - check:
             ($error != null): true
         file: pod-bad.yaml
-    - apply:
+    - create:
         expect:
         - check:
             ($error != null): true
         file: podcontroller-bad.yaml
   - name: step-03
     try:
-    - apply:
+    - create:
         file: exception.yaml
-    - apply:
+    - script:
+        content: |
+          output=
+          for attempt in $(seq 1 30); do
+            if output=$(kubectl create --dry-run=server -f pod-bad01.yaml 2>&1); then
+              exit 0
+            fi
+            sleep 1
+          done
+          printf '%s\n' "$output"
+          exit 1
+    - create:
         file: pod-bad01.yaml
-    - apply:
+    - create:
         expect:
         - check:
             (contains($error, 'Pods must have the "foo" label in metadata.labels')): true
@@ -63,7 +93,22 @@ spec:
         file: pod-bad01.yaml
     - delete:
         file: exception.yaml
-    - apply:
+    - script:
+        content: |
+          output=
+          for attempt in $(seq 1 30); do
+            if ! kubectl get pod exclude-dynamically-exception-pod >/dev/null 2>&1; then
+              if output=$(kubectl create --dry-run=server -f pod-bad01.yaml 2>&1); then
+                output='Pod unexpectedly admitted after exception deletion'
+              elif printf '%s' "$output" | grep -F 'Pods must have the "foo" label in metadata.labels' >/dev/null; then
+                  exit 0
+              fi
+            fi
+            sleep 1
+          done
+          printf '%s\n' "$output"
+          exit 1
+    - create:
         expect:
         - check:
             (contains($error, 'Pods must have the "foo" label in metadata.labels')): true
